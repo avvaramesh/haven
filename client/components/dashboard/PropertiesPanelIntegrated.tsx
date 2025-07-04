@@ -652,7 +652,7 @@ export default function PropertiesPanelIntegrated({
                           Bar Spacing
                         </Label>
                         <Slider
-                          value={[properties.barSpacing * 100]}
+                          value={[(properties.barSpacing || 0.1) * 100]}
                           onValueChange={(value) =>
                             updateProperty("barSpacing", value[0] / 100)
                           }
