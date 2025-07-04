@@ -376,8 +376,16 @@ export default function CanvasArea({
   };
 
   const handleMaximize = (chartId: string) => {
+    const currentState = chartStates[chartId];
+    const newMaximizedState = !currentState?.isMaximized;
+
+    console.log(`Maximizing chart ${chartId}:`, {
+      currentlyMaximized: currentState?.isMaximized,
+      newState: newMaximizedState,
+    });
+
     updateChartState(chartId, {
-      isMaximized: !chartStates[chartId]?.isMaximized,
+      isMaximized: newMaximizedState,
       isMinimized: false,
     });
   };
