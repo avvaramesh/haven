@@ -47,6 +47,10 @@ interface CanvasAreaProps {
     ((action: HistoryAction) => void) | undefined
   >;
   onPropertyChange?: (chartId: string, property: string, value: any) => void;
+  initialZoomLevel?: number;
+  initialGridSize?: number;
+  initialCanvasSize?: { width: number; height: number };
+  initialShowGrid?: boolean;
 }
 
 export default function CanvasArea({
