@@ -27,7 +27,13 @@ import {
   Underline,
 } from "lucide-react";
 
-export default function PropertiesPanel() {
+interface PropertiesPanelProps {
+  selectedElement: string | null;
+}
+
+export default function PropertiesPanel({
+  selectedElement,
+}: PropertiesPanelProps) {
   const [selectedElement, setSelectedElement] = useState("Revenue Chart");
   const [properties, setProperties] = useState({
     title: "Q4 Revenue Analysis",
