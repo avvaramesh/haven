@@ -72,6 +72,14 @@ export default function PropertiesPanelIntegrated({
     yMinValue: "",
     yMaxValue: "",
     startFromZero: true,
+    // Table-specific properties
+    showHeader: true,
+    alternateRows: true,
+    showBorders: true,
+    editable: false,
+    headerColor: "#1e293b",
+    rowColor: "transparent",
+    alternateRowColor: "#374151",
   });
 
   const updateProperty = (key: string, value: any) => {
