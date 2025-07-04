@@ -124,11 +124,6 @@ export default function UnifiedChartComponent({
   // Determine chart configuration
   const isHorizontal = chartType.includes("horizontal");
   const isStacked = chartType.includes("stacked");
-
-  // Temporary debug alert
-  if (chartType.includes("bar")) {
-    alert(`Chart type: ${chartType}, isHorizontal: ${isHorizontal}`);
-  }
   const isGrouped = chartType.includes("grouped");
   const isMultiLine = chartType.includes("multi");
   const isStepped = chartType.includes("stepped");
