@@ -954,7 +954,21 @@ export default function CanvasArea({
       </div>
 
       {/* Canvas Info */}
-      <div className="absolute bottom-4 left-4 bg-dashboard-surface border border-dashboard-border rounded-lg p-2 text-xs text-dashboard-text-muted">
+      {showCanvasInfo && (
+        <div className="absolute bottom-4 left-4 bg-dashboard-surface border border-dashboard-border rounded-lg overflow-hidden">
+          <div className="flex items-center justify-between px-2 py-1 border-b border-dashboard-border bg-dashboard-muted/30">
+            <span className="text-xs font-medium text-dashboard-text">Canvas Info</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowCanvasInfo(false)}
+              className="h-5 w-5 p-0 text-dashboard-text-muted hover:text-dashboard-text"
+              title="Hide Canvas Info"
+            >
+              <X className="w-3 h-3" />
+            </Button>
+          </div>
+          <div className="p-2 text-xs text-dashboard-text-muted">
         <div className="flex items-center gap-4">
           <span>
             Canvas: {canvasSize.width}×{canvasSize.height}
