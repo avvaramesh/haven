@@ -30,6 +30,12 @@ interface CanvasAreaProps {
   onAddToHistory?: (action: Omit<HistoryAction, "timestamp">) => void;
   onUndo?: () => HistoryAction | null;
   onRedo?: () => HistoryAction | null;
+  undoRef?: React.MutableRefObject<
+    ((action: HistoryAction) => void) | undefined
+  >;
+  redoRef?: React.MutableRefObject<
+    ((action: HistoryAction) => void) | undefined
+  >;
 }
 
 export default function CanvasArea({
