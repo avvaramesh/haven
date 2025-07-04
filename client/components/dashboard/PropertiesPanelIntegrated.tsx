@@ -662,7 +662,7 @@ export default function PropertiesPanelIntegrated({
                           className="w-full"
                         />
                         <span className="text-xs text-dashboard-text-muted">
-                          {Math.round(properties.barSpacing * 100)}%
+                          {Math.round((properties.barSpacing || 0.1) * 100)}%
                         </span>
                       </div>
                     )}
