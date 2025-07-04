@@ -427,13 +427,19 @@ export default function CanvasArea({
     property: string,
     value: any,
   ) => {
-    setChartProperties((prev) => ({
-      ...prev,
-      [chartId]: {
-        ...prev[chartId],
-        [property]: value,
-      },
-    }));
+    console.log("CanvasArea: Property change", { chartId, property, value }); // Debug log
+
+    setChartProperties((prev) => {
+      const newProps = {
+        ...prev,
+        [chartId]: {
+          ...prev[chartId],
+          [property]: value,
+        },
+      };
+      console.log("CanvasArea: Updated chart properties", newProps); // Debug log
+      return newProps;
+    });
 
     // Notify parent component
     parentOnPropertyChange?.(chartId, property, value);
