@@ -253,6 +253,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <Button
             variant="outline"
             size="sm"
+            onClick={handleShare}
             className="border-dashboard-border text-dashboard-text hover:bg-dashboard-muted"
           >
             Share
@@ -260,11 +261,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <Button
             variant="outline"
             size="sm"
+            onClick={handlePreview}
             className="border-dashboard-border text-dashboard-text hover:bg-dashboard-muted"
           >
             Preview
           </Button>
-          <Button className="bg-dashboard-accent hover:bg-dashboard-accent-light text-white">
+          <Button
+            className="bg-dashboard-accent hover:bg-dashboard-accent-light text-white"
+            onClick={handlePublish}
+          >
             Publish
           </Button>
         </div>
