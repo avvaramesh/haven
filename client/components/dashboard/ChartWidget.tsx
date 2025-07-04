@@ -284,9 +284,9 @@ export default function ChartWidget({
       )}
 
       {/* Resize Handles - Only show when selected and not maximized */}
-      {isSelected && !isMaximized && !isMinimized && (
+      {isSelected && !isMaximized && !isMinimized && position && (
         <>
-          {/* Corner Resize Handles */}
+          {/* Bottom-Right Corner */}
           <div
             className="absolute -bottom-1 -right-1 w-3 h-3 bg-dashboard-accent rounded-sm cursor-se-resize opacity-80 hover:opacity-100"
             onMouseDown={(e) => {
@@ -296,11 +296,11 @@ export default function ChartWidget({
 
               const startX = e.clientX;
               const startY = e.clientY;
-              const startWidth = position?.width || 300;
-              const startHeight = position?.height || 200;
+              const startWidth = position.width;
+              const startHeight = position.height;
 
               const handleMouseMove = (moveEvent: MouseEvent) => {
-                if (!position || !onPositionChange) return;
+                if (!onPositionChange) return;
 
                 const newWidth = Math.max(
                   200,
@@ -328,62 +328,76 @@ export default function ChartWidget({
               document.addEventListener("mouseup", handleMouseUp);
             }}
           />
-          <div
-            className="absolute -top-1 -right-1 w-3 h-3 bg-dashboard-accent rounded-sm cursor-ne-resize opacity-80 hover:opacity-100"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setIsResizing(true);
-            }}
-          />
-          <div
-            className="absolute -bottom-1 -left-1 w-3 h-3 bg-dashboard-accent rounded-sm cursor-sw-resize opacity-80 hover:opacity-100"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setIsResizing(true);
-            }}
-          />
-          <div
-            className="absolute -top-1 -left-1 w-3 h-3 bg-dashboard-accent rounded-sm cursor-nw-resize opacity-80 hover:opacity-100"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setIsResizing(true);
-            }}
-          />
 
-          {/* Edge Resize Handles */}
-          <div
-            className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-6 h-2 bg-dashboard-accent rounded-sm cursor-n-resize opacity-80 hover:opacity-100"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setIsResizing(true);
-            }}
-          />
-          <div
-            className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-6 h-2 bg-dashboard-accent rounded-sm cursor-s-resize opacity-80 hover:opacity-100"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setIsResizing(true);
-            }}
-          />
-          <div
-            className="absolute -left-1 top-1/2 transform -translate-y-1/2 w-2 h-6 bg-dashboard-accent rounded-sm cursor-w-resize opacity-80 hover:opacity-100"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setIsResizing(true);
-            }}
-          />
+          {/* Right Edge */}
           <div
             className="absolute -right-1 top-1/2 transform -translate-y-1/2 w-2 h-6 bg-dashboard-accent rounded-sm cursor-e-resize opacity-80 hover:opacity-100"
             onMouseDown={(e) => {
               e.preventDefault();
               e.stopPropagation();
               setIsResizing(true);
+
+              const startX = e.clientX;
+              const startWidth = position.width;
+
+              const handleMouseMove = (moveEvent: MouseEvent) => {
+                if (!onPositionChange) return;
+
+                const newWidth = Math.max(
+                  200,
+                  startWidth + (moveEvent.clientX - startX),
+                );
+
+                onPositionChange({
+                  ...position,
+                  width: newWidth,
+                });
+              };
+
+              const handleMouseUp = () => {
+                setIsResizing(false);
+                document.removeEventListener("mousemove", handleMouseMove);
+                document.removeEventListener("mouseup", handleMouseUp);
+              };
+
+              document.addEventListener("mousemove", handleMouseMove);
+              document.addEventListener("mouseup", handleMouseUp);
+            }}
+          />
+
+          {/* Bottom Edge */}
+          <div
+            className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-6 h-2 bg-dashboard-accent rounded-sm cursor-s-resize opacity-80 hover:opacity-100"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsResizing(true);
+
+              const startY = e.clientY;
+              const startHeight = position.height;
+
+              const handleMouseMove = (moveEvent: MouseEvent) => {
+                if (!onPositionChange) return;
+
+                const newHeight = Math.max(
+                  150,
+                  startHeight + (moveEvent.clientY - startY),
+                );
+
+                onPositionChange({
+                  ...position,
+                  height: newHeight,
+                });
+              };
+
+              const handleMouseUp = () => {
+                setIsResizing(false);
+                document.removeEventListener("mousemove", handleMouseMove);
+                document.removeEventListener("mouseup", handleMouseUp);
+              };
+
+              document.addEventListener("mousemove", handleMouseMove);
+              document.addEventListener("mouseup", handleMouseUp);
             }}
           />
         </>
