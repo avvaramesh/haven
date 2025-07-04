@@ -379,6 +379,29 @@ export default function CanvasArea({
     onElementSelect(chartId);
   };
 
+  const handlePositionChange = (
+    chartId: string,
+    newPosition: ChartPosition,
+  ) => {
+    updateChartState(chartId, { position: newPosition });
+  };
+
+  const handleResize = (
+    chartId: string,
+    newSize: { width: number; height: number },
+  ) => {
+    const currentPosition = chartStates[chartId]?.position;
+    if (currentPosition) {
+      updateChartState(chartId, {
+        position: {
+          ...currentPosition,
+          width: newSize.width,
+          height: newSize.height,
+        },
+      });
+    }
+  };
+
   // Count visible charts
   const visibleCharts = Object.values(chartStates).filter(
     (state) => !state.isHidden,
