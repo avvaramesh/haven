@@ -36,6 +36,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     "data" | "templates" | "properties" | "copilot"
   >("data");
   const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(100);
   const isMobile = useIsMobile();
 
   // Global undo/redo state
@@ -153,6 +154,53 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     }
   };
 
+  // Zoom and view handlers
+  const handleZoomIn = () => {
+    setZoomLevel((prev) => Math.min(200, prev + 25));
+    // Notify canvas area if available
+    if ((window as any).setCanvasZoom) {
+      (window as any).setCanvasZoom(Math.min(200, zoomLevel + 25));
+    }
+  };
+
+  const handleZoomOut = () => {
+    setZoomLevel((prev) => Math.max(25, prev - 25));
+    // Notify canvas area if available
+    if ((window as any).setCanvasZoom) {
+      (window as any).setCanvasZoom(Math.max(25, zoomLevel - 25));
+    }
+  };
+
+  const handleFitToScreen = () => {
+    setZoomLevel(100);
+    // Notify canvas area if available
+    if ((window as any).setCanvasZoom) {
+      (window as any).setCanvasZoom(100);
+    }
+  };
+
+  const handlePreview = () => {
+    console.log("Preview dashboard functionality triggered");
+    // TODO: Implement preview functionality
+    if ((window as any).toast) {
+      (window as any).toast({
+        title: "Preview",
+        description: "Preview functionality coming soon.",
+      });
+    }
+  };
+
+  const handlePublish = () => {
+    console.log("Publish dashboard functionality triggered");
+    // TODO: Implement publish functionality
+    if ((window as any).toast) {
+      (window as any).toast({
+        title: "Publish",
+        description: "Publish functionality coming soon.",
+      });
+    }
+  };
+
   const handlePropertyChange = (
     elementId: string,
     property: string,
@@ -219,6 +267,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         canRedo={canRedo}
         onSave={handleSave}
         onExport={handleExport}
+        onZoomIn={handleZoomIn}
+        onZoomOut={handleZoomOut}
+        onFitToScreen={handleFitToScreen}
+        onPreview={handlePreview}
+        onPublish={handlePublish}
+        zoomLevel={zoomLevel}
       />
 
       {/* Main Editor Area */}
