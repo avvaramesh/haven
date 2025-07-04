@@ -241,6 +241,24 @@ export default function PropertiesPanelIntegrated({
           height: 120,
         },
       },
+      "table-chart": {
+        type: "table",
+        title: "Data Table",
+        properties: {
+          title: "Data Table",
+          chartType: "table",
+          showHeader: true,
+          alternateRows: true,
+          showBorders: true,
+          fontSize: 12,
+          headerColor: "#1e293b",
+          rowColor: "#transparent",
+          alternateRowColor: "#374151",
+          editable: true,
+          width: 500,
+          height: 300,
+        },
+      },
     };
 
     return (
