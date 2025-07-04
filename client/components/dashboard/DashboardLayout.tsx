@@ -23,10 +23,16 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [selectedElement, setSelectedElement] = useState<string | null>(null);
   const [leftPanelTab, setLeftPanelTab] = useState<
-    "data" | "templates" | "copilot"
+    "data" | "templates" | "properties" | "copilot"
   >("data");
-  const [isRightPanelCollapsed, setIsRightPanelCollapsed] = useState(false);
   const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false);
+
+  // Auto-switch to properties when element is selected
+  React.useEffect(() => {
+    if (selectedElement && !isLeftPanelCollapsed) {
+      setLeftPanelTab("properties");
+    }
+  }, [selectedElement, isLeftPanelCollapsed]);
   return (
     <div className="h-screen flex flex-col bg-dashboard-background">
       {/* Top Header */}
