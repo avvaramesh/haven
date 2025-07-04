@@ -41,6 +41,7 @@ export default function PropertiesPanel({
   selectedElement,
   isCollapsed,
   onToggleCollapse,
+  onPropertyChange,
 }: PropertiesPanelProps) {
   // Determine chart type based on selected element
   const getChartTypeFromElement = (elementId: string | null): string => {
