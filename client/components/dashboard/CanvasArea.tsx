@@ -66,6 +66,38 @@ export default function CanvasArea({
   const [chartProperties, setChartProperties] = useState<Record<string, any>>(
     {},
   );
+
+  // Initialize chart properties with correct chart types
+  React.useEffect(() => {
+    const initialProperties: Record<string, any> = {};
+
+    Object.entries(chartStates).forEach(([chartId, chartState]) => {
+      initialProperties[chartId] = {
+        chartType: chartState.chartType,
+        type: chartState.chartType,
+        title: getChartTitle(chartId),
+        color:
+          chartId === "smart-chart"
+            ? "#3b82f6"
+            : chartId === "revenue-chart"
+              ? "#10b981"
+              : chartId === "sales-dist"
+                ? "#f59e0b"
+                : "#8b5cf6",
+        primaryColor:
+          chartId === "smart-chart"
+            ? "#3b82f6"
+            : chartId === "revenue-chart"
+              ? "#10b981"
+              : chartId === "sales-dist"
+                ? "#f59e0b"
+                : "#8b5cf6",
+      };
+    });
+
+    setChartProperties(initialProperties);
+    console.log("Initialized chart properties:", initialProperties);
+  }, []); // Only run once on mount
   const [chartStates, setChartStates] = useState<Record<string, ChartState>>({
     "smart-chart": {
       id: "smart-chart",
@@ -344,8 +376,23 @@ export default function CanvasArea({
   };
 
   const handleMaximize = (chartId: string) => {
+    console.log(`=== HANDLE MAXIMIZE CALLED ===`);
+    console.log(`Chart ID: ${chartId}`);
+
+    const currentState = chartStates[chartId];
+    const newMaximizedState = !currentState?.isMaximized;
+
+    console.log(`Current chartStates:`, chartStates);
+    console.log(`Current state for ${chartId}:`, currentState);
+    console.log(`New maximized state will be:`, newMaximizedState);
+
     updateChartState(chartId, {
-      isMaximized: !chartStates[chartId]?.isMaximized,
+      isMaximized: newMaximizedState,
+      isMinimized: false,
+    });
+
+    console.log(`updateChartState called with:`, {
+      isMaximized: newMaximizedState,
       isMinimized: false,
     });
   };
@@ -573,6 +620,7 @@ export default function CanvasArea({
     const significantProperties = [
       "chartType",
       "color",
+      "primaryColor",
       "title",
       "showLegend",
       "showGrid",
@@ -587,27 +635,57 @@ export default function CanvasArea({
     }
 
     // Handle chart type changes - update chartStates directly
-    if (property === "chartType") {
+    if (property === "chartType" || property === "type") {
+      const actualChartType = value;
       setChartStates((prev) => ({
         ...prev,
         [chartId]: {
           ...prev[chartId],
-          chartType: value,
+          chartType: actualChartType,
         },
       }));
+
+      console.log(`Updated chartType for ${chartId} to ${actualChartType}`);
+    }
+
+    // Map normalized properties to legacy format for backwards compatibility
+    const legacyPropertyMap: Record<string, string> = {
+      primaryColor: "color",
+      backgroundColor: "background",
+      "xAxis.label": "xAxisLabel",
+      "yAxis.label": "yAxisLabel",
+      "xAxis.enabled": "showXAxis",
+      "yAxis.enabled": "showYAxis",
+      "xAxis.showGridLines": "showGrid",
+      "yAxis.showGridLines": "showGrid",
+      "yAxis.startFromZero": "startFromZero",
+    };
+
+    // Update both the original property and any legacy mapping
+    const propertiesToUpdate: Array<{ key: string; value: any }> = [
+      { key: property, value },
+    ];
+
+    // Add legacy property if mapping exists
+    if (legacyPropertyMap[property]) {
+      propertiesToUpdate.push({
+        key: legacyPropertyMap[property],
+        value,
+      });
     }
 
     // Immediate state update for smooth real-time updates
     setChartProperties((prev) => {
-      const newProps = {
-        ...prev,
-        [chartId]: {
-          ...prev[chartId],
-          [property]: value,
-        },
-      };
-      console.log("CanvasArea: Updated chart properties", newProps); // Debug log
+      const newProps = { ...prev };
 
+      propertiesToUpdate.forEach(({ key, value }) => {
+        if (!newProps[chartId]) {
+          newProps[chartId] = {};
+        }
+        newProps[chartId][key] = value;
+      });
+
+      console.log("CanvasArea: Updated chart properties", newProps); // Debug log
       return newProps;
     });
 
@@ -617,17 +695,22 @@ export default function CanvasArea({
     }
   };
 
-  // Expose property change handler to parent
+  // Expose utility functions to parent
   React.useEffect(() => {
-    if (parentOnPropertyChange) {
-      // Make the property change handler available to parent
-      (window as any).canvasPropertyChange = handlePropertyChange;
-    }
-
     // Expose grid and zoom controls to parent
     (window as any).setCanvasGrid = (show: boolean) => setShowGrid(show);
     (window as any).setCanvasZoom = (level: number) => setZoomLevel(level);
-  }, [handlePropertyChange, parentOnPropertyChange]);
+
+    // Expose property change handler for direct updates (avoid circular calls)
+    (window as any).updateCanvasProperty = handlePropertyChange;
+
+    // Clean up function
+    return () => {
+      delete (window as any).setCanvasGrid;
+      delete (window as any).setCanvasZoom;
+      delete (window as any).updateCanvasProperty;
+    };
+  }, [handlePropertyChange]);
 
   const [isDragOver, setIsDragOver] = useState(false);
 
@@ -792,7 +875,45 @@ export default function CanvasArea({
               position={chart.position}
               onSelect={() => handleElementClick(chart.id)}
               onMinimize={() => handleMinimize(chart.id)}
-              onMaximize={() => handleMaximize(chart.id)}
+              onMaximize={() => {
+                console.log(`=== INLINE MAXIMIZE CALLED ===`);
+                console.log(`Chart ID: ${chart.id}`);
+                console.log(`Chart Name: ${getChartTitle(chart.id)}`);
+
+                const currentState = chartStates[chart.id];
+                const newMaximizedState = !currentState?.isMaximized;
+
+                console.log(
+                  `Current state for ${getChartTitle(chart.id)}:`,
+                  currentState,
+                );
+                console.log(
+                  `New maximized state for ${getChartTitle(chart.id)}:`,
+                  newMaximizedState,
+                );
+
+                setChartStates((prev) => {
+                  const newStates = {
+                    ...prev,
+                    [chart.id]: {
+                      ...prev[chart.id],
+                      isMaximized: newMaximizedState,
+                      isMinimized: false,
+                    },
+                  };
+
+                  console.log(
+                    `Chart state updated for ${getChartTitle(chart.id)} (${chart.id})`,
+                  );
+                  console.log(`New chartStates:`, newStates);
+                  console.log(
+                    `Specific chart state for ${getChartTitle(chart.id)}:`,
+                    newStates[chart.id],
+                  );
+
+                  return newStates;
+                });
+              }}
               onHide={() => handleHide(chart.id)}
               onRemove={() => handleRemove(chart.id)}
               onDownload={() => handleDownload(chart.id)}
@@ -805,7 +926,12 @@ export default function CanvasArea({
             >
               {/* Use DynamicChart for all charts to enable type switching */}
               <DynamicChart
-                chartType={chart.chartType || "line"}
+                chartType={
+                  chartProperties[chart.id]?.chartType ||
+                  chartProperties[chart.id]?.type ||
+                  chart.chartType ||
+                  "line"
+                }
                 properties={chartProperties[chart.id]}
               />
             </ChartWidget>
@@ -820,7 +946,7 @@ export default function CanvasArea({
           </span>
           <span>•</span>
           <span>Grid: {gridSize}px</span>
-          <span>•</span>
+          <span>���</span>
           <span>Zoom: {zoomLevel}%</span>
           <span>•</span>
           <span>{visibleCharts.length} charts visible</span>

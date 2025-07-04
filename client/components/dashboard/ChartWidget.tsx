@@ -89,6 +89,8 @@ export default function ChartWidget({
     }
   };
 
+  console.log(`ChartWidget "${title}" (${id}) - isMaximized:`, isMaximized);
+
   const containerClasses = `
     group relative bg-dashboard-surface border border-dashboard-border rounded-lg
     transition-all duration-200
@@ -98,6 +100,11 @@ export default function ChartWidget({
     ${isDragging ? "z-50 shadow-2xl" : ""}
     ${className}
   `;
+
+  console.log(
+    `ChartWidget "${title}" (${id}) - containerClasses:`,
+    containerClasses,
+  );
 
   const containerStyle =
     position && !isMaximized
@@ -119,6 +126,7 @@ export default function ChartWidget({
         transition-opacity duration-200
         ${showToolbar || isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"}
       `}
+        style={{ pointerEvents: "auto" }}
       >
         {/* Quick Actions */}
         <Button
@@ -138,9 +146,32 @@ export default function ChartWidget({
         <Button
           variant="secondary"
           size="sm"
-          onClick={onMaximize}
-          className="h-6 w-6 p-0 bg-dashboard-surface border border-dashboard-border hover:bg-dashboard-muted"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log(`=== MAXIMIZE BUTTON CLICKED ===`);
+            console.log(`Chart: "${title}" (${id})`);
+            console.log(`Currently maximized: ${isMaximized}`);
+            console.log(`onMaximize function exists:`, !!onMaximize);
+            console.log(`onMaximize function type:`, typeof onMaximize);
+            console.log(`onMaximize function:`, onMaximize);
+
+            try {
+              if (onMaximize) {
+                console.log(`About to call onMaximize...`);
+                const result = onMaximize();
+                console.log(`onMaximize result:`, result);
+                console.log(`onMaximize called successfully`);
+              } else {
+                console.error(`onMaximize function is missing!`);
+              }
+            } catch (error) {
+              console.error(`Error calling onMaximize:`, error);
+            }
+          }}
+          className="h-6 w-6 p-0 bg-red-500 border border-dashboard-border hover:bg-red-600 z-50"
           title={isMaximized ? "Restore" : "Maximize"}
+          style={{ backgroundColor: "red", zIndex: 50 }}
         >
           {isMaximized ? (
             <Shrink className="w-3 h-3" />
@@ -420,7 +451,11 @@ export default function ChartWidget({
       {isMaximized && (
         <div
           className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[90]"
-          onClick={onMaximize}
+          onClick={(e) => {
+            e.preventDefault();
+            console.log(`Overlay clicked for maximized chart ${id}`);
+            onMaximize?.();
+          }}
           style={{ zIndex: 90 }}
         />
       )}

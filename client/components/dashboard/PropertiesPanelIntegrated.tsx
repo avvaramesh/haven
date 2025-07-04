@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,6 +26,21 @@ import {
   Zap,
   X,
 } from "lucide-react";
+import {
+  chartPropertyManager,
+  LegacyChartProperties,
+  getChartProperties,
+  updateChartProperty,
+  createDefaultChartProperties,
+  migrateLegacyChartProperties,
+} from "@/lib/chartPropertyManager";
+import {
+  VisualizationType,
+  AllVisualizationProperties,
+  chartSupportsAxes,
+  chartSupportsLegend,
+  getRelevantPropertyGroups,
+} from "@/lib/chartProperties";
 
 interface PropertiesPanelIntegratedProps {
   selectedElement: string | null;
@@ -40,258 +55,217 @@ export default function PropertiesPanelIntegrated({
   onClose,
   onPropertyChange = () => {},
 }: PropertiesPanelIntegratedProps) {
-  const [properties, setProperties] = useState({
-    title: "Q4 Revenue Analysis",
-    width: 400,
-    height: 300,
-    color: "#3b82f6",
-    background: "#1e293b",
-    fontSize: 14,
-    fontWeight: "normal",
-    textAlign: "left",
-    showLegend: true,
-    showGrid: true,
-    opacity: 100,
-    borderRadius: 8,
-    chartType: "line",
-    // Chart-specific properties
-    showDataPoints: true,
-    smoothCurves: true,
-    barSpacing: 0.3,
-    showPercentages: true,
-    startAngle: 0,
-    value: "",
-    showTrend: true,
-    subtitle: "",
-    xAxisLabel: "",
-    yAxisLabel: "",
-    showXAxis: true,
-    showYAxis: true,
-    rotateXLabels: false,
-    xLabelAngle: 0,
-    yMinValue: "",
-    yMaxValue: "",
-    startFromZero: true,
-    // Table-specific properties
-    showHeader: true,
-    alternateRows: true,
-    showBorders: true,
-    editable: false,
-    headerColor: "#1e293b",
-    rowColor: "transparent",
-    alternateRowColor: "#374151",
-  });
+  const [normalizedProperties, setNormalizedProperties] =
+    useState<AllVisualizationProperties | null>(null);
+  const [legacyProperties, setLegacyProperties] =
+    useState<LegacyChartProperties>({});
 
   const updateProperty = (key: string, value: any) => {
-    // Update local state immediately for responsive UI
-    setProperties((prev) => ({ ...prev, [key]: value }));
+    if (!selectedElement || !normalizedProperties) return;
 
-    // Immediately notify parent component for real-time chart updates
-    if (
-      selectedElement &&
-      onPropertyChange &&
-      typeof onPropertyChange === "function"
-    ) {
-      // Use immediate callback to ensure smooth updates
-      onPropertyChange(selectedElement, key, value);
+    // Update the normalized property
+    const success = updateChartProperty(selectedElement, key, value);
 
-      // Also try to call the global canvas property change if available
-      if ((window as any).canvasPropertyChange) {
-        (window as any).canvasPropertyChange(selectedElement, key, value);
+    if (success) {
+      // Get updated properties
+      const updatedProps = getChartProperties(selectedElement);
+      if (updatedProps) {
+        setNormalizedProperties(updatedProps);
+
+        // Convert to legacy format for backwards compatibility
+        const legacyFormat =
+          chartPropertyManager.toLegacyFormat(selectedElement);
+        setLegacyProperties(legacyFormat);
+
+        // Notify parent component for real-time chart updates
+        if (onPropertyChange && typeof onPropertyChange === "function") {
+          onPropertyChange(selectedElement, key, value);
+        }
+
+        // Also update canvas directly for immediate visual updates
+        if ((window as any).updateCanvasProperty) {
+          (window as any).updateCanvasProperty(selectedElement, key, value);
+        }
       }
     }
   };
 
-  // Get element type and relevant properties
-  const getElementInfo = (elementId: string | null) => {
-    if (!elementId) return { type: "none", title: "", properties: {} };
+  // Initialize or get properties for the selected element
+  const initializeProperties = (elementId: string) => {
+    // Try to get existing properties
+    let properties = getChartProperties(elementId);
 
-    const elementConfigs = {
-      "smart-chart": {
-        type: "line-chart",
-        title: "Smart Analytics Chart",
-        properties: {
-          title: "Q4 Revenue Trends",
-          chartType: "line",
-          showLegend: true,
-          showGrid: true,
-          showDataPoints: true,
-          smoothCurves: true,
-          color: "#3b82f6",
-          background: "#1e293b",
-          width: 600,
-          height: 300,
-          // X-Axis properties
-          xAxisLabel: "Months",
-          showXAxis: true,
-          rotateXLabels: false,
-          xLabelAngle: 0,
-          // Y-Axis properties
-          yAxisLabel: "Revenue ($)",
-          showYAxis: true,
-          yMinValue: "",
-          yMaxValue: "",
-          startFromZero: true,
-        },
-      },
-      "revenue-chart": {
-        type: "bar-chart",
-        title: "Revenue by Category Chart",
-        properties: {
-          title: "Revenue by Category",
-          chartType: "bar",
-          showLegend: true,
-          showGrid: true,
-          color: "#3b82f6",
-          background: "#1e293b",
-          width: 400,
-          height: 250,
-          // X-Axis properties
-          xAxisLabel: "Categories",
-          showXAxis: true,
-          rotateXLabels: true,
-          xLabelAngle: -45,
-          // Y-Axis properties
-          yAxisLabel: "Revenue ($)",
-          showYAxis: true,
-          yMinValue: "",
-          yMaxValue: "",
-          startFromZero: true,
-          barSpacing: 0.3,
-          showValues: true,
-        },
-      },
-      "sales-dist": {
-        type: "pie-chart",
-        title: "Sales Distribution Chart",
-        properties: {
-          title: "Sales Distribution",
-          chartType: "pie",
-          showLegend: true,
-          showPercentages: true,
-          donutMode: false,
-          startAngle: 0,
-          color: "#f59e0b",
-          background: "#1e293b",
-          width: 350,
-          height: 280,
-        },
-      },
-      "kpi-widget": {
-        type: "kpi-large",
-        title: "KPI Widget",
-        properties: {
-          title: "Total Revenue",
-          value: "$142,583",
-          trend: "+12.5%",
-          trendDirection: "up",
-          fontSize: 24,
-          color: "#3b82f6",
-          background: "#1e293b",
-          showTrend: true,
-          width: 300,
-          height: 150,
-        },
-      },
-      "kpi-1": {
-        type: "kpi-card",
-        title: "Growth KPI",
-        properties: {
-          title: "Monthly Growth",
-          value: "+12.5%",
-          subtitle: "vs last month",
-          color: "#10b981",
-          background: "#1e293b",
-          fontSize: 18,
-          width: 200,
-          height: 120,
-        },
-      },
-      "kpi-2": {
-        type: "kpi-card",
-        title: "Users KPI",
-        properties: {
-          title: "Active Users",
-          value: "24.8k",
-          subtitle: "this week",
-          color: "#3b82f6",
-          background: "#1e293b",
-          fontSize: 18,
-          width: 200,
-          height: 120,
-        },
-      },
-      "kpi-3": {
-        type: "kpi-card",
-        title: "Conversion KPI",
-        properties: {
-          title: "Conversion Rate",
-          value: "3.2%",
-          subtitle: "avg rate",
-          color: "#f59e0b",
-          background: "#1e293b",
-          fontSize: 18,
-          width: 200,
-          height: 120,
-        },
-      },
-      "kpi-4": {
-        type: "kpi-card",
-        title: "LTV KPI",
-        properties: {
-          title: "Customer LTV",
-          value: "$1,247",
-          subtitle: "average",
-          color: "#8b5cf6",
-          background: "#1e293b",
-          fontSize: 18,
-          width: 200,
-          height: 120,
-        },
-      },
-      "table-chart": {
-        type: "table",
-        title: "Data Table",
-        properties: {
-          title: "Data Table",
-          chartType: "table",
-          showHeader: true,
-          alternateRows: true,
-          showBorders: true,
-          fontSize: 12,
-          headerColor: "#1e293b",
-          rowColor: "#transparent",
-          alternateRowColor: "#374151",
-          editable: true,
-          width: 500,
-          height: 300,
-        },
-      },
+    if (!properties) {
+      // Determine chart type from element ID
+      const chartType = getChartTypeFromElementId(elementId);
+
+      // Create default properties for this chart type
+      properties = createDefaultChartProperties(chartType, elementId);
+
+      // Apply element-specific overrides
+      properties = applyElementSpecificDefaults(elementId, properties);
+    }
+
+    return properties;
+  };
+
+  const getChartTypeFromElementId = (elementId: string): VisualizationType => {
+    // Map element IDs to chart types
+    const typeMap: Record<string, VisualizationType> = {
+      "smart-chart": "line",
+      "revenue-chart": "bar",
+      "sales-dist": "pie",
+      "kpi-widget": "metric",
+      "kpi-1": "metric",
+      "kpi-2": "metric",
+      "kpi-3": "metric",
+      "kpi-4": "metric",
+      "table-chart": "table",
     };
 
-    return (
-      elementConfigs[elementId as keyof typeof elementConfigs] || {
-        type: "unknown",
-        title: elementId,
-        properties: {},
-      }
-    );
+    return typeMap[elementId] || "line";
   };
 
-  const elementInfo = getElementInfo(selectedElement);
+  const applyElementSpecificDefaults = (
+    elementId: string,
+    properties: AllVisualizationProperties,
+  ): AllVisualizationProperties => {
+    const updates = { ...properties };
+
+    // Apply element-specific customizations
+    switch (elementId) {
+      case "smart-chart":
+        updates.title = "Q4 Revenue Trends";
+        updates.width = 600;
+        updates.height = 300;
+        if (chartSupportsAxes(updates.type)) {
+          (updates as any).xAxis.label = "Months";
+          (updates as any).yAxis.label = "Revenue ($)";
+        }
+        break;
+
+      case "revenue-chart":
+        updates.title = "Revenue by Category";
+        updates.width = 400;
+        updates.height = 250;
+        if (chartSupportsAxes(updates.type)) {
+          (updates as any).xAxis.label = "Categories";
+          (updates as any).yAxis.label = "Revenue ($)";
+          (updates as any).xAxis.tickRotation = -45;
+        }
+        break;
+
+      case "sales-dist":
+        updates.title = "Sales Distribution";
+        updates.primaryColor = "#f59e0b";
+        updates.width = 350;
+        updates.height = 280;
+        break;
+
+      case "kpi-widget":
+        updates.title = "Total Revenue";
+        updates.width = 300;
+        updates.height = 150;
+        updates.titleFontSize = 24;
+        if (updates.type === "metric") {
+          (updates as any).value = "$142,583";
+          (updates as any).trend = "up";
+          (updates as any).trendPercentage = 12.5;
+        }
+        break;
+
+      case "kpi-1":
+        updates.title = "Monthly Growth";
+        updates.primaryColor = "#10b981";
+        if (updates.type === "metric") {
+          (updates as any).value = "+12.5%";
+          (updates as any).unit = "vs last month";
+        }
+        break;
+
+      case "kpi-2":
+        updates.title = "Active Users";
+        if (updates.type === "metric") {
+          (updates as any).value = "24.8k";
+          (updates as any).unit = "this week";
+        }
+        break;
+
+      case "kpi-3":
+        updates.title = "Conversion Rate";
+        updates.primaryColor = "#f59e0b";
+        if (updates.type === "metric") {
+          (updates as any).value = "3.2%";
+          (updates as any).unit = "avg rate";
+        }
+        break;
+
+      case "kpi-4":
+        updates.title = "Customer LTV";
+        updates.primaryColor = "#8b5cf6";
+        if (updates.type === "metric") {
+          (updates as any).value = "$1,247";
+          (updates as any).unit = "average";
+        }
+        break;
+
+      case "table-chart":
+        updates.title = "Data Table";
+        updates.width = 500;
+        updates.height = 300;
+        break;
+    }
+
+    return updates;
+  };
+
+  const getElementDisplayInfo = (elementId: string | null) => {
+    if (!elementId || !normalizedProperties) {
+      return { type: "none", title: "", displayType: "" };
+    }
+
+    const displayTypeMap: Record<VisualizationType, string> = {
+      line: "Line Chart",
+      area: "Area Chart",
+      bar: "Bar Chart",
+      column: "Column Chart",
+      pie: "Pie Chart",
+      donut: "Donut Chart",
+      scatter: "Scatter Chart",
+      radar: "Radar Chart",
+      funnel: "Funnel Chart",
+      gauge: "Gauge Chart",
+      metric: "KPI Metric",
+      trend: "KPI Trend",
+      progress: "KPI Progress",
+      comparison: "KPI Comparison",
+      table: "Data Table",
+    };
+
+    return {
+      type: normalizedProperties.type,
+      title: normalizedProperties.title,
+      displayType:
+        displayTypeMap[normalizedProperties.type] || normalizedProperties.type,
+    };
+  };
 
   // Update properties when element changes
-  React.useEffect(() => {
-    if (selectedElement && elementInfo.properties) {
-      // Filter out undefined values to prevent NaN issues
-      const filteredProperties = Object.fromEntries(
-        Object.entries(elementInfo.properties).filter(
-          ([_, value]) => value !== undefined,
-        ),
-      );
-      setProperties((prev) => ({ ...prev, ...filteredProperties }));
+  useEffect(() => {
+    if (selectedElement) {
+      const properties = initializeProperties(selectedElement);
+      setNormalizedProperties(properties);
+
+      // Convert to legacy format for compatibility
+      const legacyFormat = chartPropertyManager.toLegacyFormat(selectedElement);
+      setLegacyProperties(legacyFormat);
+    } else {
+      setNormalizedProperties(null);
+      setLegacyProperties({});
     }
   }, [selectedElement]);
+
+  const elementInfo = getElementDisplayInfo(selectedElement);
 
   if (!selectedElement) {
     return (
@@ -382,7 +356,7 @@ export default function PropertiesPanelIntegrated({
           <div className="space-y-2">
             <Label className="text-xs text-dashboard-text-muted">Title</Label>
             <Input
-              value={properties.title}
+              value={normalizedProperties?.title || ""}
               onChange={(e) => updateProperty("title", e.target.value)}
               className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
             />
@@ -393,7 +367,7 @@ export default function PropertiesPanelIntegrated({
               <Label className="text-xs text-dashboard-text-muted">Width</Label>
               <Input
                 type="number"
-                value={properties.width || ""}
+                value={normalizedProperties?.width || ""}
                 onChange={(e) => {
                   const value = parseInt(e.target.value) || 0;
                   updateProperty("width", value);
@@ -407,7 +381,7 @@ export default function PropertiesPanelIntegrated({
               </Label>
               <Input
                 type="number"
-                value={properties.height || ""}
+                value={normalizedProperties?.height || ""}
                 onChange={(e) => {
                   const value = parseInt(e.target.value) || 0;
                   updateProperty("height", value);
@@ -433,13 +407,17 @@ export default function PropertiesPanelIntegrated({
               <div className="flex gap-2">
                 <input
                   type="color"
-                  value={properties.color}
-                  onChange={(e) => updateProperty("color", e.target.value)}
+                  value={normalizedProperties?.primaryColor || "#3b82f6"}
+                  onChange={(e) =>
+                    updateProperty("primaryColor", e.target.value)
+                  }
                   className="w-10 h-8 rounded border border-dashboard-border"
                 />
                 <Input
-                  value={properties.color}
-                  onChange={(e) => updateProperty("color", e.target.value)}
+                  value={normalizedProperties?.primaryColor || "#3b82f6"}
+                  onChange={(e) =>
+                    updateProperty("primaryColor", e.target.value)
+                  }
                   className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
                 />
               </div>
@@ -480,12 +458,12 @@ export default function PropertiesPanelIntegrated({
                   <button
                     key={color}
                     className={`w-6 h-6 rounded border-2 transition-all hover:scale-110 ${
-                      properties.color === color
+                      normalizedProperties?.primaryColor === color
                         ? "border-dashboard-accent ring-2 ring-dashboard-accent/30"
                         : "border-dashboard-border hover:border-dashboard-accent/50"
                     }`}
                     style={{ backgroundColor: color }}
-                    onClick={() => updateProperty("color", color)}
+                    onClick={() => updateProperty("primaryColor", color)}
                     title={color}
                   />
                 ))}
@@ -499,13 +477,17 @@ export default function PropertiesPanelIntegrated({
               <div className="flex gap-2">
                 <input
                   type="color"
-                  value={properties.background}
-                  onChange={(e) => updateProperty("background", e.target.value)}
+                  value={normalizedProperties?.backgroundColor || "#1e293b"}
+                  onChange={(e) =>
+                    updateProperty("backgroundColor", e.target.value)
+                  }
                   className="w-10 h-8 rounded border border-dashboard-border"
                 />
                 <Input
-                  value={properties.background}
-                  onChange={(e) => updateProperty("background", e.target.value)}
+                  value={normalizedProperties?.backgroundColor || "#1e293b"}
+                  onChange={(e) =>
+                    updateProperty("backgroundColor", e.target.value)
+                  }
                   className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
                 />
               </div>
@@ -525,7 +507,7 @@ export default function PropertiesPanelIntegrated({
               Font Size
             </Label>
             <Slider
-              value={[properties.fontSize || 14]}
+              value={[normalizedProperties?.fontSize || 14]}
               onValueChange={(value) => updateProperty("fontSize", value[0])}
               min={8}
               max={48}
@@ -533,7 +515,7 @@ export default function PropertiesPanelIntegrated({
               className="w-full"
             />
             <span className="text-xs text-dashboard-text-muted">
-              {properties.fontSize || 14}px
+              {normalizedProperties?.fontSize || 14}px
             </span>
           </div>
 
@@ -545,11 +527,15 @@ export default function PropertiesPanelIntegrated({
               {["left", "center", "right"].map((align) => (
                 <Button
                   key={align}
-                  variant={properties.textAlign === align ? "default" : "ghost"}
+                  variant={
+                    normalizedProperties?.textAlign === align
+                      ? "default"
+                      : "ghost"
+                  }
                   size="sm"
                   onClick={() => updateProperty("textAlign", align)}
                   className={
-                    properties.textAlign === align
+                    normalizedProperties?.textAlign === align
                       ? "bg-dashboard-accent text-white"
                       : "text-dashboard-text hover:bg-dashboard-muted"
                   }
@@ -564,17 +550,32 @@ export default function PropertiesPanelIntegrated({
         </div>
 
         {/* Element-Specific Options */}
-        {(elementInfo.type.includes("chart") ||
-          elementInfo.type.includes("kpi")) && (
+        {normalizedProperties && (
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              {elementInfo.type.includes("chart") ? (
+              {[
+                "line",
+                "area",
+                "bar",
+                "column",
+                "pie",
+                "donut",
+                "scatter",
+              ].includes(normalizedProperties.type) ? (
                 <BarChart3 className="w-4 h-4 text-dashboard-accent" />
               ) : (
                 <Settings className="w-4 h-4 text-dashboard-accent" />
               )}
               <h4 className="font-medium text-dashboard-text">
-                {elementInfo.type.includes("chart")
+                {[
+                  "line",
+                  "area",
+                  "bar",
+                  "column",
+                  "pie",
+                  "donut",
+                  "scatter",
+                ].includes(normalizedProperties.type)
                   ? "Chart Options"
                   : "Display Options"}
               </h4>
@@ -582,43 +583,50 @@ export default function PropertiesPanelIntegrated({
 
             <div className="space-y-3">
               {/* Chart Type - only for charts */}
-              {elementInfo.type.includes("chart") && (
+              {[
+                "line",
+                "area",
+                "bar",
+                "column",
+                "pie",
+                "donut",
+                "scatter",
+              ].includes(normalizedProperties.type) && (
                 <div className="space-y-2">
                   <Label className="text-xs text-dashboard-text-muted">
                     Chart Type
                   </Label>
                   <Select
-                    value={properties.chartType}
-                    onValueChange={(value) =>
-                      updateProperty("chartType", value)
-                    }
+                    value={normalizedProperties.type}
+                    onValueChange={(value) => updateProperty("type", value)}
                   >
                     <SelectTrigger className="bg-dashboard-surface border-dashboard-border text-dashboard-text">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {elementInfo.type === "line-chart" && (
+                      {(normalizedProperties.type === "line" ||
+                        normalizedProperties.type === "area") && (
                         <>
                           <SelectItem value="line">Line Chart</SelectItem>
                           <SelectItem value="area">Area Chart</SelectItem>
-                          <SelectItem value="spline">Smooth Line</SelectItem>
                         </>
                       )}
-                      {elementInfo.type === "bar-chart" && (
+                      {(normalizedProperties.type === "bar" ||
+                        normalizedProperties.type === "column") && (
                         <>
                           <SelectItem value="bar">Bar Chart</SelectItem>
                           <SelectItem value="column">Column Chart</SelectItem>
-                          <SelectItem value="stacked">Stacked Bar</SelectItem>
                         </>
                       )}
-                      {elementInfo.type === "pie-chart" && (
+                      {(normalizedProperties.type === "pie" ||
+                        normalizedProperties.type === "donut") && (
                         <>
                           <SelectItem value="pie">Pie Chart</SelectItem>
                           <SelectItem value="donut">Donut Chart</SelectItem>
-                          <SelectItem value="semi-donut">
-                            Semi Circle
-                          </SelectItem>
                         </>
+                      )}
+                      {normalizedProperties.type === "scatter" && (
+                        <SelectItem value="scatter">Scatter Chart</SelectItem>
                       )}
                     </SelectContent>
                   </Select>
@@ -626,13 +634,13 @@ export default function PropertiesPanelIntegrated({
               )}
 
               {/* KPI Value - for KPI elements */}
-              {elementInfo.type.includes("kpi") && properties.value && (
+              {normalizedProperties.type === "metric" && (
                 <div className="space-y-2">
                   <Label className="text-xs text-dashboard-text-muted">
                     Value
                   </Label>
                   <Input
-                    value={properties.value}
+                    value={(normalizedProperties as any).value || ""}
                     onChange={(e) => updateProperty("value", e.target.value)}
                     className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
                   />
@@ -640,235 +648,328 @@ export default function PropertiesPanelIntegrated({
               )}
 
               {/* Common Chart Options */}
-              {elementInfo.type.includes("chart") && (
+              {chartSupportsLegend(normalizedProperties.type) && (
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs text-dashboard-text-muted">
+                    Show Legend
+                  </Label>
+                  <Switch
+                    checked={(normalizedProperties as any).enabled !== false}
+                    onCheckedChange={(checked) =>
+                      updateProperty("enabled", checked)
+                    }
+                  />
+                </div>
+              )}
+
+              {chartSupportsAxes(normalizedProperties.type) && (
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs text-dashboard-text-muted">
+                    Show Grid
+                  </Label>
+                  <Switch
+                    checked={
+                      (normalizedProperties as any).xAxis?.showGridLines !==
+                      false
+                    }
+                    onCheckedChange={(checked) => {
+                      updateProperty("xAxis.showGridLines", checked);
+                      updateProperty("yAxis.showGridLines", checked);
+                    }}
+                  />
+                </div>
+              )}
+
+              {/* Line Chart Specific */}
+              {(normalizedProperties.type === "line" ||
+                normalizedProperties.type === "area") && (
                 <>
-                  {properties.showLegend !== undefined && (
-                    <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs text-dashboard-text-muted">
+                      Show Data Points
+                    </Label>
+                    <Switch
+                      checked={
+                        (normalizedProperties as any).showDataPoints !== false
+                      }
+                      onCheckedChange={(checked) =>
+                        updateProperty("showDataPoints", checked)
+                      }
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs text-dashboard-text-muted">
+                      Smooth Curves
+                    </Label>
+                    <Switch
+                      checked={
+                        (normalizedProperties as any).smoothCurve === true
+                      }
+                      onCheckedChange={(checked) =>
+                        updateProperty("smoothCurve", checked)
+                      }
+                    />
+                  </div>
+                  {normalizedProperties.type === "area" && (
+                    <div className="space-y-2">
                       <Label className="text-xs text-dashboard-text-muted">
-                        Show Legend
+                        Area Opacity:{" "}
+                        {Math.round(
+                          ((normalizedProperties as any).areaOpacity || 0.3) *
+                            100,
+                        )}
+                        %
                       </Label>
-                      <Switch
-                        checked={properties.showLegend}
-                        onCheckedChange={(checked) =>
-                          updateProperty("showLegend", checked)
+                      <Slider
+                        value={[
+                          ((normalizedProperties as any).areaOpacity || 0.3) *
+                            100,
+                        ]}
+                        onValueChange={(value) =>
+                          updateProperty("areaOpacity", value[0] / 100)
                         }
+                        min={0}
+                        max={100}
+                        step={5}
+                        className="w-full"
                       />
                     </div>
                   )}
+                </>
+              )}
 
-                  {properties.showGrid !== undefined && (
-                    <div className="flex items-center justify-between">
+              {/* Bar Chart Specific */}
+              {(normalizedProperties.type === "bar" ||
+                normalizedProperties.type === "column") && (
+                <>
+                  <div className="space-y-2">
+                    <Label className="text-xs text-dashboard-text-muted">
+                      Bar Spacing:{" "}
+                      {Math.round(
+                        ((normalizedProperties as any).barSpacing || 0.1) * 100,
+                      )}
+                      %
+                    </Label>
+                    <Slider
+                      value={[
+                        ((normalizedProperties as any).barSpacing || 0.1) * 100,
+                      ]}
+                      onValueChange={(value) =>
+                        updateProperty("barSpacing", value[0] / 100)
+                      }
+                      min={0}
+                      max={100}
+                      step={5}
+                      className="w-full"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs text-dashboard-text-muted">
+                      Show Data Labels
+                    </Label>
+                    <Switch
+                      checked={
+                        (normalizedProperties as any).showDataLabels === true
+                      }
+                      onCheckedChange={(checked) =>
+                        updateProperty("showDataLabels", checked)
+                      }
+                    />
+                  </div>
+                </>
+              )}
+
+              {/* Pie Chart Specific */}
+              {(normalizedProperties.type === "pie" ||
+                normalizedProperties.type === "donut") && (
+                <>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs text-dashboard-text-muted">
+                      Show Percentages
+                    </Label>
+                    <Switch
+                      checked={
+                        (normalizedProperties as any).showPercentages !== false
+                      }
+                      onCheckedChange={(checked) =>
+                        updateProperty("showPercentages", checked)
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs text-dashboard-text-muted">
+                      Start Angle:{" "}
+                      {(normalizedProperties as any).startAngle || 0}°
+                    </Label>
+                    <Slider
+                      value={[(normalizedProperties as any).startAngle || 0]}
+                      onValueChange={(value) =>
+                        updateProperty("startAngle", value[0])
+                      }
+                      min={0}
+                      max={360}
+                      step={15}
+                      className="w-full"
+                    />
+                  </div>
+                  {normalizedProperties.type === "donut" && (
+                    <div className="space-y-2">
                       <Label className="text-xs text-dashboard-text-muted">
-                        Show Grid
+                        Inner Radius:{" "}
+                        {(normalizedProperties as any).innerRadius || 0}%
                       </Label>
-                      <Switch
-                        checked={properties.showGrid}
-                        onCheckedChange={(checked) =>
-                          updateProperty("showGrid", checked)
+                      <Slider
+                        value={[(normalizedProperties as any).innerRadius || 0]}
+                        onValueChange={(value) =>
+                          updateProperty("innerRadius", value[0])
                         }
+                        min={0}
+                        max={80}
+                        step={5}
+                        className="w-full"
                       />
                     </div>
                   )}
+                </>
+              )}
 
-                  {/* Line Chart Specific */}
-                  {elementInfo.type === "line-chart" && (
-                    <>
-                      {properties.showDataPoints !== undefined && (
-                        <div className="flex items-center justify-between">
-                          <Label className="text-xs text-dashboard-text-muted">
-                            Show Data Points
-                          </Label>
-                          <Switch
-                            checked={properties.showDataPoints}
-                            onCheckedChange={(checked) =>
-                              updateProperty("showDataPoints", checked)
-                            }
-                          />
-                        </div>
-                      )}
-                      {properties.smoothCurves !== undefined && (
-                        <div className="flex items-center justify-between">
-                          <Label className="text-xs text-dashboard-text-muted">
-                            Smooth Curves
-                          </Label>
-                          <Switch
-                            checked={properties.smoothCurves}
-                            onCheckedChange={(checked) =>
-                              updateProperty("smoothCurves", checked)
-                            }
-                          />
-                        </div>
-                      )}
-                    </>
-                  )}
+              {/* Scatter Chart Specific */}
+              {normalizedProperties.type === "scatter" && (
+                <>
+                  <div className="space-y-2">
+                    <Label className="text-xs text-dashboard-text-muted">
+                      Point Size: {(normalizedProperties as any).pointSize || 6}
+                      px
+                    </Label>
+                    <Slider
+                      value={[(normalizedProperties as any).pointSize || 6]}
+                      onValueChange={(value) =>
+                        updateProperty("pointSize", value[0])
+                      }
+                      min={2}
+                      max={20}
+                      step={1}
+                      className="w-full"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs text-dashboard-text-muted">
+                      Show Trend Line
+                    </Label>
+                    <Switch
+                      checked={
+                        (normalizedProperties as any).showTrendLine === true
+                      }
+                      onCheckedChange={(checked) =>
+                        updateProperty("showTrendLine", checked)
+                      }
+                    />
+                  </div>
+                </>
+              )}
 
-                  {/* Bar Chart Specific */}
-                  {elementInfo.type === "bar-chart" &&
-                    properties.barSpacing !== undefined && (
-                      <div className="space-y-2">
-                        <Label className="text-xs text-dashboard-text-muted">
-                          Bar Spacing
-                        </Label>
-                        <Slider
-                          value={[(properties.barSpacing || 0.1) * 100]}
-                          onValueChange={(value) =>
-                            updateProperty("barSpacing", value[0] / 100)
-                          }
-                          min={0}
-                          max={100}
-                          step={5}
-                          className="w-full"
-                        />
-                        <span className="text-xs text-dashboard-text-muted">
-                          {Math.round((properties.barSpacing || 0.1) * 100)}%
-                        </span>
-                      </div>
-                    )}
-
-                  {/* Table Chart Specific */}
-                  {elementInfo.type === "table" && (
-                    <>
-                      <div className="flex items-center justify-between">
-                        <Label className="text-xs text-dashboard-text-muted">
-                          Show Header
-                        </Label>
-                        <Switch
-                          checked={properties.showHeader !== false}
-                          onCheckedChange={(checked) =>
-                            updateProperty("showHeader", checked)
-                          }
-                        />
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <Label className="text-xs text-dashboard-text-muted">
-                          Alternate Rows
-                        </Label>
-                        <Switch
-                          checked={properties.alternateRows || false}
-                          onCheckedChange={(checked) =>
-                            updateProperty("alternateRows", checked)
-                          }
-                        />
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <Label className="text-xs text-dashboard-text-muted">
-                          Show Borders
-                        </Label>
-                        <Switch
-                          checked={properties.showBorders !== false}
-                          onCheckedChange={(checked) =>
-                            updateProperty("showBorders", checked)
-                          }
-                        />
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <Label className="text-xs text-dashboard-text-muted">
-                          Editable
-                        </Label>
-                        <Switch
-                          checked={properties.editable || false}
-                          onCheckedChange={(checked) =>
-                            updateProperty("editable", checked)
-                          }
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label className="text-xs text-dashboard-text-muted">
-                          Header Color
-                        </Label>
-                        <Input
-                          type="color"
-                          value={properties.headerColor || "#1e293b"}
-                          onChange={(e) =>
-                            updateProperty("headerColor", e.target.value)
-                          }
-                          className="w-full h-8"
-                        />
-                      </div>
-                    </>
-                  )}
-
-                  {/* Pie Chart Specific */}
-                  {elementInfo.type === "pie-chart" && (
-                    <>
-                      {properties.showPercentages !== undefined && (
-                        <div className="flex items-center justify-between">
-                          <Label className="text-xs text-dashboard-text-muted">
-                            Show Percentages
-                          </Label>
-                          <Switch
-                            checked={properties.showPercentages}
-                            onCheckedChange={(checked) =>
-                              updateProperty("showPercentages", checked)
-                            }
-                          />
-                        </div>
-                      )}
-                      {properties.startAngle !== undefined && (
-                        <div className="space-y-2">
-                          <Label className="text-xs text-dashboard-text-muted">
-                            Start Angle
-                          </Label>
-                          <Slider
-                            value={[properties.startAngle || 0]}
-                            onValueChange={(value) =>
-                              updateProperty("startAngle", value[0])
-                            }
-                            min={0}
-                            max={360}
-                            step={15}
-                            className="w-full"
-                          />
-                          <span className="text-xs text-dashboard-text-muted">
-                            {properties.startAngle || 0}°
-                          </span>
-                        </div>
-                      )}
-                    </>
-                  )}
+              {/* Table Specific */}
+              {normalizedProperties.type === "table" && (
+                <>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs text-dashboard-text-muted">
+                      Show Header
+                    </Label>
+                    <Switch
+                      checked={
+                        (normalizedProperties as any).showHeader !== false
+                      }
+                      onCheckedChange={(checked) =>
+                        updateProperty("showHeader", checked)
+                      }
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs text-dashboard-text-muted">
+                      Alternate Row Colors
+                    </Label>
+                    <Switch
+                      checked={
+                        (normalizedProperties as any).alternateRowColors ===
+                        true
+                      }
+                      onCheckedChange={(checked) =>
+                        updateProperty("alternateRowColors", checked)
+                      }
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs text-dashboard-text-muted">
+                      Show Borders
+                    </Label>
+                    <Switch
+                      checked={
+                        (normalizedProperties as any).borderEnabled !== false
+                      }
+                      onCheckedChange={(checked) =>
+                        updateProperty("borderEnabled", checked)
+                      }
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs text-dashboard-text-muted">
+                      Editable
+                    </Label>
+                    <Switch
+                      checked={(normalizedProperties as any).editable === true}
+                      onCheckedChange={(checked) =>
+                        updateProperty("editable", checked)
+                      }
+                    />
+                  </div>
                 </>
               )}
 
               {/* KPI Specific Options */}
-              {elementInfo.type.includes("kpi") && (
+              {normalizedProperties.type === "metric" && (
                 <>
-                  {properties.showTrend !== undefined && (
-                    <div className="flex items-center justify-between">
-                      <Label className="text-xs text-dashboard-text-muted">
-                        Show Trend
-                      </Label>
-                      <Switch
-                        checked={properties.showTrend}
-                        onCheckedChange={(checked) =>
-                          updateProperty("showTrend", checked)
-                        }
-                      />
-                    </div>
-                  )}
-                  {properties.subtitle && (
-                    <div className="space-y-2">
-                      <Label className="text-xs text-dashboard-text-muted">
-                        Subtitle
-                      </Label>
-                      <Input
-                        value={properties.subtitle}
-                        onChange={(e) =>
-                          updateProperty("subtitle", e.target.value)
-                        }
-                        className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
-                      />
-                    </div>
-                  )}
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs text-dashboard-text-muted">
+                      Show Trend
+                    </Label>
+                    <Switch
+                      checked={
+                        (normalizedProperties as any).showTrend !== false
+                      }
+                      onCheckedChange={(checked) =>
+                        updateProperty("showTrend", checked)
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs text-dashboard-text-muted">
+                      Unit
+                    </Label>
+                    <Input
+                      value={(normalizedProperties as any).unit || ""}
+                      onChange={(e) => updateProperty("unit", e.target.value)}
+                      placeholder="e.g., %, USD, users"
+                      className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs text-dashboard-text-muted">
+                      Show Progress Bar
+                    </Label>
+                    <Switch
+                      checked={
+                        (normalizedProperties as any).showProgress === true
+                      }
+                      onCheckedChange={(checked) =>
+                        updateProperty("showProgress", checked)
+                      }
+                    />
+                  </div>
                 </>
               )}
 
-              {/* X/Y Axis Properties - Show for line and bar charts */}
-              {(elementInfo.type === "line-chart" ||
-                elementInfo.type === "bar-chart") && (
+              {/* X/Y Axis Properties - Show for charts that support axes */}
+              {chartSupportsAxes(normalizedProperties.type) && (
                 <div className="space-y-4 mt-6">
                   <div className="flex items-center gap-2">
                     <Layout className="w-4 h-4 text-dashboard-accent" />
@@ -890,9 +991,11 @@ export default function PropertiesPanelIntegrated({
                         </Label>
                         <Input
                           placeholder="e.g., Months, Categories"
-                          value={properties.xAxisLabel || ""}
+                          value={
+                            (normalizedProperties as any).xAxis?.label || ""
+                          }
                           onChange={(e) =>
-                            updateProperty("xAxisLabel", e.target.value)
+                            updateProperty("xAxis.label", e.target.value)
                           }
                           className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
                         />
@@ -903,33 +1006,45 @@ export default function PropertiesPanelIntegrated({
                           Show X-Axis
                         </Label>
                         <Switch
-                          checked={properties.showXAxis !== false}
+                          checked={
+                            (normalizedProperties as any).xAxis?.enabled !==
+                            false
+                          }
                           onCheckedChange={(checked) =>
-                            updateProperty("showXAxis", checked)
+                            updateProperty("xAxis.enabled", checked)
                           }
                         />
                       </div>
 
                       <div className="flex items-center justify-between">
                         <Label className="text-xs text-dashboard-text-muted">
-                          Rotate Labels
+                          Show Grid Lines
                         </Label>
                         <Switch
-                          checked={properties.rotateXLabels === true}
+                          checked={
+                            (normalizedProperties as any).xAxis
+                              ?.showGridLines !== false
+                          }
                           onCheckedChange={(checked) =>
-                            updateProperty("rotateXLabels", checked)
+                            updateProperty("xAxis.showGridLines", checked)
                           }
                         />
                       </div>
 
                       <div className="space-y-2">
                         <Label className="text-xs text-dashboard-text-muted">
-                          Label Angle: {properties.xLabelAngle || 0}°
+                          Label Rotation:{" "}
+                          {(normalizedProperties as any).xAxis?.tickRotation ||
+                            0}
+                          °
                         </Label>
                         <Slider
-                          value={[properties.xLabelAngle || 0]}
+                          value={[
+                            (normalizedProperties as any).xAxis?.tickRotation ||
+                              0,
+                          ]}
                           onValueChange={(value) =>
-                            updateProperty("xLabelAngle", value[0])
+                            updateProperty("xAxis.tickRotation", value[0])
                           }
                           max={90}
                           min={-90}
@@ -951,9 +1066,11 @@ export default function PropertiesPanelIntegrated({
                         </Label>
                         <Input
                           placeholder="e.g., Revenue ($), Count"
-                          value={properties.yAxisLabel || ""}
+                          value={
+                            (normalizedProperties as any).yAxis?.label || ""
+                          }
                           onChange={(e) =>
-                            updateProperty("yAxisLabel", e.target.value)
+                            updateProperty("yAxis.label", e.target.value)
                           }
                           className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
                         />
@@ -964,9 +1081,27 @@ export default function PropertiesPanelIntegrated({
                           Show Y-Axis
                         </Label>
                         <Switch
-                          checked={properties.showYAxis !== false}
+                          checked={
+                            (normalizedProperties as any).yAxis?.enabled !==
+                            false
+                          }
                           onCheckedChange={(checked) =>
-                            updateProperty("showYAxis", checked)
+                            updateProperty("yAxis.enabled", checked)
+                          }
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <Label className="text-xs text-dashboard-text-muted">
+                          Show Grid Lines
+                        </Label>
+                        <Switch
+                          checked={
+                            (normalizedProperties as any).yAxis
+                              ?.showGridLines !== false
+                          }
+                          onCheckedChange={(checked) =>
+                            updateProperty("yAxis.showGridLines", checked)
                           }
                         />
                       </div>
@@ -979,10 +1114,17 @@ export default function PropertiesPanelIntegrated({
                           <Input
                             type="number"
                             placeholder="Auto"
-                            value={properties.yMinValue || ""}
-                            onChange={(e) =>
-                              updateProperty("yMinValue", e.target.value)
+                            value={
+                              (normalizedProperties as any).yAxis?.minValue ||
+                              ""
                             }
+                            onChange={(e) => {
+                              const value = e.target.value
+                                ? Number(e.target.value)
+                                : undefined;
+                              updateProperty("yAxis.minValue", value);
+                              updateProperty("yAxis.autoScale", !value);
+                            }}
                             className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
                           />
                         </div>
@@ -993,10 +1135,17 @@ export default function PropertiesPanelIntegrated({
                           <Input
                             type="number"
                             placeholder="Auto"
-                            value={properties.yMaxValue || ""}
-                            onChange={(e) =>
-                              updateProperty("yMaxValue", e.target.value)
+                            value={
+                              (normalizedProperties as any).yAxis?.maxValue ||
+                              ""
                             }
+                            onChange={(e) => {
+                              const value = e.target.value
+                                ? Number(e.target.value)
+                                : undefined;
+                              updateProperty("yAxis.maxValue", value);
+                              updateProperty("yAxis.autoScale", !value);
+                            }}
                             className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
                           />
                         </div>
@@ -1007,9 +1156,12 @@ export default function PropertiesPanelIntegrated({
                           Start from Zero
                         </Label>
                         <Switch
-                          checked={properties.startFromZero !== false}
+                          checked={
+                            (normalizedProperties as any).yAxis
+                              ?.startFromZero !== false
+                          }
                           onCheckedChange={(checked) =>
-                            updateProperty("startFromZero", checked)
+                            updateProperty("yAxis.startFromZero", checked)
                           }
                         />
                       </div>
@@ -1030,30 +1182,79 @@ export default function PropertiesPanelIntegrated({
             </span>
           </div>
           <p className="text-xs text-dashboard-text-muted mb-2">
-            {elementInfo.type === "line-chart" &&
+            {normalizedProperties?.type === "line" &&
               "Try adding smooth curves and data point markers to make trends more visible."}
-            {elementInfo.type === "bar-chart" &&
+            {normalizedProperties?.type === "area" &&
+              "Adjust the area opacity and try gradient fills for better visual appeal."}
+            {(normalizedProperties?.type === "bar" ||
+              normalizedProperties?.type === "column") &&
               "Consider using gradient colors and adjusting bar spacing for better visual impact."}
-            {elementInfo.type === "pie-chart" &&
-              "Enable percentage labels and try a donut style for modern appearance."}
-            {elementInfo.type.includes("kpi") &&
+            {(normalizedProperties?.type === "pie" ||
+              normalizedProperties?.type === "donut") &&
+              "Enable percentage labels and adjust the start angle for better data presentation."}
+            {normalizedProperties?.type === "scatter" &&
+              "Try adding a trend line and adjust point sizes for better data visualization."}
+            {normalizedProperties?.type === "metric" &&
               "Add trend indicators and optimize the font size for better readability."}
-            {!elementInfo.type.includes("chart") &&
-              !elementInfo.type.includes("kpi") &&
-              "Select a chart or KPI element to get AI-powered suggestions."}
+            {normalizedProperties?.type === "table" &&
+              "Enable alternate row colors and borders for better data organization."}
+            {!normalizedProperties &&
+              "Select a chart or element to get AI-powered suggestions."}
           </p>
           <Button
             size="sm"
             variant="ghost"
             className="h-6 px-2 text-xs text-dashboard-accent hover:bg-dashboard-accent/20 w-full"
+            onClick={() => {
+              if (!normalizedProperties) return;
+
+              // Apply smart defaults based on chart type
+              switch (normalizedProperties.type) {
+                case "line":
+                  updateProperty("smoothCurve", true);
+                  updateProperty("showDataPoints", true);
+                  break;
+                case "area":
+                  updateProperty("areaOpacity", 0.7);
+                  updateProperty("gradientEnabled", true);
+                  break;
+                case "bar":
+                case "column":
+                  updateProperty("gradientEnabled", true);
+                  updateProperty("barSpacing", 0.2);
+                  break;
+                case "pie":
+                case "donut":
+                  updateProperty("showPercentages", true);
+                  updateProperty("labelPosition", "outside");
+                  break;
+                case "scatter":
+                  updateProperty("showTrendLine", true);
+                  updateProperty("pointSize", 8);
+                  break;
+                case "metric":
+                  updateProperty("showTrend", true);
+                  updateProperty("titleFontSize", 18);
+                  break;
+                case "table":
+                  updateProperty("alternateRowColors", true);
+                  updateProperty("borderEnabled", true);
+                  break;
+              }
+            }}
           >
-            {elementInfo.type === "line-chart" && "Optimize Line Chart"}
-            {elementInfo.type === "bar-chart" && "Apply Gradient"}
-            {elementInfo.type === "pie-chart" && "Enable Donut Mode"}
-            {elementInfo.type.includes("kpi") && "Optimize KPI"}
-            {!elementInfo.type.includes("chart") &&
-              !elementInfo.type.includes("kpi") &&
-              "Get Suggestions"}
+            {normalizedProperties?.type === "line" && "Optimize Line Chart"}
+            {normalizedProperties?.type === "area" && "Apply Gradient Fill"}
+            {(normalizedProperties?.type === "bar" ||
+              normalizedProperties?.type === "column") &&
+              "Apply Gradient"}
+            {(normalizedProperties?.type === "pie" ||
+              normalizedProperties?.type === "donut") &&
+              "Enable Labels"}
+            {normalizedProperties?.type === "scatter" && "Add Trend Line"}
+            {normalizedProperties?.type === "metric" && "Optimize KPI"}
+            {normalizedProperties?.type === "table" && "Style Table"}
+            {!normalizedProperties && "Get Suggestions"}
           </Button>
         </div>
       </div>
