@@ -32,7 +32,21 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-export default function RevenueByCategoryChart() {
+interface RevenueByCategoryChartProps {
+  properties?: {
+    color?: string;
+    showGrid?: boolean;
+    showLegend?: boolean;
+    xAxisLabel?: string;
+    yAxisLabel?: string;
+    showXAxis?: boolean;
+    showYAxis?: boolean;
+  };
+}
+
+export default function RevenueByCategoryChart({
+  properties,
+}: RevenueByCategoryChartProps = {}) {
   return (
     <div className="h-40">
       <ResponsiveContainer width="100%" height="100%">
