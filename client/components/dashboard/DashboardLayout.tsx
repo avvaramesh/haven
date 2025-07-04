@@ -13,10 +13,11 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [selectedElement, setSelectedElement] = useState<string | null>(null);
-  const [leftPanelTab, setLeftPanelTab] = useState<"data" | "templates">(
-    "data",
-  );
+  const [leftPanelTab, setLeftPanelTab] = useState<
+    "data" | "templates" | "copilot"
+  >("data");
   const [isRightPanelCollapsed, setIsRightPanelCollapsed] = useState(false);
+  const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false);
   return (
     <div className="h-screen flex flex-col bg-dashboard-background">
       {/* Top Header */}
