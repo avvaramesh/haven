@@ -651,12 +651,16 @@ export default function CanvasArea({
     (window as any).setCanvasGrid = (show: boolean) => setShowGrid(show);
     (window as any).setCanvasZoom = (level: number) => setZoomLevel(level);
 
+    // Expose property change handler for direct updates (avoid circular calls)
+    (window as any).updateCanvasProperty = handlePropertyChange;
+
     // Clean up function
     return () => {
       delete (window as any).setCanvasGrid;
       delete (window as any).setCanvasZoom;
+      delete (window as any).updateCanvasProperty;
     };
-  }, []);
+  }, [handlePropertyChange]);
 
   const [isDragOver, setIsDragOver] = useState(false);
 
