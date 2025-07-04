@@ -555,6 +555,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           undoRef={canvasUndoRef}
           redoRef={canvasRedoRef}
           onPropertyChange={handlePropertyChange}
+          initialZoomLevel={zoomLevel}
+          initialGridSize={gridSize}
+          initialCanvasSize={canvasSize}
+          initialShowGrid={showGrid}
         />
       </div>
 
