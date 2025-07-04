@@ -233,7 +233,7 @@ export default function UnifiedChartComponent({
         {(chartType.includes("bar") || chartType.includes("column")) && (
           <BarChart
             {...commonProps}
-            layout={isHorizontal ? "vertical" : "horizontal"}
+            layout={isHorizontal ? "horizontal" : "vertical"}
           >
             {properties.showGrid !== false && (
               <CartesianGrid
