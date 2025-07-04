@@ -458,12 +458,12 @@ export default function PropertiesPanelIntegrated({
                   <button
                     key={color}
                     className={`w-6 h-6 rounded border-2 transition-all hover:scale-110 ${
-                      properties.color === color
+                      normalizedProperties?.primaryColor === color
                         ? "border-dashboard-accent ring-2 ring-dashboard-accent/30"
                         : "border-dashboard-border hover:border-dashboard-accent/50"
                     }`}
                     style={{ backgroundColor: color }}
-                    onClick={() => updateProperty("color", color)}
+                    onClick={() => updateProperty("primaryColor", color)}
                     title={color}
                   />
                 ))}
