@@ -34,6 +34,7 @@ interface PropertiesPanelProps {
   selectedElement: string | null;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
+  onPropertyChange?: (elementId: string, property: string, value: any) => void;
 }
 
 export default function PropertiesPanel({
