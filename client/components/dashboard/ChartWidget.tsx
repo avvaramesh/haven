@@ -293,7 +293,39 @@ export default function ChartWidget({
               e.preventDefault();
               e.stopPropagation();
               setIsResizing(true);
-              // Add resize logic here
+
+              const startX = e.clientX;
+              const startY = e.clientY;
+              const startWidth = position?.width || 300;
+              const startHeight = position?.height || 200;
+
+              const handleMouseMove = (moveEvent: MouseEvent) => {
+                if (!position || !onPositionChange) return;
+
+                const newWidth = Math.max(
+                  200,
+                  startWidth + (moveEvent.clientX - startX),
+                );
+                const newHeight = Math.max(
+                  150,
+                  startHeight + (moveEvent.clientY - startY),
+                );
+
+                onPositionChange({
+                  ...position,
+                  width: newWidth,
+                  height: newHeight,
+                });
+              };
+
+              const handleMouseUp = () => {
+                setIsResizing(false);
+                document.removeEventListener("mousemove", handleMouseMove);
+                document.removeEventListener("mouseup", handleMouseUp);
+              };
+
+              document.addEventListener("mousemove", handleMouseMove);
+              document.addEventListener("mouseup", handleMouseUp);
             }}
           />
           <div
