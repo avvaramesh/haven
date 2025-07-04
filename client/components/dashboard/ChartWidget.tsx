@@ -95,8 +95,20 @@ export default function ChartWidget({
     ${isSelected ? "ring-2 ring-dashboard-accent ring-offset-2 ring-offset-dashboard-background" : ""}
     ${isMaximized ? "fixed inset-4 z-50 shadow-2xl" : ""}
     ${isMinimized ? "h-12 overflow-hidden" : ""}
+    ${isDragging ? "z-50 shadow-2xl" : ""}
     ${className}
   `;
+
+  const containerStyle =
+    position && !isMaximized
+      ? {
+          position: "absolute" as const,
+          left: position.x,
+          top: position.y,
+          width: position.width,
+          height: position.height,
+        }
+      : {};
 
   return (
     <div className={containerClasses}>
