@@ -436,6 +436,26 @@ export default function CanvasArea({
   ) => {
     console.log("CanvasArea: Property change", { chartId, property, value }); // Debug log
 
+    // Store previous value for undo functionality
+    const previousValue = chartProperties[chartId]?.[property];
+
+    // Add to history for significant property changes (not for every minor change)
+    const significantProperties = [
+      "chartType",
+      "color",
+      "title",
+      "showLegend",
+      "showGrid",
+    ];
+    if (significantProperties.includes(property) && previousValue !== value) {
+      onAddToHistory?.({
+        type: "MODIFY_CHART",
+        chartId,
+        previousState: { property, value: previousValue },
+        newState: { property, value },
+      });
+    }
+
     // Handle chart type changes - update chartStates directly
     if (property === "chartType") {
       setChartStates((prev) => ({
