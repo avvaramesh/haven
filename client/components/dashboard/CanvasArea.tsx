@@ -999,8 +999,22 @@ export default function CanvasArea({
               </span>
             </>
           )}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Show Canvas Info Button when hidden */}
+      {!showCanvasInfo && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setShowCanvasInfo(true)}
+          className="absolute bottom-4 left-4 h-8 px-3 bg-dashboard-surface border border-dashboard-border text-xs text-dashboard-text-muted hover:text-dashboard-text"
+          title="Show Canvas Info"
+        >
+          Canvas Info
+        </Button>
+      )}
     </div>
   );
 }
