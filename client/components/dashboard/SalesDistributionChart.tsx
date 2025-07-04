@@ -80,6 +80,8 @@ interface SalesDistributionChartProps {
 export default function SalesDistributionChart({
   properties,
 }: SalesDistributionChartProps = {}) {
+  const colors = getColors(properties?.color);
+
   return (
     <div className="h-32 flex items-center justify-center">
       <ResponsiveContainer width="100%" height="100%">
@@ -97,7 +99,7 @@ export default function SalesDistributionChart({
             {data.map((entry, index) => (
               <Cell
                 key={`cell-${index}`}
-                fill={COLORS[index % COLORS.length]}
+                fill={colors[index % colors.length]}
                 stroke="hsl(210, 11%, 12%)"
                 strokeWidth={1}
               />
