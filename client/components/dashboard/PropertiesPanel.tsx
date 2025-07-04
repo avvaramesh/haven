@@ -55,6 +55,17 @@ export default function PropertiesPanel({
     opacity: 100,
     borderRadius: 8,
     chartType: "line",
+    // X-Axis properties
+    xAxisLabel: "",
+    showXAxis: true,
+    rotateXLabels: false,
+    xLabelAngle: 0,
+    // Y-Axis properties
+    yAxisLabel: "",
+    showYAxis: true,
+    yMinValue: "",
+    yMaxValue: "",
+    startFromZero: true,
   });
 
   const updateProperty = (key: string, value: any) => {
