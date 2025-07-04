@@ -200,7 +200,10 @@ export default function ChartWidget({
         }}
         title="Click to select • Drag to move"
       >
-        <h3 className="text-dashboard-text font-medium truncate">{title}</h3>
+        <div className="flex items-center gap-2 flex-1">
+          <GripVertical className="w-4 h-4 text-dashboard-text-muted opacity-50 group-hover:opacity-100 transition-opacity" />
+          <h3 className="text-dashboard-text font-medium truncate">{title}</h3>
+        </div>
         {isMinimized && (
           <Button
             variant="ghost"
