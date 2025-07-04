@@ -26,6 +26,8 @@ import {
   Bold,
   Italic,
   Underline,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 interface PropertiesPanelProps {
