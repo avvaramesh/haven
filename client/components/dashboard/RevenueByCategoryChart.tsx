@@ -98,16 +98,8 @@ export default function RevenueByCategoryChart({
               tick={{ fill: "hsl(215, 20.2%, 65.1%)", fontSize: 10 }}
               angle={isHorizontal ? 0 : -45}
               textAnchor={isHorizontal ? "middle" : "end"}
-              height={isHorizontal ? 20 : 40}
-              label={
-                properties?.xAxisLabel
-                  ? {
-                      value: properties.xAxisLabel,
-                      position: "insideBottom",
-                      offset: -5,
-                    }
-                  : undefined
-              }
+              height={isHorizontal ? 25 : 45}
+              interval={0}
             />
           )}
           {properties?.showYAxis !== false && (
@@ -117,16 +109,8 @@ export default function RevenueByCategoryChart({
               axisLine={false}
               tickLine={false}
               tick={{ fill: "hsl(215, 20.2%, 65.1%)", fontSize: 10 }}
-              width={isHorizontal ? 60 : 30}
-              label={
-                properties?.yAxisLabel
-                  ? {
-                      value: properties.yAxisLabel,
-                      angle: -90,
-                      position: "insideLeft",
-                    }
-                  : undefined
-              }
+              width={isHorizontal ? 75 : 35}
+              interval={0}
             />
           )}
           <Tooltip content={<CustomTooltip />} />
@@ -146,31 +130,35 @@ export default function RevenueByCategoryChart({
             <>
               <Bar
                 dataKey="Q1"
-                name="Q1"
+                name="Q1 2024"
                 fill={properties?.color || "hsl(199, 89%, 48%)"}
-                stackId={isStacked ? "stack" : undefined}
-                radius={isHorizontal ? [0, 2, 2, 0] : [2, 2, 0, 0]}
+                stackId={isStacked ? "quarters" : undefined}
+                radius={isHorizontal ? [0, 3, 3, 0] : [3, 3, 0, 0]}
+                maxBarSize={isGrouped ? 15 : 40}
               />
               <Bar
                 dataKey="Q2"
-                name="Q2"
+                name="Q2 2024"
                 fill="hsl(142, 76%, 36%)"
-                stackId={isStacked ? "stack" : undefined}
-                radius={isHorizontal ? [0, 2, 2, 0] : [2, 2, 0, 0]}
+                stackId={isStacked ? "quarters" : undefined}
+                radius={isHorizontal ? [0, 3, 3, 0] : [3, 3, 0, 0]}
+                maxBarSize={isGrouped ? 15 : 40}
               />
               <Bar
                 dataKey="Q3"
-                name="Q3"
+                name="Q3 2024"
                 fill="hsl(271, 81%, 56%)"
-                stackId={isStacked ? "stack" : undefined}
-                radius={isHorizontal ? [0, 2, 2, 0] : [2, 2, 0, 0]}
+                stackId={isStacked ? "quarters" : undefined}
+                radius={isHorizontal ? [0, 3, 3, 0] : [3, 3, 0, 0]}
+                maxBarSize={isGrouped ? 15 : 40}
               />
               <Bar
                 dataKey="Q4"
-                name="Q4"
+                name="Q4 2024"
                 fill="hsl(48, 96%, 53%)"
-                stackId={isStacked ? "stack" : undefined}
-                radius={isHorizontal ? [0, 2, 2, 0] : [2, 2, 0, 0]}
+                stackId={isStacked ? "quarters" : undefined}
+                radius={isHorizontal ? [0, 3, 3, 0] : [3, 3, 0, 0]}
+                maxBarSize={isGrouped ? 15 : 40}
               />
             </>
           ) : (
@@ -178,7 +166,8 @@ export default function RevenueByCategoryChart({
               dataKey="value"
               name="Revenue"
               fill={properties?.color || "hsl(199, 89%, 48%)"}
-              radius={isHorizontal ? [0, 2, 2, 0] : [2, 2, 0, 0]}
+              radius={isHorizontal ? [0, 4, 4, 0] : [4, 4, 0, 0]}
+              maxBarSize={40}
               cursor="pointer"
             />
           )}
