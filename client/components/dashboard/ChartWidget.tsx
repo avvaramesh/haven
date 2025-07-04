@@ -188,10 +188,16 @@ export default function ChartWidget({
 
       {/* Chart Header */}
       <div
-        className={`flex items-center justify-between p-4 cursor-pointer ${isMinimized ? "pb-0" : "pb-2"}`}
+        className={`flex items-center justify-between p-4 cursor-move ${isMinimized ? "pb-0" : "pb-2"}`}
         onClick={onSelect}
         onMouseEnter={() => setShowToolbar(true)}
         onMouseLeave={() => setShowToolbar(false)}
+        draggable={true}
+        onDragStart={(e) => {
+          e.dataTransfer.setData("text/plain", id);
+          e.dataTransfer.effectAllowed = "move";
+        }}
+        title="Click to select • Drag to move"
       >
         <h3 className="text-dashboard-text font-medium truncate">{title}</h3>
         {isMinimized && (
