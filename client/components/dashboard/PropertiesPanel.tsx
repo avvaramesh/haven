@@ -472,6 +472,10 @@ export default function PropertiesPanel({
                   </Label>
                   <Input
                     placeholder="e.g., Revenue ($), Count"
+                    value={properties.yAxisLabel}
+                    onChange={(e) =>
+                      updateProperty("yAxisLabel", e.target.value)
+                    }
                     className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
                   />
                 </div>
@@ -480,7 +484,12 @@ export default function PropertiesPanel({
                   <Label className="text-xs text-dashboard-text-muted">
                     Show Y-Axis
                   </Label>
-                  <Switch defaultChecked />
+                  <Switch
+                    checked={properties.showYAxis}
+                    onCheckedChange={(checked) =>
+                      updateProperty("showYAxis", checked)
+                    }
+                  />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
@@ -491,6 +500,10 @@ export default function PropertiesPanel({
                     <Input
                       type="number"
                       placeholder="Auto"
+                      value={properties.yMinValue}
+                      onChange={(e) =>
+                        updateProperty("yMinValue", e.target.value)
+                      }
                       className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
                     />
                   </div>
@@ -501,6 +514,10 @@ export default function PropertiesPanel({
                     <Input
                       type="number"
                       placeholder="Auto"
+                      value={properties.yMaxValue}
+                      onChange={(e) =>
+                        updateProperty("yMaxValue", e.target.value)
+                      }
                       className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
                     />
                   </div>
@@ -510,7 +527,12 @@ export default function PropertiesPanel({
                   <Label className="text-xs text-dashboard-text-muted">
                     Start from Zero
                   </Label>
-                  <Switch defaultChecked />
+                  <Switch
+                    checked={properties.startFromZero}
+                    onCheckedChange={(checked) =>
+                      updateProperty("startFromZero", checked)
+                    }
+                  />
                 </div>
               </div>
             </div>
