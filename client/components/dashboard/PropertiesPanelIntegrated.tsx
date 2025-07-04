@@ -38,6 +38,7 @@ export default function PropertiesPanelIntegrated({
   selectedElement,
   isMobile = false,
   onClose,
+  onPropertyChange = () => {},
 }: PropertiesPanelIntegratedProps) {
   const [properties, setProperties] = useState({
     title: "Q4 Revenue Analysis",
