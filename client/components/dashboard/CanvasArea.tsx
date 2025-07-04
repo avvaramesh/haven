@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { ToastAction } from "@/components/ui/toast";
-import { ChevronUp, ChevronDown, X } from "lucide-react";
+import { ChevronUp, ChevronDown, X, MoreVertical } from "lucide-react";
 import html2canvas from "html2canvas";
 import ChartWidget from "./ChartWidget";
 import SmartChart from "./SmartChart";
