@@ -527,11 +527,15 @@ export default function PropertiesPanelIntegrated({
               {["left", "center", "right"].map((align) => (
                 <Button
                   key={align}
-                  variant={properties.textAlign === align ? "default" : "ghost"}
+                  variant={
+                    normalizedProperties?.textAlign === align
+                      ? "default"
+                      : "ghost"
+                  }
                   size="sm"
                   onClick={() => updateProperty("textAlign", align)}
                   className={
-                    properties.textAlign === align
+                    normalizedProperties?.textAlign === align
                       ? "bg-dashboard-accent text-white"
                       : "text-dashboard-text hover:bg-dashboard-muted"
                   }
