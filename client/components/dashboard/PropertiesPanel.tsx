@@ -81,24 +81,6 @@ export default function PropertiesPanel({
       </div>
 
       <div className="p-4 space-y-6">
-        {/* Element Selector */}
-        <div className="space-y-2">
-          <Label className="text-sm font-medium text-dashboard-text">
-            Selected Element
-          </Label>
-          <Select value={selectedElement} onValueChange={setSelectedElement}>
-            <SelectTrigger className="bg-dashboard-surface border-dashboard-border text-dashboard-text">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Revenue Chart">Revenue Chart</SelectItem>
-              <SelectItem value="KPI Card">KPI Card</SelectItem>
-              <SelectItem value="Data Table">Data Table</SelectItem>
-              <SelectItem value="Text Element">Text Element</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
         {/* Basic Properties */}
         <div className="space-y-4">
           <div className="flex items-center gap-2">
