@@ -1,4 +1,8 @@
 import React, { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { ToastAction } from "@/components/ui/toast";
+import html2canvas from "html2canvas";
 import ChartWidget from "./ChartWidget";
 import SmartChart from "./SmartChart";
 import RevenueByCategoryChart from "./RevenueByCategoryChart";
@@ -73,6 +77,12 @@ export default function CanvasArea({
     },
   });
 
+  // Store removed charts for undo functionality
+  const [removedCharts, setRemovedCharts] = useState<
+    Record<string, ChartState>
+  >({});
+  const { toast } = useToast();
+
   const handleElementClick = (elementId: string) => {
     onElementSelect(elementId === selectedElement ? null : elementId);
   };
@@ -103,22 +113,164 @@ export default function CanvasArea({
   };
 
   const handleRemove = (chartId: string) => {
-    if (confirm("Are you sure you want to remove this chart?")) {
-      setChartStates((prev) => {
-        const newStates = { ...prev };
-        delete newStates[chartId];
-        return newStates;
-      });
-      if (selectedElement === chartId) {
-        onElementSelect(null);
-      }
+    const chartToRemove = chartStates[chartId];
+    if (!chartToRemove) return;
+
+    // Store the removed chart for undo
+    setRemovedCharts((prev) => ({
+      ...prev,
+      [chartId]: chartToRemove,
+    }));
+
+    // Remove from active charts
+    setChartStates((prev) => {
+      const newStates = { ...prev };
+      delete newStates[chartId];
+      return newStates;
+    });
+
+    // Clear selection if this chart was selected
+    if (selectedElement === chartId) {
+      onElementSelect(null);
     }
+
+    // Show undo toast
+    toast({
+      title: "Chart Removed",
+      description: `${getChartTitle(chartId)} has been removed from the dashboard.`,
+      action: (
+        <ToastAction
+          altText="Undo remove"
+          onClick={() => handleUndo(chartId)}
+          className="bg-dashboard-accent hover:bg-dashboard-accent-light text-white"
+        >
+          Undo
+        </ToastAction>
+      ),
+      duration: 10000, // 10 seconds to undo
+    });
+
+    // Auto-cleanup after toast expires
+    setTimeout(() => {
+      setRemovedCharts((prev) => {
+        const newRemoved = { ...prev };
+        delete newRemoved[chartId];
+        return newRemoved;
+      });
+    }, 10000);
   };
 
-  const handleDownload = (chartId: string) => {
-    // In a real implementation, this would generate and download the chart
-    console.log(`Downloading chart: ${chartId}`);
-    // You could use libraries like html2canvas, jsPDF, etc.
+  const handleUndo = (chartId: string) => {
+    const removedChart = removedCharts[chartId];
+    if (!removedChart) return;
+
+    // Restore the chart
+    setChartStates((prev) => ({
+      ...prev,
+      [chartId]: removedChart,
+    }));
+
+    // Remove from removed charts
+    setRemovedCharts((prev) => {
+      const newRemoved = { ...prev };
+      delete newRemoved[chartId];
+      return newRemoved;
+    });
+
+    toast({
+      title: "Chart Restored",
+      description: `${getChartTitle(chartId)} has been restored to the dashboard.`,
+      duration: 3000,
+    });
+  };
+
+  const getChartTitle = (chartId: string): string => {
+    const titles: Record<string, string> = {
+      "smart-chart": "Smart Analytics Chart",
+      "kpi-widget": "Total Revenue",
+      "revenue-chart": "Revenue by Category",
+      "sales-dist": "Sales Distribution",
+      "kpi-1": "Monthly Growth",
+      "kpi-2": "Active Users",
+      "kpi-3": "Conversion Rate",
+      "kpi-4": "Customer LTV",
+    };
+    return titles[chartId] || chartId;
+  };
+
+  const handleDownload = async (chartId: string) => {
+    try {
+      const chartElement = document.getElementById(`chart-${chartId}`);
+      if (!chartElement) {
+        toast({
+          title: "Download Failed",
+          description: "Chart element not found. Please try again.",
+          variant: "destructive",
+          duration: 5000,
+        });
+        return;
+      }
+
+      // Show loading toast
+      const loadingToast = toast({
+        title: "Preparing Download",
+        description: "Generating chart image...",
+        duration: 30000,
+      });
+
+      // Capture the chart as canvas
+      const canvas = await html2canvas(chartElement, {
+        backgroundColor: "#1e293b", // dashboard-surface color
+        scale: 2, // Higher quality
+        useCORS: true,
+        allowTaint: true,
+        logging: false,
+        width: chartElement.offsetWidth,
+        height: chartElement.offsetHeight,
+      });
+
+      // Convert to blob and download
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            toast({
+              title: "Download Failed",
+              description: "Failed to generate chart image.",
+              variant: "destructive",
+              duration: 5000,
+            });
+            return;
+          }
+
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `${chartId}-${new Date().toISOString().split("T")[0]}.png`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+
+          // Dismiss loading toast and show success
+          loadingToast.dismiss();
+          toast({
+            title: "Download Complete",
+            description: `${getChartTitle(chartId)} has been downloaded as PNG.`,
+            duration: 5000,
+          });
+        },
+        "image/png",
+        0.95,
+      );
+    } catch (error) {
+      console.error("Download error:", error);
+      toast({
+        title: "Download Failed",
+        description: "An error occurred while downloading the chart.",
+        variant: "destructive",
+        duration: 5000,
+      });
+    }
   };
 
   const handleDuplicate = (chartId: string) => {
