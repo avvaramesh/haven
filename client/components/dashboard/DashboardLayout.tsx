@@ -342,6 +342,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         zoomLevel={zoomLevel}
         showGrid={showGrid}
         onToggleGrid={handleToggleGrid}
+        gridSize={gridSize}
+        canvasSize={canvasSize}
+        onZoomChange={handleZoomChange}
+        onGridSizeChange={handleGridSizeChange}
+        onCanvasSizeChange={handleCanvasSizeChange}
       />
 
       {/* Main Editor Area */}
