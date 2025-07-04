@@ -66,6 +66,38 @@ export default function CanvasArea({
   const [chartProperties, setChartProperties] = useState<Record<string, any>>(
     {},
   );
+
+  // Initialize chart properties with correct chart types
+  React.useEffect(() => {
+    const initialProperties: Record<string, any> = {};
+
+    Object.entries(chartStates).forEach(([chartId, chartState]) => {
+      initialProperties[chartId] = {
+        chartType: chartState.chartType,
+        type: chartState.chartType,
+        title: getChartTitle(chartId),
+        color:
+          chartId === "smart-chart"
+            ? "#3b82f6"
+            : chartId === "revenue-chart"
+              ? "#10b981"
+              : chartId === "sales-dist"
+                ? "#f59e0b"
+                : "#8b5cf6",
+        primaryColor:
+          chartId === "smart-chart"
+            ? "#3b82f6"
+            : chartId === "revenue-chart"
+              ? "#10b981"
+              : chartId === "sales-dist"
+                ? "#f59e0b"
+                : "#8b5cf6",
+      };
+    });
+
+    setChartProperties(initialProperties);
+    console.log("Initialized chart properties:", initialProperties);
+  }, []); // Only run once on mount
   const [chartStates, setChartStates] = useState<Record<string, ChartState>>({
     "smart-chart": {
       id: "smart-chart",
