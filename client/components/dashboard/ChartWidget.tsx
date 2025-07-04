@@ -95,7 +95,7 @@ export default function ChartWidget({
     group relative bg-dashboard-surface border border-dashboard-border rounded-lg
     transition-all duration-200
     ${isSelected ? "ring-2 ring-dashboard-accent ring-offset-2 ring-offset-dashboard-background" : ""}
-    ${isMaximized ? "fixed inset-8 z-[100] shadow-2xl" : ""}
+    ${isMaximized ? "absolute inset-4 z-[100] shadow-2xl" : ""}
     ${isMinimized ? "h-12 overflow-hidden" : ""}
     ${isDragging ? "z-50 shadow-2xl" : ""}
     ${className}
@@ -122,7 +122,7 @@ export default function ChartWidget({
       {/* Maximize Overlay Background - rendered at root level */}
       {isMaximized && (
         <div
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[90]"
+          className="absolute inset-0 bg-black/40 backdrop-blur-sm z-[90]"
           onClick={(e) => {
             e.preventDefault();
             console.log(`Overlay clicked for maximized chart ${id}`);
@@ -182,9 +182,8 @@ export default function ChartWidget({
                 console.error(`Error calling onMaximize:`, error);
               }
             }}
-            className="h-6 w-6 p-0 bg-red-500 border border-dashboard-border hover:bg-red-600 z-50"
+            className="h-6 w-6 p-0 bg-dashboard-surface border border-dashboard-border hover:bg-dashboard-muted"
             title={isMaximized ? "Restore" : "Maximize"}
-            style={{ backgroundColor: "red", zIndex: 50 }}
           >
             {isMaximized ? (
               <Shrink className="w-3 h-3" />

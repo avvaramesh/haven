@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { ToastAction } from "@/components/ui/toast";
+import { ChevronUp, ChevronDown, X, MoreVertical } from "lucide-react";
 import html2canvas from "html2canvas";
 import ChartWidget from "./ChartWidget";
 import SmartChart from "./SmartChart";
@@ -47,6 +48,10 @@ interface CanvasAreaProps {
     ((action: HistoryAction) => void) | undefined
   >;
   onPropertyChange?: (chartId: string, property: string, value: any) => void;
+  initialZoomLevel?: number;
+  initialGridSize?: number;
+  initialCanvasSize?: { width: number; height: number };
+  initialShowGrid?: boolean;
 }
 
 export default function CanvasArea({
@@ -58,11 +63,16 @@ export default function CanvasArea({
   undoRef,
   redoRef,
   onPropertyChange: parentOnPropertyChange,
+  initialZoomLevel = 100,
+  initialGridSize = 20,
+  initialCanvasSize = { width: 1920, height: 1080 },
+  initialShowGrid = true,
 }: CanvasAreaProps) {
-  const [showGrid, setShowGrid] = useState(true);
-  const [canvasSize, setCanvasSize] = useState({ width: 1920, height: 1080 });
-  const [zoomLevel, setZoomLevel] = useState(100);
-  const [gridSize, setGridSize] = useState(20);
+  const [showGrid, setShowGrid] = useState(initialShowGrid);
+  const [canvasSize, setCanvasSize] = useState(initialCanvasSize);
+  const [zoomLevel, setZoomLevel] = useState(initialZoomLevel);
+  const [gridSize, setGridSize] = useState(initialGridSize);
+  const [showCanvasInfo, setShowCanvasInfo] = useState(true);
   const [chartProperties, setChartProperties] = useState<Record<string, any>>(
     {},
   );
@@ -700,6 +710,9 @@ export default function CanvasArea({
     // Expose grid and zoom controls to parent
     (window as any).setCanvasGrid = (show: boolean) => setShowGrid(show);
     (window as any).setCanvasZoom = (level: number) => setZoomLevel(level);
+    (window as any).setCanvasGridSize = (size: number) => setGridSize(size);
+    (window as any).setCanvasSize = (size: { width: number; height: number }) =>
+      setCanvasSize(size);
 
     // Expose property change handler for direct updates (avoid circular calls)
     (window as any).updateCanvasProperty = handlePropertyChange;
@@ -708,6 +721,8 @@ export default function CanvasArea({
     return () => {
       delete (window as any).setCanvasGrid;
       delete (window as any).setCanvasZoom;
+      delete (window as any).setCanvasGridSize;
+      delete (window as any).setCanvasSize;
       delete (window as any).updateCanvasProperty;
     };
   }, [handlePropertyChange]);
@@ -939,39 +954,70 @@ export default function CanvasArea({
       </div>
 
       {/* Canvas Info */}
-      <div className="absolute bottom-4 left-4 bg-dashboard-surface border border-dashboard-border rounded-lg p-2 text-xs text-dashboard-text-muted">
-        <div className="flex items-center gap-4">
-          <span>
-            Canvas: {canvasSize.width}×{canvasSize.height}
-          </span>
-          <span>•</span>
-          <span>Grid: {gridSize}px</span>
-          <span>���</span>
-          <span>Zoom: {zoomLevel}%</span>
-          <span>•</span>
-          <span>{visibleCharts.length} charts visible</span>
-          {minimizedCharts.length > 0 && (
-            <>
-              <span>•</span>
-              <span>{minimizedCharts.length} minimized</span>
-            </>
-          )}
-          {maximizedChart && (
-            <>
-              <span>•</span>
-              <span className="text-dashboard-accent">1 maximized</span>
-            </>
-          )}
-          {selectedElement && (
-            <>
-              <span>���</span>
-              <span className="text-dashboard-accent">
-                Selected: {selectedElement}
+      {showCanvasInfo && (
+        <div className="fixed bottom-4 left-4 bg-dashboard-surface border border-dashboard-border rounded-lg overflow-hidden z-30">
+          <div className="flex items-center justify-between px-2 py-1 border-b border-dashboard-border bg-dashboard-muted/30">
+            <span className="text-xs font-medium text-dashboard-text">
+              Canvas Info
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowCanvasInfo(false)}
+              className="h-5 w-5 p-0 text-dashboard-text-muted hover:text-dashboard-text"
+              title="Hide Canvas Info"
+            >
+              <X className="w-3 h-3" />
+            </Button>
+          </div>
+          <div className="p-2 text-xs text-dashboard-text-muted">
+            <div className="flex items-center gap-4">
+              <span>
+                Canvas: {canvasSize.width}×{canvasSize.height}
               </span>
-            </>
-          )}
+              <span>•</span>
+              <span>Grid: {gridSize}px</span>
+              <span>����</span>
+              <span>Zoom: {zoomLevel}%</span>
+              <span>•</span>
+              <span>{visibleCharts.length} charts visible</span>
+              {minimizedCharts.length > 0 && (
+                <>
+                  <span>•</span>
+                  <span>{minimizedCharts.length} minimized</span>
+                </>
+              )}
+              {maximizedChart && (
+                <>
+                  <span>•</span>
+                  <span className="text-dashboard-accent">1 maximized</span>
+                </>
+              )}
+              {selectedElement && (
+                <>
+                  <span>���</span>
+                  <span className="text-dashboard-accent">
+                    Selected: {selectedElement}
+                  </span>
+                </>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Show Canvas Info Button when hidden */}
+      {!showCanvasInfo && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setShowCanvasInfo(true)}
+          className="fixed bottom-4 left-4 h-7 w-7 p-0 bg-dashboard-surface border border-dashboard-border text-dashboard-text-muted hover:text-dashboard-text z-30"
+          title="Show Canvas Info"
+        >
+          <MoreVertical className="w-3 h-3" />
+        </Button>
+      )}
     </div>
   );
 }

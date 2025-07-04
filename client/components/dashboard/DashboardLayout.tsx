@@ -44,6 +44,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(100);
   const [showGrid, setShowGrid] = useState(true);
+  const [gridSize, setGridSize] = useState(20);
+  const [canvasSize, setCanvasSize] = useState({ width: 1920, height: 1080 });
   const [showExportDialog, setShowExportDialog] = useState(false);
   const isMobile = useIsMobile();
   const { toast } = useToast();
@@ -218,6 +220,39 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     }
   };
 
+  const handleZoomChange = (newZoom: number) => {
+    const clampedZoom = Math.max(25, Math.min(500, newZoom));
+    setZoomLevel(clampedZoom);
+    // Notify canvas area if available
+    if ((window as any).setCanvasZoom) {
+      (window as any).setCanvasZoom(clampedZoom);
+    }
+  };
+
+  const handleGridSizeChange = (newSize: number) => {
+    const clampedSize = Math.max(10, Math.min(100, newSize));
+    setGridSize(clampedSize);
+    // Notify canvas area if available
+    if ((window as any).setCanvasGridSize) {
+      (window as any).setCanvasGridSize(clampedSize);
+    }
+  };
+
+  const handleCanvasSizeChange = (newSize: {
+    width: number;
+    height: number;
+  }) => {
+    const clampedSize = {
+      width: Math.max(800, Math.min(7680, newSize.width)),
+      height: Math.max(600, Math.min(4320, newSize.height)),
+    };
+    setCanvasSize(clampedSize);
+    // Notify canvas area if available
+    if ((window as any).setCanvasSize) {
+      (window as any).setCanvasSize(clampedSize);
+    }
+  };
+
   const handlePropertyChange = (
     elementId: string,
     property: string,
@@ -307,6 +342,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         zoomLevel={zoomLevel}
         showGrid={showGrid}
         onToggleGrid={handleToggleGrid}
+        gridSize={gridSize}
+        canvasSize={canvasSize}
+        onZoomChange={handleZoomChange}
+        onGridSizeChange={handleGridSizeChange}
+        onCanvasSizeChange={handleCanvasSizeChange}
       />
 
       {/* Main Editor Area */}
@@ -515,6 +555,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           undoRef={canvasUndoRef}
           redoRef={canvasRedoRef}
           onPropertyChange={handlePropertyChange}
+          initialZoomLevel={zoomLevel}
+          initialGridSize={gridSize}
+          initialCanvasSize={canvasSize}
+          initialShowGrid={showGrid}
         />
       </div>
 
