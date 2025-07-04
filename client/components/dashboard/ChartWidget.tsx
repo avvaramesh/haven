@@ -447,16 +447,15 @@ export default function ChartWidget({
         </>
       )}
 
-      {/* Maximize Overlay Background */}
+      {/* Maximize Overlay Background - rendered behind the chart */}
       {isMaximized && (
         <div
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[90]"
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[80]"
           onClick={(e) => {
             e.preventDefault();
             console.log(`Overlay clicked for maximized chart ${id}`);
             onMaximize?.();
           }}
-          style={{ zIndex: 90 }}
         />
       )}
     </div>
