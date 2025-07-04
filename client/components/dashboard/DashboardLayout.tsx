@@ -10,9 +10,10 @@ import {
   Bot,
   Settings,
 } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import DataConnectionsPanel from "./DataConnectionsPanel";
 import ChartTemplatesPanel from "./ChartTemplatesPanel";
-import AICopilotIntegrated from "./AICopilotIntegrated";
+import AIAssistantUnified from "./AIAssistantUnified";
 import PropertiesPanelIntegrated from "./PropertiesPanelIntegrated";
 import EditingToolbar from "./EditingToolbar";
 import CanvasArea from "./CanvasArea";
@@ -21,12 +22,36 @@ interface DashboardLayoutProps {
   children?: ReactNode;
 }
 
+interface HistoryAction {
+  type: "REMOVE_CHART" | "ADD_CHART" | "MODIFY_CHART";
+  chartId: string;
+  previousState?: any;
+  newState?: any;
+  timestamp: number;
+}
+
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [selectedElement, setSelectedElement] = useState<string | null>(null);
   const [leftPanelTab, setLeftPanelTab] = useState<
     "data" | "templates" | "properties" | "copilot"
   >("data");
   const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false);
+  const isMobile = useIsMobile();
+
+  // Global undo/redo state
+  const [undoStack, setUndoStack] = useState<HistoryAction[]>([]);
+  const [redoStack, setRedoStack] = useState<HistoryAction[]>([]);
+
+  // Ref to communicate with CanvasArea
+  const canvasUndoRef = React.useRef<(action: HistoryAction) => void>();
+  const canvasRedoRef = React.useRef<(action: HistoryAction) => void>();
+
+  // Auto-collapse on mobile
+  React.useEffect(() => {
+    if (isMobile) {
+      setIsLeftPanelCollapsed(true);
+    }
+  }, [isMobile]);
 
   // Auto-switch to properties when element is selected
   React.useEffect(() => {
@@ -34,6 +59,53 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       setLeftPanelTab("properties");
     }
   }, [selectedElement, isLeftPanelCollapsed]);
+
+  // Handle collapsed icon clicks - expand and switch to tab
+  const handleCollapsedTabClick = (
+    tab: "data" | "templates" | "properties" | "copilot",
+  ) => {
+    setLeftPanelTab(tab);
+    setIsLeftPanelCollapsed(false);
+  };
+
+  // Global undo/redo functions
+  const addToHistory = (action: Omit<HistoryAction, "timestamp">) => {
+    const historyAction: HistoryAction = {
+      ...action,
+      timestamp: Date.now(),
+    };
+    setUndoStack((prev) => [...prev, historyAction]);
+    setRedoStack([]); // Clear redo stack when new action is performed
+  };
+
+  const handleGlobalUndo = () => {
+    if (undoStack.length === 0) return null;
+
+    const lastAction = undoStack[undoStack.length - 1];
+    setUndoStack((prev) => prev.slice(0, -1));
+    setRedoStack((prev) => [lastAction, ...prev]);
+
+    // Call the CanvasArea undo handler
+    canvasUndoRef.current?.(lastAction);
+
+    return lastAction;
+  };
+
+  const handleGlobalRedo = () => {
+    if (redoStack.length === 0) return null;
+
+    const actionToRedo = redoStack[0];
+    setRedoStack((prev) => prev.slice(1));
+    setUndoStack((prev) => [...prev, actionToRedo]);
+
+    // Call the CanvasArea redo handler
+    canvasRedoRef.current?.(actionToRedo);
+
+    return actionToRedo;
+  };
+
+  const canUndo = undoStack.length > 0;
+  const canRedo = redoStack.length > 0;
   return (
     <div className="h-screen flex flex-col bg-dashboard-background">
       {/* Top Header */}
@@ -79,12 +151,27 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       </div>
 
       {/* Editing Toolbar */}
-      <EditingToolbar />
+      <EditingToolbar
+        onUndo={handleGlobalUndo}
+        onRedo={handleGlobalRedo}
+        canUndo={canUndo}
+        canRedo={canRedo}
+      />
 
       {/* Main Editor Area */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Panel - Collapsible Tabbed Interface */}
-        <div className="flex flex-col">
+        <div
+          className={`flex flex-col ${isMobile && !isLeftPanelCollapsed ? "absolute inset-y-0 left-0 z-50 bg-dashboard-background/95 backdrop-blur-sm" : ""}`}
+        >
+          {/* Mobile Overlay */}
+          {isMobile && !isLeftPanelCollapsed && (
+            <div
+              className="fixed inset-0 bg-black/20 z-40"
+              onClick={() => setIsLeftPanelCollapsed(true)}
+            />
+          )}
+
           {/* Collapsed State */}
           {isLeftPanelCollapsed ? (
             <div className="w-12 bg-dashboard-background border-r border-dashboard-border h-full flex flex-col items-center py-4">
@@ -92,31 +179,76 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsLeftPanelCollapsed(false)}
-                className="text-dashboard-text hover:bg-dashboard-muted mb-4"
+                className="text-dashboard-text hover:bg-dashboard-muted mb-4 p-0 h-8 w-8"
+                title="Expand Panel"
               >
                 <ChevronRight className="w-4 h-4" />
               </Button>
-              <div className="flex flex-col gap-3">
-                <Database
-                  className="w-5 h-5 text-dashboard-text-muted"
-                  title="Data"
-                />
-                <BarChart3
-                  className="w-5 h-5 text-dashboard-text-muted"
-                  title="Charts"
-                />
-                <Settings
-                  className={`w-5 h-5 ${selectedElement ? "text-dashboard-accent" : "text-dashboard-text-muted"}`}
-                  title="Properties"
-                />
-                <Bot
-                  className="w-5 h-5 text-dashboard-text-muted"
+              <div className="flex flex-col gap-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleCollapsedTabClick("data")}
+                  className={`p-0 h-8 w-8 hover:bg-dashboard-muted ${
+                    leftPanelTab === "data"
+                      ? "text-dashboard-accent"
+                      : "text-dashboard-text-muted"
+                  }`}
+                  title="Data Connections"
+                >
+                  <Database className="w-5 h-5" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleCollapsedTabClick("templates")}
+                  className={`p-0 h-8 w-8 hover:bg-dashboard-muted ${
+                    leftPanelTab === "templates"
+                      ? "text-dashboard-accent"
+                      : "text-dashboard-text-muted"
+                  }`}
+                  title="Chart Templates"
+                >
+                  <BarChart3 className="w-5 h-5" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleCollapsedTabClick("properties")}
+                  disabled={!selectedElement}
+                  className={`p-0 h-8 w-8 hover:bg-dashboard-muted relative ${
+                    leftPanelTab === "properties" && selectedElement
+                      ? "text-dashboard-accent"
+                      : "text-dashboard-text-muted"
+                  } ${!selectedElement ? "opacity-50 cursor-not-allowed" : ""}`}
+                  title={
+                    selectedElement
+                      ? "Properties"
+                      : "Select an element to view properties"
+                  }
+                >
+                  <Settings className="w-5 h-5" />
+                  {selectedElement && (
+                    <div className="absolute -top-1 -right-1 w-2 h-2 bg-dashboard-accent rounded-full" />
+                  )}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleCollapsedTabClick("copilot")}
+                  className={`p-0 h-8 w-8 hover:bg-dashboard-muted ${
+                    leftPanelTab === "copilot"
+                      ? "text-dashboard-accent"
+                      : "text-dashboard-text-muted"
+                  }`}
                   title="AI Copilot"
-                />
+                >
+                  <Bot className="w-5 h-5" />
+                </Button>
               </div>
             </div>
           ) : (
-            <div className="flex h-full">
+            <div className={`flex h-full ${isMobile ? "relative z-50" : ""}`}>
               {/* Vertical Tab Sidebar */}
               <div className="w-16 bg-dashboard-surface border-r border-dashboard-border flex flex-col py-2">
                 <Button
@@ -199,15 +331,21 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 {leftPanelTab === "data" && <DataConnectionsPanel />}
                 {leftPanelTab === "templates" && <ChartTemplatesPanel />}
                 {leftPanelTab === "properties" && (
-                  <div className="w-80 h-full">
+                  <div
+                    className={`${isMobile ? "w-screen max-w-sm" : "w-80"} h-full`}
+                  >
                     <PropertiesPanelIntegrated
                       selectedElement={selectedElement}
+                      isMobile={isMobile}
+                      onClose={() => isMobile && setIsLeftPanelCollapsed(true)}
                     />
                   </div>
                 )}
                 {leftPanelTab === "copilot" && (
-                  <div className="w-80 h-full">
-                    <AICopilotIntegrated />
+                  <div
+                    className={`${isMobile ? "w-screen max-w-sm" : "w-80"} h-full`}
+                  >
+                    <AIAssistantUnified />
                   </div>
                 )}
               </div>
@@ -219,6 +357,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         <CanvasArea
           selectedElement={selectedElement}
           onElementSelect={setSelectedElement}
+          onAddToHistory={addToHistory}
+          onUndo={handleGlobalUndo}
+          onRedo={handleGlobalRedo}
+          undoRef={canvasUndoRef}
+          redoRef={canvasRedoRef}
         />
       </div>
 
