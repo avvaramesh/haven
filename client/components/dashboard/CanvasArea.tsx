@@ -573,6 +573,7 @@ export default function CanvasArea({
     const significantProperties = [
       "chartType",
       "color",
+      "primaryColor",
       "title",
       "showLegend",
       "showGrid",
@@ -587,7 +588,7 @@ export default function CanvasArea({
     }
 
     // Handle chart type changes - update chartStates directly
-    if (property === "chartType") {
+    if (property === "chartType" || property === "type") {
       setChartStates((prev) => ({
         ...prev,
         [chartId]: {
@@ -597,17 +598,44 @@ export default function CanvasArea({
       }));
     }
 
+    // Map normalized properties to legacy format for backwards compatibility
+    const legacyPropertyMap: Record<string, string> = {
+      primaryColor: "color",
+      backgroundColor: "background",
+      "xAxis.label": "xAxisLabel",
+      "yAxis.label": "yAxisLabel",
+      "xAxis.enabled": "showXAxis",
+      "yAxis.enabled": "showYAxis",
+      "xAxis.showGridLines": "showGrid",
+      "yAxis.showGridLines": "showGrid",
+      "yAxis.startFromZero": "startFromZero",
+    };
+
+    // Update both the original property and any legacy mapping
+    const propertiesToUpdate: Array<{ key: string; value: any }> = [
+      { key: property, value },
+    ];
+
+    // Add legacy property if mapping exists
+    if (legacyPropertyMap[property]) {
+      propertiesToUpdate.push({
+        key: legacyPropertyMap[property],
+        value,
+      });
+    }
+
     // Immediate state update for smooth real-time updates
     setChartProperties((prev) => {
-      const newProps = {
-        ...prev,
-        [chartId]: {
-          ...prev[chartId],
-          [property]: value,
-        },
-      };
-      console.log("CanvasArea: Updated chart properties", newProps); // Debug log
+      const newProps = { ...prev };
 
+      propertiesToUpdate.forEach(({ key, value }) => {
+        if (!newProps[chartId]) {
+          newProps[chartId] = {};
+        }
+        newProps[chartId][key] = value;
+      });
+
+      console.log("CanvasArea: Updated chart properties", newProps); // Debug log
       return newProps;
     });
 
