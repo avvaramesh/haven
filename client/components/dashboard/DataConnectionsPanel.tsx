@@ -1,33 +1,5 @@
-import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import {
-  Database,
-  Plus,
-  RefreshCw,
-  CheckCircle,
-  AlertTriangle,
-  Clock,
-  Search,
-  Filter,
-  Download,
-  Upload,
-  Link,
-  FileSpreadsheet,
-  Cloud,
-  Server,
-  Zap,
-  Users,
-  Target,
-  DollarSign,
-  TrendingUp,
-} from "lucide-react";
-import {
-  allDatasets,
-  getDatasetsByCategory,
-  Dataset,
-} from "../../data/sampleData";
+import React from "react";
+import DataSourceManager from "./DataSourceManager";
 
 interface DataConnection {
   id: string;
