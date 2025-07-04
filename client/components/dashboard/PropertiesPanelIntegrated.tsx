@@ -57,15 +57,22 @@ export default function PropertiesPanelIntegrated({
   });
 
   const updateProperty = (key: string, value: any) => {
+    // Update local state immediately for responsive UI
     setProperties((prev) => ({ ...prev, [key]: value }));
 
-    // Notify parent component of property change
+    // Immediately notify parent component for real-time chart updates
     if (
       selectedElement &&
       onPropertyChange &&
       typeof onPropertyChange === "function"
     ) {
+      // Use immediate callback to ensure smooth updates
       onPropertyChange(selectedElement, key, value);
+
+      // Also try to call the global canvas property change if available
+      if ((window as any).canvasPropertyChange) {
+        (window as any).canvasPropertyChange(selectedElement, key, value);
+      }
     }
   };
 

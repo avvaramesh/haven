@@ -429,6 +429,7 @@ export default function CanvasArea({
   ) => {
     console.log("CanvasArea: Property change", { chartId, property, value }); // Debug log
 
+    // Immediate state update for smooth real-time updates
     setChartProperties((prev) => {
       const newProps = {
         ...prev,
@@ -438,11 +439,20 @@ export default function CanvasArea({
         },
       };
       console.log("CanvasArea: Updated chart properties", newProps); // Debug log
+
+      // Force immediate re-render by updating at next tick
+      setTimeout(() => {
+        // Trigger a forced update if needed
+        setChartStates((states) => ({ ...states }));
+      }, 0);
+
       return newProps;
     });
 
-    // Notify parent component
-    parentOnPropertyChange?.(chartId, property, value);
+    // Notify parent component immediately
+    if (parentOnPropertyChange) {
+      parentOnPropertyChange(chartId, property, value);
+    }
   };
 
   // Expose property change handler to parent
@@ -462,21 +472,27 @@ export default function CanvasArea({
     e.preventDefault();
     const data = e.dataTransfer.getData("text/plain");
 
-    // Get the canvas container for proper coordinate calculation
-    const canvasContainer = e.currentTarget.querySelector(
-      ".relative.p-6.min-h-full",
-    ) as HTMLElement;
-    if (!canvasContainer) return;
+    // Get better coordinates for drop location
+    const dropX = e.clientX - e.currentTarget.getBoundingClientRect().left;
+    const dropY = e.clientY - e.currentTarget.getBoundingClientRect().top;
 
-    const canvasRect = canvasContainer.getBoundingClientRect();
-    const dropX = e.clientX - canvasRect.left - 24; // Account for padding
-    const dropY = e.clientY - canvasRect.top - 24;
-
-    console.log("Drop event:", { data, dropX, dropY, canvasRect }); // Debug log
+    console.log("Drop event:", { data, dropX, dropY }); // Debug log
 
     if (data.startsWith("new-chart:")) {
       const chartType = data.replace("new-chart:", "");
       const newId = `${chartType}-${Date.now()}`;
+
+      // Determine chart size based on type
+      let chartWidth = 400;
+      let chartHeight = 250;
+
+      if (chartType === "kpi") {
+        chartWidth = 200;
+        chartHeight = 120;
+      } else if (chartType === "pie") {
+        chartWidth = 300;
+        chartHeight = 300;
+      }
 
       const newChartState: ChartState = {
         id: newId,
@@ -484,23 +500,25 @@ export default function CanvasArea({
         isMaximized: false,
         isHidden: false,
         position: {
-          x: Math.max(0, dropX),
-          y: Math.max(0, dropY),
-          width: 400,
-          height: 250,
+          x: Math.max(0, dropX - 100), // Center the chart on drop point
+          y: Math.max(0, dropY - 50),
+          width: chartWidth,
+          height: chartHeight,
         },
         chartType: chartType,
       };
 
       console.log("Creating new chart:", newChartState); // Debug log
-      console.log("Current chart states before:", Object.keys(chartStates)); // Debug log
 
       setChartStates((prev) => {
         const newStates = {
           ...prev,
           [newId]: newChartState,
         };
-        console.log("New chart states after:", Object.keys(newStates)); // Debug log
+        console.log(
+          "Chart states updated. New chart count:",
+          Object.keys(newStates).length,
+        ); // Debug log
         return newStates;
       });
 
@@ -511,10 +529,13 @@ export default function CanvasArea({
       });
 
       toast({
-        title: "Chart Created",
-        description: `New ${chartType} chart added to canvas`,
-        duration: 2000,
+        title: "Chart Created Successfully!",
+        description: `New ${chartType} chart added to canvas at position (${Math.round(dropX)}, ${Math.round(dropY)})`,
+        duration: 3000,
       });
+
+      // Auto-select the new chart
+      onElementSelect(newId);
     } else {
       // Handle existing chart movement
       const chartId = data;
@@ -669,10 +690,13 @@ export default function CanvasArea({
           ))}
       </div>
 
-      {/* Canvas Controls */}
-      <div className="absolute top-4 right-4 bg-dashboard-surface border border-dashboard-border rounded-lg p-3 space-y-2">
+      {/* Canvas Controls - Positioned at bottom right */}
+      <div className="absolute bottom-4 right-4 bg-dashboard-surface border border-dashboard-border rounded-lg p-3 space-y-2 shadow-lg">
+        <div className="text-xs font-medium text-dashboard-text mb-2">
+          Canvas Controls
+        </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-dashboard-text-muted">Canvas:</span>
+          <span className="text-xs text-dashboard-text-muted">Size:</span>
           <input
             type="number"
             value={canvasSize.width}
@@ -712,7 +736,7 @@ export default function CanvasArea({
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowGrid(!showGrid)}
-            className={`px-2 py-1 text-xs rounded border ${showGrid ? "bg-dashboard-accent text-white" : "bg-dashboard-muted text-dashboard-text"}`}
+            className={`px-2 py-1 text-xs rounded border transition-colors ${showGrid ? "bg-dashboard-accent text-white border-dashboard-accent" : "bg-dashboard-muted text-dashboard-text border-dashboard-border hover:border-dashboard-accent"}`}
           >
             Grid
           </button>
