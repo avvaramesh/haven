@@ -58,6 +58,9 @@ export default function CanvasArea({
   redoRef,
 }: CanvasAreaProps) {
   const [showGrid, setShowGrid] = useState(true);
+  const [chartProperties, setChartProperties] = useState<Record<string, any>>(
+    {},
+  );
   const [chartStates, setChartStates] = useState<Record<string, ChartState>>({
     "smart-chart": {
       id: "smart-chart",
