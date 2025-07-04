@@ -158,10 +158,13 @@ export default function TreemapChart({ properties }: TreemapChartProps = {}) {
                   animationEnabled ? "hover:opacity-80" : ""
                 }`}
                 style={{
-                  animation: animationEnabled
-                    ? `fadeIn 0.5s ease-out ${index * 0.1}s both`
-                    : "none",
+                  animationDelay: animationEnabled
+                    ? `${index * 0.1}s`
+                    : undefined,
                 }}
+                className={
+                  animationEnabled ? "animate-in fade-in duration-500" : ""
+                }
               />
 
               {/* Label and value text */}
@@ -246,18 +249,7 @@ export default function TreemapChart({ properties }: TreemapChartProps = {}) {
         </div>
       </div>
 
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: scale(0.8);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-      `}</style>
+      {/* Animation styles moved to CSS classes */}
     </div>
   );
 }
