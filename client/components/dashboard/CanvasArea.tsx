@@ -561,10 +561,20 @@ export default function CanvasArea({
               }
               onResize={(size) => handleResize(chart.id, size)}
             >
-              {chart.id === "smart-chart" && <SmartChart />}
+              {chart.id === "smart-chart" && (
+                <SmartChart properties={chartProperties[chart.id]} />
+              )}
               {chart.id === "kpi-widget" && <KPIWidget />}
-              {chart.id === "revenue-chart" && <RevenueByCategoryChart />}
-              {chart.id === "sales-dist" && <SalesDistributionChart />}
+              {chart.id === "revenue-chart" && (
+                <RevenueByCategoryChart
+                  properties={chartProperties[chart.id]}
+                />
+              )}
+              {chart.id === "sales-dist" && (
+                <SalesDistributionChart
+                  properties={chartProperties[chart.id]}
+                />
+              )}
               {chart.id === "kpi-1" && (
                 <div className="flex flex-col justify-center items-center h-full">
                   <div className="text-lg font-bold text-green-400">+12.5%</div>
