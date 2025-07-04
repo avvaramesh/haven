@@ -9,11 +9,20 @@ import RevenueByCategoryChart from "./RevenueByCategoryChart";
 import KPIWidget from "./KPIWidget";
 import SalesDistributionChart from "./SalesDistributionChart";
 
+interface ChartPosition {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 interface ChartState {
   id: string;
   isMinimized: boolean;
   isMaximized: boolean;
   isHidden: boolean;
+  position?: ChartPosition;
+  chartType?: string;
 }
 
 interface HistoryAction {
