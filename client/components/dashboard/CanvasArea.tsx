@@ -780,6 +780,55 @@ export default function CanvasArea({
               </div>
             )}
         </div>
+
+        {/* Dynamic Charts - Absolute Positioned */}
+        {Object.values(chartStates)
+          .filter(
+            (chart) =>
+              !chart.isHidden &&
+              chart.position &&
+              ![
+                "smart-chart",
+                "kpi-widget",
+                "revenue-chart",
+                "sales-dist",
+                "kpi-1",
+                "kpi-2",
+                "kpi-3",
+                "kpi-4",
+              ].includes(chart.id),
+          )
+          .map((chart) => (
+            <ChartWidget
+              key={chart.id}
+              id={chart.id}
+              title={
+                chart.chartType
+                  ? `${chart.chartType.charAt(0).toUpperCase() + chart.chartType.slice(1)} Chart`
+                  : "Chart"
+              }
+              className=""
+              isSelected={selectedElement === chart.id}
+              isMinimized={chart.isMinimized}
+              isMaximized={chart.isMaximized}
+              isHidden={chart.isHidden}
+              position={chart.position}
+              onSelect={() => handleElementClick(chart.id)}
+              onMinimize={() => handleMinimize(chart.id)}
+              onMaximize={() => handleMaximize(chart.id)}
+              onHide={() => handleHide(chart.id)}
+              onRemove={() => handleRemove(chart.id)}
+              onDownload={() => handleDownload(chart.id)}
+              onDuplicate={() => handleDuplicate(chart.id)}
+              onEdit={() => handleEdit(chart.id)}
+              onPositionChange={(position) =>
+                handlePositionChange(chart.id, position)
+              }
+              onResize={(size) => handleResize(chart.id, size)}
+            >
+              <DynamicChart chartType={chart.chartType || "line"} />
+            </ChartWidget>
+          ))}
       </div>
 
       {/* Canvas Info */}
