@@ -44,6 +44,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(100);
   const [showGrid, setShowGrid] = useState(true);
+  const [gridSize, setGridSize] = useState(20);
+  const [canvasSize, setCanvasSize] = useState({ width: 1920, height: 1080 });
   const [showExportDialog, setShowExportDialog] = useState(false);
   const isMobile = useIsMobile();
   const { toast } = useToast();
