@@ -185,11 +185,6 @@ export default function CanvasArea() {
             )}
           </div>
         </div>
-
-        {/* Drop Zones for new elements */}
-        <div className="absolute inset-0 pointer-events-none">
-          {/* Visual indicators for drop zones could go here */}
-        </div>
       </div>
 
       {/* Canvas Info */}
