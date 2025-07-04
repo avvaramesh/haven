@@ -220,6 +220,39 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     }
   };
 
+  const handleZoomChange = (newZoom: number) => {
+    const clampedZoom = Math.max(25, Math.min(500, newZoom));
+    setZoomLevel(clampedZoom);
+    // Notify canvas area if available
+    if ((window as any).setCanvasZoom) {
+      (window as any).setCanvasZoom(clampedZoom);
+    }
+  };
+
+  const handleGridSizeChange = (newSize: number) => {
+    const clampedSize = Math.max(10, Math.min(100, newSize));
+    setGridSize(clampedSize);
+    // Notify canvas area if available
+    if ((window as any).setCanvasGridSize) {
+      (window as any).setCanvasGridSize(clampedSize);
+    }
+  };
+
+  const handleCanvasSizeChange = (newSize: {
+    width: number;
+    height: number;
+  }) => {
+    const clampedSize = {
+      width: Math.max(800, Math.min(7680, newSize.width)),
+      height: Math.max(600, Math.min(4320, newSize.height)),
+    };
+    setCanvasSize(clampedSize);
+    // Notify canvas area if available
+    if ((window as any).setCanvasSize) {
+      (window as any).setCanvasSize(clampedSize);
+    }
+  };
+
   const handlePropertyChange = (
     elementId: string,
     property: string,
