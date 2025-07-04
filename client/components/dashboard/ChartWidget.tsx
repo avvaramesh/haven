@@ -111,7 +111,7 @@ export default function ChartWidget({
       : {};
 
   return (
-    <div className={containerClasses}>
+    <div ref={widgetRef} className={containerClasses} style={containerStyle}>
       {/* Toolbar - appears on hover or when selected */}
       <div
         className={`
