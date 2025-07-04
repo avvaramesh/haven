@@ -54,26 +54,50 @@ export default function RevenueByCategoryChart({
           data={data}
           margin={{ top: 10, right: 10, left: 10, bottom: 40 }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="hsl(210, 11%, 20%)" />
-          <XAxis
-            dataKey="category"
-            axisLine={false}
-            tickLine={false}
-            tick={{ fill: "hsl(215, 20.2%, 65.1%)", fontSize: 10 }}
-            angle={-45}
-            textAnchor="end"
-            height={40}
-          />
-          <YAxis
-            axisLine={false}
-            tickLine={false}
-            tick={{ fill: "hsl(215, 20.2%, 65.1%)", fontSize: 10 }}
-            width={30}
-          />
+          {properties?.showGrid !== false && (
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(210, 11%, 20%)" />
+          )}
+          {properties?.showXAxis !== false && (
+            <XAxis
+              dataKey="category"
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: "hsl(215, 20.2%, 65.1%)", fontSize: 10 }}
+              angle={-45}
+              textAnchor="end"
+              height={40}
+              label={
+                properties?.xAxisLabel
+                  ? {
+                      value: properties.xAxisLabel,
+                      position: "insideBottom",
+                      offset: -5,
+                    }
+                  : undefined
+              }
+            />
+          )}
+          {properties?.showYAxis !== false && (
+            <YAxis
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: "hsl(215, 20.2%, 65.1%)", fontSize: 10 }}
+              width={30}
+              label={
+                properties?.yAxisLabel
+                  ? {
+                      value: properties.yAxisLabel,
+                      angle: -90,
+                      position: "insideLeft",
+                    }
+                  : undefined
+              }
+            />
+          )}
           <Tooltip content={<CustomTooltip />} />
           <Bar
             dataKey="value"
-            fill="hsl(199, 89%, 48%)"
+            fill={properties?.color || "hsl(199, 89%, 48%)"}
             radius={[2, 2, 0, 0]}
             cursor="pointer"
           />
