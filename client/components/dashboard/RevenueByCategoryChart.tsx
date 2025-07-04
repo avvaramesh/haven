@@ -172,7 +172,7 @@ export default function RevenueByCategoryChart({
             <Bar
               dataKey="value"
               name="Revenue"
-              fill={properties?.color || "hsl(199, 89%, 48%)"}
+              fill={properties?.color || "#3b82f6"}
               radius={isHorizontal ? [0, 4, 4, 0] : [4, 4, 0, 0]}
               maxBarSize={40}
               cursor="pointer"
