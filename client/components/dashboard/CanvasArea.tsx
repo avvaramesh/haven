@@ -5,7 +5,15 @@ import RevenueByCategoryChart from "./RevenueByCategoryChart";
 import KPIWidget from "./KPIWidget";
 import SalesDistributionChart from "./SalesDistributionChart";
 
-export default function CanvasArea() {
+interface CanvasAreaProps {
+  selectedElement: string | null;
+  onElementSelect: (elementId: string | null) => void;
+}
+
+export default function CanvasArea({
+  selectedElement,
+  onElementSelect,
+}: CanvasAreaProps) {
   const [showGrid, setShowGrid] = useState(true);
   const [selectedElement, setSelectedElement] = useState<string | null>(null);
 
