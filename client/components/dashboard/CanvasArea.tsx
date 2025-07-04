@@ -458,7 +458,7 @@ export default function CanvasArea({
     const dropX = e.clientX - canvasRect.left - 24; // Account for padding
     const dropY = e.clientY - canvasRect.top - 24;
 
-    console.log("Drop event:", { data, dropX, dropY }); // Debug log
+    console.log("Drop event:", { data, dropX, dropY, canvasRect }); // Debug log
 
     if (data.startsWith("new-chart:")) {
       const chartType = data.replace("new-chart:", "");
@@ -470,20 +470,25 @@ export default function CanvasArea({
         isMaximized: false,
         isHidden: false,
         position: {
-          x: Math.max(0, dropX - 150),
-          y: Math.max(0, dropY - 100),
-          width: 300,
-          height: 200,
+          x: Math.max(0, dropX),
+          y: Math.max(0, dropY),
+          width: 400,
+          height: 250,
         },
         chartType: chartType,
       };
 
       console.log("Creating new chart:", newChartState); // Debug log
+      console.log("Current chart states before:", Object.keys(chartStates)); // Debug log
 
-      setChartStates((prev) => ({
-        ...prev,
-        [newId]: newChartState,
-      }));
+      setChartStates((prev) => {
+        const newStates = {
+          ...prev,
+          [newId]: newChartState,
+        };
+        console.log("New chart states after:", Object.keys(newStates)); // Debug log
+        return newStates;
+      });
 
       onAddToHistory?.({
         type: "ADD_CHART",
