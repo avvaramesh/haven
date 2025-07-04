@@ -13,7 +13,7 @@ import {
 import { useIsMobile } from "@/hooks/use-mobile";
 import DataConnectionsPanel from "./DataConnectionsPanel";
 import ChartTemplatesPanel from "./ChartTemplatesPanel";
-import AICopilotIntegrated from "./AICopilotIntegrated";
+import AIAssistantUnified from "./AIAssistantUnified";
 import PropertiesPanelIntegrated from "./PropertiesPanelIntegrated";
 import EditingToolbar from "./EditingToolbar";
 import CanvasArea from "./CanvasArea";
