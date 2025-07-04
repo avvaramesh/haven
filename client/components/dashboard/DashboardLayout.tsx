@@ -65,8 +65,44 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
       {/* Main Editor Area */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Left Panel - Data Connections */}
-        <DataConnectionsPanel />
+        {/* Left Panel - Tabbed Interface */}
+        <div className="flex flex-col">
+          {/* Tab Header */}
+          <div className="flex bg-dashboard-surface border-r border-dashboard-border">
+            <Button
+              variant={leftPanelTab === "data" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setLeftPanelTab("data")}
+              className={`rounded-none border-b-2 ${
+                leftPanelTab === "data"
+                  ? "border-dashboard-accent bg-dashboard-accent text-white"
+                  : "border-transparent text-dashboard-text hover:bg-dashboard-muted"
+              }`}
+            >
+              <Database className="w-4 h-4 mr-2" />
+              Data
+            </Button>
+            <Button
+              variant={leftPanelTab === "templates" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setLeftPanelTab("templates")}
+              className={`rounded-none border-b-2 ${
+                leftPanelTab === "templates"
+                  ? "border-dashboard-accent bg-dashboard-accent text-white"
+                  : "border-transparent text-dashboard-text hover:bg-dashboard-muted"
+              }`}
+            >
+              <BarChart3 className="w-4 h-4 mr-2" />
+              Charts
+            </Button>
+          </div>
+
+          {/* Tab Content */}
+          <div className="flex-1">
+            {leftPanelTab === "data" && <DataConnectionsPanel />}
+            {leftPanelTab === "templates" && <ChartTemplatesPanel />}
+          </div>
+        </div>
 
         {/* Center Canvas Area */}
         <CanvasArea
