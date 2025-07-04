@@ -271,6 +271,80 @@ export default function ChartWidget({
         </div>
       )}
 
+      {/* Resize Handles - Only show when selected and not maximized */}
+      {isSelected && !isMaximized && !isMinimized && (
+        <>
+          {/* Corner Resize Handles */}
+          <div
+            className="absolute -bottom-1 -right-1 w-3 h-3 bg-dashboard-accent rounded-sm cursor-se-resize opacity-80 hover:opacity-100"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsResizing(true);
+              // Add resize logic here
+            }}
+          />
+          <div
+            className="absolute -top-1 -right-1 w-3 h-3 bg-dashboard-accent rounded-sm cursor-ne-resize opacity-80 hover:opacity-100"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsResizing(true);
+            }}
+          />
+          <div
+            className="absolute -bottom-1 -left-1 w-3 h-3 bg-dashboard-accent rounded-sm cursor-sw-resize opacity-80 hover:opacity-100"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsResizing(true);
+            }}
+          />
+          <div
+            className="absolute -top-1 -left-1 w-3 h-3 bg-dashboard-accent rounded-sm cursor-nw-resize opacity-80 hover:opacity-100"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsResizing(true);
+            }}
+          />
+
+          {/* Edge Resize Handles */}
+          <div
+            className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-6 h-2 bg-dashboard-accent rounded-sm cursor-n-resize opacity-80 hover:opacity-100"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsResizing(true);
+            }}
+          />
+          <div
+            className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-6 h-2 bg-dashboard-accent rounded-sm cursor-s-resize opacity-80 hover:opacity-100"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsResizing(true);
+            }}
+          />
+          <div
+            className="absolute -left-1 top-1/2 transform -translate-y-1/2 w-2 h-6 bg-dashboard-accent rounded-sm cursor-w-resize opacity-80 hover:opacity-100"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsResizing(true);
+            }}
+          />
+          <div
+            className="absolute -right-1 top-1/2 transform -translate-y-1/2 w-2 h-6 bg-dashboard-accent rounded-sm cursor-e-resize opacity-80 hover:opacity-100"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsResizing(true);
+            }}
+          />
+        </>
+      )}
+
       {/* Maximize Overlay Background */}
       {isMaximized && (
         <div
