@@ -54,6 +54,13 @@ export default function PropertiesPanelIntegrated({
     opacity: 100,
     borderRadius: 8,
     chartType: "line",
+    // Chart-specific properties
+    showDataPoints: true,
+    smoothCurves: true,
+    barSpacing: 0.3,
+    showPercentages: true,
+    startAngle: 0,
+    value: "",
   });
 
   const updateProperty = (key: string, value: any) => {
