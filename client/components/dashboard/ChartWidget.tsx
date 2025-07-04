@@ -426,7 +426,11 @@ export default function ChartWidget({
       {isMaximized && (
         <div
           className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[90]"
-          onClick={onMaximize}
+          onClick={(e) => {
+            e.preventDefault();
+            console.log(`Overlay clicked for maximized chart ${id}`);
+            onMaximize?.();
+          }}
           style={{ zIndex: 90 }}
         />
       )}
