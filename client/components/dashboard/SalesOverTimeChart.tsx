@@ -1,6 +1,8 @@
 import {
   LineChart,
   Line,
+  AreaChart,
+  Area,
   ResponsiveContainer,
   XAxis,
   YAxis,
@@ -47,90 +49,190 @@ interface SalesOverTimeChartProps {
     yAxisLabel?: string;
     showXAxis?: boolean;
     showYAxis?: boolean;
+    showDataPoints?: boolean;
+    smoothCurves?: boolean;
+    chartType?: string;
   };
 }
 
 export default function SalesOverTimeChart({
   properties,
 }: SalesOverTimeChartProps = {}) {
+  const isAreaChart =
+    properties?.chartType?.includes("area") || properties?.chartType === "area";
+
   return (
     <div className="h-40">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart
-          data={data}
-          margin={{ top: 10, right: 10, left: 10, bottom: 40 }}
-        >
-          {properties?.showGrid !== false && (
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(210, 11%, 20%)" />
-          )}
-          {properties?.showXAxis !== false && (
-            <XAxis
-              dataKey="period"
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: "hsl(215, 20.2%, 65.1%)", fontSize: 10 }}
-              angle={-45}
-              textAnchor="end"
-              height={40}
-              label={
-                properties?.xAxisLabel
+        {isAreaChart ? (
+          <AreaChart
+            data={data}
+            margin={{ top: 10, right: 10, left: 10, bottom: 40 }}
+          >
+            {properties?.showGrid !== false && (
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="hsl(210, 11%, 20%)"
+              />
+            )}
+            {properties?.showXAxis !== false && (
+              <XAxis
+                dataKey="period"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "hsl(215, 20.2%, 65.1%)", fontSize: 10 }}
+                angle={-45}
+                textAnchor="end"
+                height={40}
+                label={
+                  properties?.xAxisLabel
+                    ? {
+                        value: properties.xAxisLabel,
+                        position: "insideBottom",
+                        offset: -5,
+                      }
+                    : undefined
+                }
+              />
+            )}
+            {properties?.showYAxis !== false && (
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "hsl(215, 20.2%, 65.1%)", fontSize: 10 }}
+                width={30}
+                label={
+                  properties?.yAxisLabel
+                    ? {
+                        value: properties.yAxisLabel,
+                        angle: -90,
+                        position: "insideLeft",
+                      }
+                    : undefined
+                }
+              />
+            )}
+            <Tooltip content={<CustomTooltip />} />
+            {properties?.showLegend && (
+              <Legend
+                verticalAlign="top"
+                height={36}
+                iconType="rect"
+                wrapperStyle={{
+                  paddingBottom: "10px",
+                  fontSize: "12px",
+                  color: "hsl(215, 20.2%, 65.1%)",
+                }}
+              />
+            )}
+            <Area
+              type={properties?.smoothCurves ? "monotone" : "linear"}
+              dataKey="value"
+              name="Sales"
+              stroke={properties?.color || "hsl(199, 89%, 48%)"}
+              fill={properties?.color || "hsl(199, 89%, 48%)"}
+              fillOpacity={0.3}
+              strokeWidth={2}
+              dot={
+                properties?.showDataPoints !== false
                   ? {
-                      value: properties.xAxisLabel,
-                      position: "insideBottom",
-                      offset: -5,
+                      fill: properties?.color || "hsl(199, 89%, 48%)",
+                      strokeWidth: 2,
+                      r: 3,
                     }
-                  : undefined
+                  : false
               }
-            />
-          )}
-          {properties?.showYAxis !== false && (
-            <YAxis
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: "hsl(215, 20.2%, 65.1%)", fontSize: 10 }}
-              width={30}
-              label={
-                properties?.yAxisLabel
-                  ? {
-                      value: properties.yAxisLabel,
-                      angle: -90,
-                      position: "insideLeft",
-                    }
-                  : undefined
-              }
-            />
-          )}
-          <Tooltip content={<CustomTooltip />} />
-          {properties?.showLegend && (
-            <Legend
-              verticalAlign="top"
-              height={36}
-              iconType="line"
-              wrapperStyle={{
-                paddingBottom: "10px",
-                fontSize: "12px",
-                color: "hsl(215, 20.2%, 65.1%)",
+              activeDot={{
+                r: 5,
+                stroke: properties?.color || "hsl(199, 89%, 48%)",
+                strokeWidth: 2,
               }}
             />
-          )}
-          <Line
-            type="monotone"
-            dataKey="value"
-            name="Sales"
-            stroke={properties?.color || "hsl(199, 89%, 48%)"}
-            strokeWidth={2}
-            dot={{
-              fill: properties?.color || "hsl(199, 89%, 48%)",
-              strokeWidth: 2,
-              r: 3,
-            }}
-            activeDot={{
-              r: 5,
-              stroke: properties?.color || "hsl(199, 89%, 48%)",
-              strokeWidth: 2,
-            }}
-          />
-        </LineChart>
+          </AreaChart>
+        ) : (
+          <LineChart
+            data={data}
+            margin={{ top: 10, right: 10, left: 10, bottom: 40 }}
+          >
+            {properties?.showGrid !== false && (
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="hsl(210, 11%, 20%)"
+              />
+            )}
+            {properties?.showXAxis !== false && (
+              <XAxis
+                dataKey="period"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "hsl(215, 20.2%, 65.1%)", fontSize: 10 }}
+                angle={-45}
+                textAnchor="end"
+                height={40}
+                label={
+                  properties?.xAxisLabel
+                    ? {
+                        value: properties.xAxisLabel,
+                        position: "insideBottom",
+                        offset: -5,
+                      }
+                    : undefined
+                }
+              />
+            )}
+            {properties?.showYAxis !== false && (
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "hsl(215, 20.2%, 65.1%)", fontSize: 10 }}
+                width={30}
+                label={
+                  properties?.yAxisLabel
+                    ? {
+                        value: properties.yAxisLabel,
+                        angle: -90,
+                        position: "insideLeft",
+                      }
+                    : undefined
+                }
+              />
+            )}
+            <Tooltip content={<CustomTooltip />} />
+            {properties?.showLegend && (
+              <Legend
+                verticalAlign="top"
+                height={36}
+                iconType="line"
+                wrapperStyle={{
+                  paddingBottom: "10px",
+                  fontSize: "12px",
+                  color: "hsl(215, 20.2%, 65.1%)",
+                }}
+              />
+            )}
+            <Line
+              type={properties?.smoothCurves ? "monotone" : "linear"}
+              dataKey="value"
+              name="Sales"
+              stroke={properties?.color || "hsl(199, 89%, 48%)"}
+              strokeWidth={2}
+              dot={
+                properties?.showDataPoints !== false
+                  ? {
+                      fill: properties?.color || "hsl(199, 89%, 48%)",
+                      strokeWidth: 2,
+                      r: 3,
+                    }
+                  : false
+              }
+              activeDot={{
+                r: 5,
+                stroke: properties?.color || "hsl(199, 89%, 48%)",
+                strokeWidth: 2,
+              }}
+            />
+          </LineChart>
+        )}
       </ResponsiveContainer>
     </div>
   );
