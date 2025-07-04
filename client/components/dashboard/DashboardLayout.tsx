@@ -11,6 +11,7 @@ import {
   Settings,
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useToast } from "@/hooks/use-toast";
 import DataConnectionsPanel from "./DataConnectionsPanel";
 import ChartTemplatesPanel from "./ChartTemplatesPanel";
 import AIAssistantUnified from "./AIAssistantUnified";
@@ -38,6 +39,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(100);
   const isMobile = useIsMobile();
+  const { toast } = useToast();
 
   // Global undo/redo state
   const [undoStack, setUndoStack] = useState<HistoryAction[]>([]);
@@ -125,31 +127,62 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       console.log("Dashboard saved successfully", dashboardState);
 
       // Show success feedback
-      if ((window as any).toast) {
-        (window as any).toast({
-          title: "Dashboard Saved",
-          description: "Your dashboard has been saved successfully.",
-        });
-      }
+      toast({
+        title: "Dashboard Saved",
+        description: "Your dashboard has been saved successfully.",
+      });
     } catch (error) {
       console.error("Failed to save dashboard:", error);
-      if ((window as any).toast) {
-        (window as any).toast({
-          title: "Save Failed",
-          description: "Failed to save dashboard. Please try again.",
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: "Save Failed",
+        description: "Failed to save dashboard. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
-  const handleExport = () => {
-    console.log("Export dashboard functionality triggered");
-    // TODO: Implement export functionality (PDF, image, JSON, etc.)
-    if ((window as any).toast) {
-      (window as any).toast({
-        title: "Export",
-        description: "Export functionality coming soon.",
+  const handleExport = async () => {
+    try {
+      // Get dashboard state
+      const dashboardState = {
+        charts: (window as any).getCanvasState
+          ? (window as any).getCanvasState()
+          : {},
+        selectedElement,
+        timestamp: new Date().toISOString(),
+        metadata: {
+          version: "1.0",
+          exportedBy: "Dashboard Designer",
+          exportDate: new Date().toISOString(),
+        },
+      };
+
+      // Create JSON file
+      const dataStr = JSON.stringify(dashboardState, null, 2);
+      const dataBlob = new Blob([dataStr], { type: "application/json" });
+
+      // Create download link
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `dashboard-export-${new Date().toISOString().split("T")[0]}.json`;
+
+      // Trigger download
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: "Export Successful",
+        description: "Dashboard has been exported as JSON file.",
+      });
+    } catch (error) {
+      console.error("Export failed:", error);
+      toast({
+        title: "Export Failed",
+        description: "Failed to export dashboard. Please try again.",
+        variant: "destructive",
       });
     }
   };
