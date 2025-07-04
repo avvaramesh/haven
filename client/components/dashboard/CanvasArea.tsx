@@ -155,6 +155,7 @@ export default function CanvasArea({
 
   // Handle global undo/redo actions
   React.useEffect(() => {
+    console.log("Setting up keyboard listeners");
     const handleKeyboard = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "z" && !e.shiftKey) {
         e.preventDefault();
@@ -179,6 +180,7 @@ export default function CanvasArea({
   }, [onUndo, onRedo]);
 
   const handleUndoAction = (action: any) => {
+    console.log("Handling undo action:", action);
     switch (action.type) {
       case "REMOVE_CHART":
         // Restore the removed chart
@@ -198,6 +200,11 @@ export default function CanvasArea({
           const newStates = { ...prev };
           delete newStates[action.chartId];
           return newStates;
+        });
+        toast({
+          title: "Chart Removed",
+          description: `Duplicate chart has been removed.`,
+          duration: 3000,
         });
         break;
     }
