@@ -95,7 +95,7 @@ export default function ChartWidget({
     group relative bg-dashboard-surface border border-dashboard-border rounded-lg
     transition-all duration-200
     ${isSelected ? "ring-2 ring-dashboard-accent ring-offset-2 ring-offset-dashboard-background" : ""}
-    ${isMaximized ? "fixed inset-8 z-[100] shadow-2xl" : ""}
+    ${isMaximized ? "absolute inset-4 z-[100] shadow-2xl" : ""}
     ${isMinimized ? "h-12 overflow-hidden" : ""}
     ${isDragging ? "z-50 shadow-2xl" : ""}
     ${className}
