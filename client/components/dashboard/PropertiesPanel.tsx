@@ -59,6 +59,25 @@ export default function PropertiesPanel({
     setProperties((prev) => ({ ...prev, [key]: value }));
   };
 
+  // Collapsed state
+  if (isCollapsed) {
+    return (
+      <div className="w-12 bg-dashboard-background border-l border-dashboard-border h-full flex flex-col items-center py-4">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onToggleCollapse}
+          className="text-dashboard-text hover:bg-dashboard-muted rotate-180 mb-4"
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </Button>
+        <div className="writing-mode-vertical text-dashboard-text-muted text-sm transform rotate-90 whitespace-nowrap">
+          Properties
+        </div>
+      </div>
+    );
+  }
+
   if (!selectedElement) {
     return (
       <div className="w-80 bg-dashboard-background border-l border-dashboard-border h-full flex items-center justify-center">
@@ -69,6 +88,14 @@ export default function PropertiesPanel({
             Select a chart or KPI to edit its properties
           </p>
         </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onToggleCollapse}
+          className="absolute top-4 right-4 text-dashboard-text hover:bg-dashboard-muted"
+        >
+          <ChevronRight className="w-4 h-4" />
+        </Button>
       </div>
     );
   }
