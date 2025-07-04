@@ -875,7 +875,27 @@ export default function CanvasArea({
               position={chart.position}
               onSelect={() => handleElementClick(chart.id)}
               onMinimize={() => handleMinimize(chart.id)}
-              onMaximize={() => handleMaximize(chart.id)}
+              onMaximize={() => {
+                console.log(`=== INLINE MAXIMIZE CALLED ===`);
+                console.log(`Chart ID: ${chart.id}`);
+
+                const currentState = chartStates[chart.id];
+                const newMaximizedState = !currentState?.isMaximized;
+
+                console.log(`Current state:`, currentState);
+                console.log(`New maximized state:`, newMaximizedState);
+
+                setChartStates((prev) => ({
+                  ...prev,
+                  [chart.id]: {
+                    ...prev[chart.id],
+                    isMaximized: newMaximizedState,
+                    isMinimized: false,
+                  },
+                }));
+
+                console.log(`Chart state updated for ${chart.id}`);
+              }}
               onHide={() => handleHide(chart.id)}
               onRemove={() => handleRemove(chart.id)}
               onDownload={() => handleDownload(chart.id)}
