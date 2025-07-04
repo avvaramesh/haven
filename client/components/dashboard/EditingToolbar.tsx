@@ -55,6 +55,11 @@ export default function EditingToolbar({
   zoomLevel = 100,
   showGrid = true,
   onToggleGrid,
+  gridSize = 20,
+  canvasSize = { width: 1920, height: 1080 },
+  onZoomChange,
+  onGridSizeChange,
+  onCanvasSizeChange,
 }: EditingToolbarProps) {
   return (
     <div className="bg-dashboard-background border-b border-dashboard-border px-4 py-2">
