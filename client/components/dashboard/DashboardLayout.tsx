@@ -42,6 +42,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [undoStack, setUndoStack] = useState<HistoryAction[]>([]);
   const [redoStack, setRedoStack] = useState<HistoryAction[]>([]);
 
+  // Ref to communicate with CanvasArea
+  const canvasUndoRef = React.useRef<(action: HistoryAction) => void>();
+  const canvasRedoRef = React.useRef<(action: HistoryAction) => void>();
+
   // Auto-collapse on mobile
   React.useEffect(() => {
     if (isMobile) {
