@@ -209,6 +209,14 @@ export default function CanvasArea({
     }
   }, []);
 
+  // Expose property change handler to parent
+  React.useEffect(() => {
+    if (parentOnPropertyChange) {
+      // Make the property change handler available to parent
+      (window as any).canvasPropertyChange = handlePropertyChange;
+    }
+  }, [handlePropertyChange]);
+
   const handleElementClick = (elementId: string) => {
     onElementSelect(elementId === selectedElement ? null : elementId);
   };
