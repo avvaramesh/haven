@@ -393,14 +393,66 @@ export default function CanvasArea({
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
-    const chartId = e.dataTransfer.getData("text/plain");
+    const data = e.dataTransfer.getData("text/plain");
+    const rect = e.currentTarget.getBoundingClientRect();
+    const dropX = e.clientX - rect.left;
+    const dropY = e.clientY - rect.top;
 
-    // For now, just show a toast that the chart was moved
-    toast({
-      title: "Chart Moved",
-      description: `${getChartTitle(chartId)} position updated`,
-      duration: 2000,
-    });
+    // Check if it's a new chart type or existing chart
+    if (data.startsWith("new-chart:")) {
+      const chartType = data.replace("new-chart:", "");
+      const newId = `${chartType}-${Date.now()}`;
+
+      const newChartState: ChartState = {
+        id: newId,
+        isMinimized: false,
+        isMaximized: false,
+        isHidden: false,
+        position: {
+          x: dropX - 150, // Center the chart on drop point
+          y: dropY - 100,
+          width: 300,
+          height: 200,
+        },
+        chartType: chartType,
+      };
+
+      setChartStates((prev) => ({
+        ...prev,
+        [newId]: newChartState,
+      }));
+
+      onAddToHistory?.({
+        type: "ADD_CHART",
+        chartId: newId,
+        newState: newChartState,
+      });
+
+      toast({
+        title: "Chart Created",
+        description: `New ${chartType} chart added to canvas`,
+        duration: 2000,
+      });
+    } else {
+      // Existing chart being moved
+      const chartId = data;
+      if (chartStates[chartId]) {
+        const updatedPosition = {
+          x: dropX - 150,
+          y: dropY - 100,
+          width: chartStates[chartId].position?.width || 300,
+          height: chartStates[chartId].position?.height || 200,
+        };
+
+        updateChartState(chartId, { position: updatedPosition });
+
+        toast({
+          title: "Chart Moved",
+          description: `${getChartTitle(chartId)} position updated`,
+          duration: 2000,
+        });
+      }
+    }
   };
 
   return (
