@@ -550,17 +550,32 @@ export default function PropertiesPanelIntegrated({
         </div>
 
         {/* Element-Specific Options */}
-        {(elementInfo.type.includes("chart") ||
-          elementInfo.type.includes("kpi")) && (
+        {normalizedProperties && (
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              {elementInfo.type.includes("chart") ? (
+              {[
+                "line",
+                "area",
+                "bar",
+                "column",
+                "pie",
+                "donut",
+                "scatter",
+              ].includes(normalizedProperties.type) ? (
                 <BarChart3 className="w-4 h-4 text-dashboard-accent" />
               ) : (
                 <Settings className="w-4 h-4 text-dashboard-accent" />
               )}
               <h4 className="font-medium text-dashboard-text">
-                {elementInfo.type.includes("chart")
+                {[
+                  "line",
+                  "area",
+                  "bar",
+                  "column",
+                  "pie",
+                  "donut",
+                  "scatter",
+                ].includes(normalizedProperties.type)
                   ? "Chart Options"
                   : "Display Options"}
               </h4>
@@ -568,43 +583,50 @@ export default function PropertiesPanelIntegrated({
 
             <div className="space-y-3">
               {/* Chart Type - only for charts */}
-              {elementInfo.type.includes("chart") && (
+              {[
+                "line",
+                "area",
+                "bar",
+                "column",
+                "pie",
+                "donut",
+                "scatter",
+              ].includes(normalizedProperties.type) && (
                 <div className="space-y-2">
                   <Label className="text-xs text-dashboard-text-muted">
                     Chart Type
                   </Label>
                   <Select
-                    value={properties.chartType}
-                    onValueChange={(value) =>
-                      updateProperty("chartType", value)
-                    }
+                    value={normalizedProperties.type}
+                    onValueChange={(value) => updateProperty("type", value)}
                   >
                     <SelectTrigger className="bg-dashboard-surface border-dashboard-border text-dashboard-text">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {elementInfo.type === "line-chart" && (
+                      {(normalizedProperties.type === "line" ||
+                        normalizedProperties.type === "area") && (
                         <>
                           <SelectItem value="line">Line Chart</SelectItem>
                           <SelectItem value="area">Area Chart</SelectItem>
-                          <SelectItem value="spline">Smooth Line</SelectItem>
                         </>
                       )}
-                      {elementInfo.type === "bar-chart" && (
+                      {(normalizedProperties.type === "bar" ||
+                        normalizedProperties.type === "column") && (
                         <>
                           <SelectItem value="bar">Bar Chart</SelectItem>
                           <SelectItem value="column">Column Chart</SelectItem>
-                          <SelectItem value="stacked">Stacked Bar</SelectItem>
                         </>
                       )}
-                      {elementInfo.type === "pie-chart" && (
+                      {(normalizedProperties.type === "pie" ||
+                        normalizedProperties.type === "donut") && (
                         <>
                           <SelectItem value="pie">Pie Chart</SelectItem>
                           <SelectItem value="donut">Donut Chart</SelectItem>
-                          <SelectItem value="semi-donut">
-                            Semi Circle
-                          </SelectItem>
                         </>
+                      )}
+                      {normalizedProperties.type === "scatter" && (
+                        <SelectItem value="scatter">Scatter Chart</SelectItem>
                       )}
                     </SelectContent>
                   </Select>
