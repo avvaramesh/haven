@@ -376,6 +376,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           onRedo={handleGlobalRedo}
           undoRef={canvasUndoRef}
           redoRef={canvasRedoRef}
+          onPropertyChange={handlePropertyChange}
         />
       </div>
 
