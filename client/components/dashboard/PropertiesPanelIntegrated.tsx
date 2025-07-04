@@ -55,64 +55,37 @@ export default function PropertiesPanelIntegrated({
   onClose,
   onPropertyChange = () => {},
 }: PropertiesPanelIntegratedProps) {
-  const [properties, setProperties] = useState({
-    title: "Q4 Revenue Analysis",
-    width: 400,
-    height: 300,
-    color: "#3b82f6",
-    background: "#1e293b",
-    fontSize: 14,
-    fontWeight: "normal",
-    textAlign: "left",
-    showLegend: true,
-    showGrid: true,
-    opacity: 100,
-    borderRadius: 8,
-    chartType: "line",
-    // Chart-specific properties
-    showDataPoints: true,
-    smoothCurves: true,
-    barSpacing: 0.3,
-    showPercentages: true,
-    startAngle: 0,
-    value: "",
-    showTrend: true,
-    subtitle: "",
-    xAxisLabel: "",
-    yAxisLabel: "",
-    showXAxis: true,
-    showYAxis: true,
-    rotateXLabels: false,
-    xLabelAngle: 0,
-    yMinValue: "",
-    yMaxValue: "",
-    startFromZero: true,
-    // Table-specific properties
-    showHeader: true,
-    alternateRows: true,
-    showBorders: true,
-    editable: false,
-    headerColor: "#1e293b",
-    rowColor: "transparent",
-    alternateRowColor: "#374151",
-  });
+  const [normalizedProperties, setNormalizedProperties] =
+    useState<AllVisualizationProperties | null>(null);
+  const [legacyProperties, setLegacyProperties] =
+    useState<LegacyChartProperties>({});
 
   const updateProperty = (key: string, value: any) => {
-    // Update local state immediately for responsive UI
-    setProperties((prev) => ({ ...prev, [key]: value }));
+    if (!selectedElement || !normalizedProperties) return;
 
-    // Immediately notify parent component for real-time chart updates
-    if (
-      selectedElement &&
-      onPropertyChange &&
-      typeof onPropertyChange === "function"
-    ) {
-      // Use immediate callback to ensure smooth updates
-      onPropertyChange(selectedElement, key, value);
+    // Update the normalized property
+    const success = updateChartProperty(selectedElement, key, value);
 
-      // Also try to call the global canvas property change if available
-      if ((window as any).canvasPropertyChange) {
-        (window as any).canvasPropertyChange(selectedElement, key, value);
+    if (success) {
+      // Get updated properties
+      const updatedProps = getChartProperties(selectedElement);
+      if (updatedProps) {
+        setNormalizedProperties(updatedProps);
+
+        // Convert to legacy format for backwards compatibility
+        const legacyFormat =
+          chartPropertyManager.toLegacyFormat(selectedElement);
+        setLegacyProperties(legacyFormat);
+
+        // Notify parent component for real-time chart updates
+        if (onPropertyChange && typeof onPropertyChange === "function") {
+          onPropertyChange(selectedElement, key, value);
+        }
+
+        // Also try to call the global canvas property change if available
+        if ((window as any).canvasPropertyChange) {
+          (window as any).canvasPropertyChange(selectedElement, key, value);
+        }
       }
     }
   };
