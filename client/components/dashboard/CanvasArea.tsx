@@ -530,12 +530,6 @@ export default function CanvasArea({
       };
       console.log("CanvasArea: Updated chart properties", newProps); // Debug log
 
-      // Force immediate re-render by updating at next tick
-      setTimeout(() => {
-        // Trigger a forced update if needed
-        setChartStates((states) => ({ ...states }));
-      }, 0);
-
       return newProps;
     });
 
