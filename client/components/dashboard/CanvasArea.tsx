@@ -641,7 +641,10 @@ export default function CanvasArea({
                 "kpi-3",
                 "kpi-4",
               ].includes(chart.id) && (
-                <DynamicChart chartType={chart.chartType || "line"} />
+                <DynamicChart
+                  chartType={chart.chartType || "line"}
+                  properties={chartProperties[chart.id]}
+                />
               )}
             </ChartWidget>
           ))}
