@@ -437,31 +437,39 @@ export default function CanvasArea({
             )}
 
           {/* KPI Widget */}
-          {chartStates["kpi-widget"] && !chartStates["kpi-widget"].isHidden && (
-            <div
-              className={`col-span-4 row-span-1 relative group ${chartStates["kpi-widget"].isMinimized ? "col-span-2" : ""}`}
-            >
-              <ChartWidget
-                id="kpi-widget"
-                title="Total Revenue"
-                className="h-32"
-                isSelected={selectedElement === "kpi-widget"}
-                isMinimized={chartStates["kpi-widget"].isMinimized}
-                isMaximized={chartStates["kpi-widget"].isMaximized}
-                isHidden={chartStates["kpi-widget"].isHidden}
-                onSelect={() => handleElementClick("kpi-widget")}
-                onMinimize={() => handleMinimize("kpi-widget")}
-                onMaximize={() => handleMaximize("kpi-widget")}
-                onHide={() => handleHide("kpi-widget")}
-                onRemove={() => handleRemove("kpi-widget")}
-                onDownload={() => handleDownload("kpi-widget")}
-                onDuplicate={() => handleDuplicate("kpi-widget")}
-                onEdit={() => handleEdit("kpi-widget")}
+          {chartStates["kpi-widget"] &&
+            !chartStates["kpi-widget"].isHidden &&
+            !chartStates["smart-chart"]?.isMaximized && (
+              <div
+                className={`${
+                  chartStates["kpi-widget"].isMinimized
+                    ? "col-span-6 lg:col-span-3"
+                    : "col-span-12 lg:col-span-4"
+                } relative group transition-all duration-300`}
               >
-                <KPIWidget />
-              </ChartWidget>
-            </div>
-          )}
+                <ChartWidget
+                  id="kpi-widget"
+                  title="Total Revenue"
+                  className={
+                    chartStates["kpi-widget"].isMinimized ? "h-32" : "h-40"
+                  }
+                  isSelected={selectedElement === "kpi-widget"}
+                  isMinimized={chartStates["kpi-widget"].isMinimized}
+                  isMaximized={chartStates["kpi-widget"].isMaximized}
+                  isHidden={chartStates["kpi-widget"].isHidden}
+                  onSelect={() => handleElementClick("kpi-widget")}
+                  onMinimize={() => handleMinimize("kpi-widget")}
+                  onMaximize={() => handleMaximize("kpi-widget")}
+                  onHide={() => handleHide("kpi-widget")}
+                  onRemove={() => handleRemove("kpi-widget")}
+                  onDownload={() => handleDownload("kpi-widget")}
+                  onDuplicate={() => handleDuplicate("kpi-widget")}
+                  onEdit={() => handleEdit("kpi-widget")}
+                >
+                  <KPIWidget />
+                </ChartWidget>
+              </div>
+            )}
 
           {/* Revenue by Category */}
           {chartStates["revenue-chart"] &&
