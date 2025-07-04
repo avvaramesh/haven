@@ -4,23 +4,7 @@ import {
   Undo,
   Redo,
   Save,
-  Download,
-  Share2,
-  Eye,
-  EyeOff,
   Grid3X3,
-  MousePointer2,
-  Hand,
-  Square,
-  BarChart3,
-  LineChart,
-  PieChart,
-  Type,
-  Image,
-  Layers,
-  Copy,
-  Trash2,
-  RotateCcw,
   ZoomIn,
   ZoomOut,
   Maximize,
@@ -138,26 +122,6 @@ export default function EditingToolbar({
             title="Fit to Screen"
           >
             <Maximize className="w-4 h-4" />
-          </Button>
-          <div className="w-px h-6 bg-dashboard-border mx-2" />
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onPreview}
-            className="border-dashboard-border text-dashboard-text hover:bg-dashboard-muted"
-            title="Preview Dashboard"
-          >
-            <Eye className="w-4 h-4 mr-2" />
-            Preview
-          </Button>
-          <Button
-            className="bg-dashboard-accent hover:bg-dashboard-accent-light text-white"
-            size="sm"
-            onClick={onPublish}
-            title="Publish Dashboard"
-          >
-            <Share2 className="w-4 h-4 mr-2" />
-            Publish
           </Button>
         </div>
       </div>
