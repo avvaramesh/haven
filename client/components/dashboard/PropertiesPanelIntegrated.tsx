@@ -386,6 +386,41 @@ export default function PropertiesPanelIntegrated({
               </div>
             </div>
 
+            {/* Color Palette */}
+            <div className="space-y-2">
+              <Label className="text-xs text-dashboard-text-muted">
+                Quick Colors
+              </Label>
+              <div className="grid grid-cols-6 gap-2">
+                {[
+                  "#3b82f6", // Blue
+                  "#ef4444", // Red
+                  "#10b981", // Green
+                  "#f59e0b", // Yellow
+                  "#8b5cf6", // Purple
+                  "#06b6d4", // Cyan
+                  "#ec4899", // Pink
+                  "#84cc16", // Lime
+                  "#f97316", // Orange
+                  "#6366f1", // Indigo
+                  "#14b8a6", // Teal
+                  "#a855f7", // Violet
+                ].map((color) => (
+                  <button
+                    key={color}
+                    className={`w-8 h-8 rounded border-2 transition-all hover:scale-110 ${
+                      properties.color === color
+                        ? "border-dashboard-accent ring-2 ring-dashboard-accent/30"
+                        : "border-dashboard-border hover:border-dashboard-accent/50"
+                    }`}
+                    style={{ backgroundColor: color }}
+                    onClick={() => updateProperty("color", color)}
+                    title={color}
+                  />
+                ))}
+              </div>
+            </div>
+
             <div className="space-y-2">
               <Label className="text-xs text-dashboard-text-muted">
                 Background
