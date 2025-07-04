@@ -146,6 +146,23 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   Charts
                 </Button>
                 <Button
+                  variant={leftPanelTab === "properties" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setLeftPanelTab("properties")}
+                  className={`rounded-none border-b-2 relative ${
+                    leftPanelTab === "properties"
+                      ? "border-dashboard-accent bg-dashboard-accent text-white"
+                      : "border-transparent text-dashboard-text hover:bg-dashboard-muted"
+                  }`}
+                  disabled={!selectedElement}
+                >
+                  <Settings className="w-4 h-4 mr-2" />
+                  Properties
+                  {selectedElement && (
+                    <div className="absolute -top-1 -right-1 w-2 h-2 bg-dashboard-accent rounded-full" />
+                  )}
+                </Button>
+                <Button
                   variant={leftPanelTab === "copilot" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setLeftPanelTab("copilot")}
