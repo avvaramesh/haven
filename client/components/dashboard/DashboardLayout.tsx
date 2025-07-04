@@ -111,8 +111,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           onElementSelect={setSelectedElement}
         />
 
-        {/* Right Panel - Properties (only when element selected) */}
-        <PropertiesPanel selectedElement={selectedElement} />
+        {/* Right Panel - Properties (collapsible) */}
+        <PropertiesPanel
+          selectedElement={selectedElement}
+          isCollapsed={isRightPanelCollapsed}
+          onToggleCollapse={() =>
+            setIsRightPanelCollapsed(!isRightPanelCollapsed)
+          }
+        />
       </div>
 
       {/* Status Bar */}
