@@ -76,7 +76,7 @@ export default function PropertiesPanel({
     showGrid: true,
     opacity: 100,
     borderRadius: 8,
-    chartType: "line",
+    chartType: getChartTypeFromElement(selectedElement),
     // X-Axis properties
     xAxisLabel: "",
     showXAxis: true,
