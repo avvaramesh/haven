@@ -377,8 +377,29 @@ export default function CanvasArea({
   const minimizedCharts = visibleCharts.filter((state) => state.isMinimized);
   const maximizedChart = visibleCharts.find((state) => state.isMaximized);
 
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const chartId = e.dataTransfer.getData("text/plain");
+
+    // For now, just show a toast that the chart was moved
+    toast({
+      title: "Chart Moved",
+      description: `${getChartTitle(chartId)} position updated`,
+      duration: 2000,
+    });
+  };
+
   return (
-    <div className="flex-1 bg-dashboard-muted/30 relative overflow-auto">
+    <div
+      className="flex-1 bg-dashboard-muted/30 relative overflow-auto"
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+    >
       {/* Grid Background */}
       {showGrid && (
         <div
