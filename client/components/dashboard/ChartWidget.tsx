@@ -118,16 +118,29 @@ export default function ChartWidget({
       : {};
 
   return (
-    <div ref={widgetRef} className={containerClasses} style={containerStyle}>
-      {/* Toolbar - appears on hover or when selected */}
-      <div
-        className={`
-        absolute -top-2 -right-2 z-10 flex gap-1
-        transition-opacity duration-200
-        ${showToolbar || isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"}
-      `}
-        style={{ pointerEvents: "auto" }}
-      >
+    <>
+      {/* Maximize Overlay Background - rendered at root level */}
+      {isMaximized && (
+        <div
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[90]"
+          onClick={(e) => {
+            e.preventDefault();
+            console.log(`Overlay clicked for maximized chart ${id}`);
+            onMaximize?.();
+          }}
+        />
+      )}
+
+      <div ref={widgetRef} className={containerClasses} style={containerStyle}>
+        {/* Toolbar - appears on hover or when selected */}
+        <div
+          className={`
+          absolute -top-2 -right-2 z-10 flex gap-1
+          transition-opacity duration-200
+          ${showToolbar || isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"}
+        `}
+          style={{ pointerEvents: "auto" }}
+        >
         {/* Quick Actions */}
         <Button
           variant="secondary"
