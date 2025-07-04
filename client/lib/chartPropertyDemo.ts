@@ -18,7 +18,7 @@ import {
 // Demo function to show consistent property structure
 export function demonstrateNormalizedProperties() {
   console.log("🎯 Chart Property Normalization Demo");
-  console.log("=" * 50);
+  console.log("=".repeat(50));
 
   // Create different chart types with normalized properties
   const chartTypes: VisualizationType[] = [
@@ -127,7 +127,7 @@ export function demonstrateNormalizedProperties() {
 
 // Function to compare old vs new property system
 export function comparePropertySystems() {
-  console.log("\n���� Property System Comparison:");
+  console.log("\n🔍 Property System Comparison:");
 
   // Example of old inconsistent properties
   const oldLineChart = {
