@@ -55,24 +55,8 @@ interface RevenueByCategoryChartProps {
 export default function RevenueByCategoryChart({
   properties,
 }: RevenueByCategoryChartProps = {}) {
-  // Determine chart variant from chartType
-  const chartType = properties?.chartType || "bar";
-  const isHorizontal = chartType.includes("horizontal");
-  const isStacked = chartType.includes("stacked");
-  const isGrouped = chartType.includes("grouped");
-
-  // Prepare data for stacked/grouped charts with proper revenue values
-  const stackedData = [
-    { category: "Electronics", Q1: 20, Q2: 25, Q3: 30, Q4: 35, total: "$110k" },
-    { category: "Clothing", Q1: 30, Q2: 35, Q3: 40, Q4: 45, total: "$150k" },
-    { category: "Home", Q1: 40, Q2: 45, Q3: 50, Q4: 55, total: "$190k" },
-    { category: "Sports", Q1: 45, Q2: 50, Q3: 55, Q4: 60, total: "$210k" },
-    { category: "Books", Q1: 50, Q2: 55, Q3: 60, Q4: 70, total: "$235k" },
-  ];
-
-  // Ensure data is always available and properly formatted
-  const chartData = isStacked || isGrouped ? stackedData : data;
-  const layout = isHorizontal ? "horizontal" : "vertical";
+  // Use simple data like line chart
+  const chartData = data;
 
   return (
     <div className="h-40" style={{ minWidth: "200px", minHeight: "160px" }}>
