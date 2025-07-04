@@ -140,14 +140,23 @@ export default function ChartWidget({
           variant="secondary"
           size="sm"
           onClick={(e) => {
+            e.preventDefault();
             e.stopPropagation();
-            console.log(
-              `Maximize button clicked for chart ${id}, currently maximized: ${isMaximized}`,
-            );
-            onMaximize?.();
+            console.log(`=== MAXIMIZE BUTTON CLICKED ===`);
+            console.log(`Chart ID: ${id}`);
+            console.log(`Currently maximized: ${isMaximized}`);
+            console.log(`onMaximize function exists:`, !!onMaximize);
+
+            if (onMaximize) {
+              console.log(`Calling onMaximize...`);
+              onMaximize();
+            } else {
+              console.error(`onMaximize function is missing!`);
+            }
           }}
-          className="h-6 w-6 p-0 bg-dashboard-surface border border-dashboard-border hover:bg-dashboard-muted"
+          className="h-6 w-6 p-0 bg-red-500 border border-dashboard-border hover:bg-red-600 z-50"
           title={isMaximized ? "Restore" : "Maximize"}
+          style={{ backgroundColor: "red", zIndex: 50 }}
         >
           {isMaximized ? (
             <Shrink className="w-3 h-3" />
