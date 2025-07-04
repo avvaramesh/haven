@@ -539,7 +539,7 @@ export default function CanvasArea({
               linear-gradient(to right, hsl(var(--dashboard-border)) 1px, transparent 1px),
               linear-gradient(to bottom, hsl(var(--dashboard-border)) 1px, transparent 1px)
             `,
-            backgroundSize: "20px 20px",
+            backgroundSize: `${gridSize}px ${gridSize}px`,
           }}
         />
       )}
@@ -547,7 +547,12 @@ export default function CanvasArea({
       {/* Canvas Content */}
       <div
         className="relative p-6 min-h-full overflow-hidden"
-        style={{ minHeight: "1000px" }}
+        style={{
+          minHeight: `${canvasSize.height}px`,
+          width: `${canvasSize.width}px`,
+          transform: `scale(${zoomLevel / 100})`,
+          transformOrigin: "top left",
+        }}
       >
         {/* All Charts - Absolute Positioned */}
         {Object.values(chartStates)
