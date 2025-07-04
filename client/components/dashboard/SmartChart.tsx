@@ -56,15 +56,42 @@ interface SmartChartProps {
 }
 
 export default function SmartChart({ properties }: SmartChartProps = {}) {
+  // Determine chart variant from chartType
+  const chartType = properties?.chartType || "line";
+  const isMultiLine =
+    chartType.includes("multi") || chartType.includes("Multi");
+  const isStepped =
+    chartType.includes("stepped") || chartType.includes("Stepped");
+  const isSmooth = chartType.includes("smooth") || chartType.includes("Smooth");
+
+  // Multi-line data
+  const multiLineData = [
+    { month: "Jan", sales: 20, profit: 15, revenue: 25 },
+    { month: "Feb", sales: 35, profit: 28, revenue: 40 },
+    { month: "Mar", sales: 25, profit: 18, revenue: 30 },
+    { month: "Apr", sales: 40, profit: 32, revenue: 45 },
+    { month: "May", sales: 30, profit: 22, revenue: 35 },
+    { month: "Jun", sales: 45, profit: 38, revenue: 50 },
+  ];
+
+  const chartData = isMultiLine ? multiLineData : data;
+  const curveType = isStepped ? "step" : isSmooth ? "monotone" : "linear";
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="font-medium text-dashboard-text">
-            AI-Enhanced Sales Analytics
+            {isMultiLine
+              ? "Multi-Series Analytics"
+              : "AI-Enhanced Sales Analytics"}
           </h3>
           <p className="text-xs text-dashboard-text-muted">
-            With predictive insights
+            {isStepped
+              ? "Stepped line visualization"
+              : isSmooth
+                ? "Smooth curve analysis"
+                : "With predictive insights"}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -76,7 +103,7 @@ export default function SmartChart({ properties }: SmartChartProps = {}) {
       <div className="relative h-40">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
-            data={data}
+            data={chartData}
             margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
           >
             {properties?.showGrid !== false && (
@@ -131,27 +158,60 @@ export default function SmartChart({ properties }: SmartChartProps = {}) {
                 }}
               />
             )}
-            <Line
-              type={properties?.smoothCurves ? "monotone" : "linear"}
-              dataKey="value"
-              name="Sales"
-              stroke={properties?.color || "hsl(199, 89%, 48%)"}
-              strokeWidth={2}
-              dot={
-                properties?.showDataPoints !== false
-                  ? {
-                      fill: properties?.color || "hsl(199, 89%, 48%)",
-                      strokeWidth: 2,
-                      r: 4,
-                    }
-                  : false
-              }
-              activeDot={{
-                r: 6,
-                stroke: properties?.color || "hsl(199, 89%, 48%)",
-                strokeWidth: 2,
-              }}
-            />
+            {isMultiLine ? (
+              <>
+                <Line
+                  type={curveType}
+                  dataKey="sales"
+                  name="Sales"
+                  stroke={properties?.color || "hsl(199, 89%, 48%)"}
+                  strokeWidth={2}
+                  dot={properties?.showDataPoints !== false ? { r: 4 } : false}
+                  activeDot={{ r: 6 }}
+                />
+                <Line
+                  type={curveType}
+                  dataKey="profit"
+                  name="Profit"
+                  stroke="hsl(142, 76%, 36%)"
+                  strokeWidth={2}
+                  dot={properties?.showDataPoints !== false ? { r: 4 } : false}
+                  activeDot={{ r: 6 }}
+                />
+                <Line
+                  type={curveType}
+                  dataKey="revenue"
+                  name="Revenue"
+                  stroke="hsl(271, 81%, 56%)"
+                  strokeWidth={2}
+                  dot={properties?.showDataPoints !== false ? { r: 4 } : false}
+                  activeDot={{ r: 6 }}
+                />
+              </>
+            ) : (
+              <Line
+                type={curveType}
+                dataKey="value"
+                name="Sales"
+                stroke={properties?.color || "hsl(199, 89%, 48%)"}
+                strokeWidth={isStepped ? 3 : 2}
+                strokeDasharray={isStepped ? "5,5" : "0"}
+                dot={
+                  properties?.showDataPoints !== false
+                    ? {
+                        fill: properties?.color || "hsl(199, 89%, 48%)",
+                        strokeWidth: 2,
+                        r: isStepped ? 6 : 4,
+                      }
+                    : false
+                }
+                activeDot={{
+                  r: 6,
+                  stroke: properties?.color || "hsl(199, 89%, 48%)",
+                  strokeWidth: 2,
+                }}
+              />
+            )}
             <ReferenceLine
               x="Oct"
               stroke="hsl(199, 89%, 60%)"
