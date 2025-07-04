@@ -49,6 +49,8 @@ interface SmartChartProps {
     yAxisLabel?: string;
     showXAxis?: boolean;
     showYAxis?: boolean;
+    showDataPoints?: boolean;
+    smoothCurves?: boolean;
   };
 }
 
@@ -129,16 +131,20 @@ export default function SmartChart({ properties }: SmartChartProps = {}) {
               />
             )}
             <Line
-              type="monotone"
+              type={properties?.smoothCurves ? "monotone" : "linear"}
               dataKey="value"
               name="Sales"
               stroke={properties?.color || "hsl(199, 89%, 48%)"}
               strokeWidth={2}
-              dot={{
-                fill: properties?.color || "hsl(199, 89%, 48%)",
-                strokeWidth: 2,
-                r: 4,
-              }}
+              dot={
+                properties?.showDataPoints !== false
+                  ? {
+                      fill: properties?.color || "hsl(199, 89%, 48%)",
+                      strokeWidth: 2,
+                      r: 4,
+                    }
+                  : false
+              }
               activeDot={{
                 r: 6,
                 stroke: properties?.color || "hsl(199, 89%, 48%)",
