@@ -236,7 +236,13 @@ export default function PropertiesPanelIntegrated({
   // Update properties when element changes
   React.useEffect(() => {
     if (selectedElement && elementInfo.properties) {
-      setProperties((prev) => ({ ...prev, ...elementInfo.properties }));
+      // Filter out undefined values to prevent NaN issues
+      const filteredProperties = Object.fromEntries(
+        Object.entries(elementInfo.properties).filter(
+          ([_, value]) => value !== undefined,
+        ),
+      );
+      setProperties((prev) => ({ ...prev, ...filteredProperties }));
     }
   }, [selectedElement]);
 
