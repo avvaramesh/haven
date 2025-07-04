@@ -54,6 +54,32 @@ export default function PropertiesPanelIntegrated({
     opacity: 100,
     borderRadius: 8,
     chartType: "line",
+    // Chart-specific properties
+    showDataPoints: true,
+    smoothCurves: true,
+    barSpacing: 0.3,
+    showPercentages: true,
+    startAngle: 0,
+    value: "",
+    showTrend: true,
+    subtitle: "",
+    xAxisLabel: "",
+    yAxisLabel: "",
+    showXAxis: true,
+    showYAxis: true,
+    rotateXLabels: false,
+    xLabelAngle: 0,
+    yMinValue: "",
+    yMaxValue: "",
+    startFromZero: true,
+    // Table-specific properties
+    showHeader: true,
+    alternateRows: true,
+    showBorders: true,
+    editable: false,
+    headerColor: "#1e293b",
+    rowColor: "transparent",
+    alternateRowColor: "#374151",
   });
 
   const updateProperty = (key: string, value: any) => {
@@ -131,13 +157,8 @@ export default function PropertiesPanelIntegrated({
           yMinValue: "",
           yMaxValue: "",
           startFromZero: true,
-          showGrid: true,
           barSpacing: 0.3,
           showValues: true,
-          color: "#10b981",
-          background: "#1e293b",
-          width: 400,
-          height: 280,
         },
       },
       "sales-dist": {
@@ -226,6 +247,24 @@ export default function PropertiesPanelIntegrated({
           fontSize: 18,
           width: 200,
           height: 120,
+        },
+      },
+      "table-chart": {
+        type: "table",
+        title: "Data Table",
+        properties: {
+          title: "Data Table",
+          chartType: "table",
+          showHeader: true,
+          alternateRows: true,
+          showBorders: true,
+          fontSize: 12,
+          headerColor: "#1e293b",
+          rowColor: "#transparent",
+          alternateRowColor: "#374151",
+          editable: true,
+          width: 500,
+          height: 300,
         },
       },
     };
@@ -411,7 +450,7 @@ export default function PropertiesPanelIntegrated({
               <Label className="text-xs text-dashboard-text-muted">
                 Quick Colors
               </Label>
-              <div className="grid grid-cols-6 gap-2">
+              <div className="grid grid-cols-8 gap-1">
                 {[
                   "#3b82f6", // Blue
                   "#ef4444", // Red
@@ -425,10 +464,22 @@ export default function PropertiesPanelIntegrated({
                   "#6366f1", // Indigo
                   "#14b8a6", // Teal
                   "#a855f7", // Violet
+                  "#0ea5e9", // Sky
+                  "#22c55e", // Emerald
+                  "#eab308", // Amber
+                  "#dc2626", // Red-600
+                  "#7c3aed", // Violet-600
+                  "#0891b2", // Cyan-600
+                  "#65a30d", // Lime-600
+                  "#ea580c", // Orange-600
+                  "#db2777", // Pink-600
+                  "#4b5563", // Gray-600
+                  "#059669", // Emerald-600
+                  "#9333ea", // Purple-600
                 ].map((color) => (
                   <button
                     key={color}
-                    className={`w-8 h-8 rounded border-2 transition-all hover:scale-110 ${
+                    className={`w-6 h-6 rounded border-2 transition-all hover:scale-110 ${
                       properties.color === color
                         ? "border-dashboard-accent ring-2 ring-dashboard-accent/30"
                         : "border-dashboard-border hover:border-dashboard-accent/50"
@@ -673,6 +724,73 @@ export default function PropertiesPanelIntegrated({
                         </span>
                       </div>
                     )}
+
+                  {/* Table Chart Specific */}
+                  {elementInfo.type === "table" && (
+                    <>
+                      <div className="flex items-center justify-between">
+                        <Label className="text-xs text-dashboard-text-muted">
+                          Show Header
+                        </Label>
+                        <Switch
+                          checked={properties.showHeader !== false}
+                          onCheckedChange={(checked) =>
+                            updateProperty("showHeader", checked)
+                          }
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <Label className="text-xs text-dashboard-text-muted">
+                          Alternate Rows
+                        </Label>
+                        <Switch
+                          checked={properties.alternateRows || false}
+                          onCheckedChange={(checked) =>
+                            updateProperty("alternateRows", checked)
+                          }
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <Label className="text-xs text-dashboard-text-muted">
+                          Show Borders
+                        </Label>
+                        <Switch
+                          checked={properties.showBorders !== false}
+                          onCheckedChange={(checked) =>
+                            updateProperty("showBorders", checked)
+                          }
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <Label className="text-xs text-dashboard-text-muted">
+                          Editable
+                        </Label>
+                        <Switch
+                          checked={properties.editable || false}
+                          onCheckedChange={(checked) =>
+                            updateProperty("editable", checked)
+                          }
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-xs text-dashboard-text-muted">
+                          Header Color
+                        </Label>
+                        <Input
+                          type="color"
+                          value={properties.headerColor || "#1e293b"}
+                          onChange={(e) =>
+                            updateProperty("headerColor", e.target.value)
+                          }
+                          className="w-full h-8"
+                        />
+                      </div>
+                    </>
+                  )}
 
                   {/* Pie Chart Specific */}
                   {elementInfo.type === "pie-chart" && (

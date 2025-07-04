@@ -6,6 +6,7 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
+  Legend,
 } from "recharts";
 
 const data = [
@@ -95,8 +96,21 @@ export default function RevenueByCategoryChart({
             />
           )}
           <Tooltip content={<CustomTooltip />} />
+          {properties?.showLegend && (
+            <Legend
+              verticalAlign="top"
+              height={36}
+              iconType="rect"
+              wrapperStyle={{
+                paddingBottom: "10px",
+                fontSize: "12px",
+                color: "hsl(215, 20.2%, 65.1%)",
+              }}
+            />
+          )}
           <Bar
             dataKey="value"
+            name="Revenue"
             fill={properties?.color || "hsl(199, 89%, 48%)"}
             radius={[2, 2, 0, 0]}
             cursor="pointer"

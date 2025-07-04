@@ -6,6 +6,7 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
+  Legend,
 } from "recharts";
 
 const data = [
@@ -37,7 +38,21 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-export default function ProfitMarginChart() {
+interface ProfitMarginChartProps {
+  properties?: {
+    color?: string;
+    showGrid?: boolean;
+    showLegend?: boolean;
+    xAxisLabel?: string;
+    yAxisLabel?: string;
+    showXAxis?: boolean;
+    showYAxis?: boolean;
+  };
+}
+
+export default function ProfitMarginChart({
+  properties,
+}: ProfitMarginChartProps = {}) {
   return (
     <div className="h-40">
       <ResponsiveContainer width="100%" height="100%">
@@ -45,28 +60,73 @@ export default function ProfitMarginChart() {
           data={data}
           margin={{ top: 10, right: 10, left: 10, bottom: 30 }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="hsl(210, 11%, 20%)" />
-          <XAxis
-            dataKey="month"
-            axisLine={false}
-            tickLine={false}
-            tick={{ fill: "hsl(215, 20.2%, 65.1%)", fontSize: 10 }}
-            height={30}
-          />
-          <YAxis
-            axisLine={false}
-            tickLine={false}
-            tick={{ fill: "hsl(215, 20.2%, 65.1%)", fontSize: 10 }}
-            width={30}
-          />
+          {properties?.showGrid !== false && (
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(210, 11%, 20%)" />
+          )}
+          {properties?.showXAxis !== false && (
+            <XAxis
+              dataKey="month"
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: "hsl(215, 20.2%, 65.1%)", fontSize: 10 }}
+              height={30}
+              label={
+                properties?.xAxisLabel
+                  ? {
+                      value: properties.xAxisLabel,
+                      position: "insideBottom",
+                      offset: -5,
+                    }
+                  : undefined
+              }
+            />
+          )}
+          {properties?.showYAxis !== false && (
+            <YAxis
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: "hsl(215, 20.2%, 65.1%)", fontSize: 10 }}
+              width={30}
+              label={
+                properties?.yAxisLabel
+                  ? {
+                      value: properties.yAxisLabel,
+                      angle: -90,
+                      position: "insideLeft",
+                    }
+                  : undefined
+              }
+            />
+          )}
           <Tooltip content={<CustomTooltip />} />
+          {properties?.showLegend && (
+            <Legend
+              verticalAlign="top"
+              height={36}
+              iconType="line"
+              wrapperStyle={{
+                paddingBottom: "10px",
+                fontSize: "12px",
+                color: "hsl(215, 20.2%, 65.1%)",
+              }}
+            />
+          )}
           <Line
             type="monotone"
             dataKey="value"
-            stroke="hsl(199, 89%, 48%)"
+            name="Profit Margin"
+            stroke={properties?.color || "hsl(199, 89%, 48%)"}
             strokeWidth={2}
-            dot={{ fill: "hsl(199, 89%, 48%)", strokeWidth: 2, r: 3 }}
-            activeDot={{ r: 5, stroke: "hsl(199, 89%, 48%)", strokeWidth: 2 }}
+            dot={{
+              fill: properties?.color || "hsl(199, 89%, 48%)",
+              strokeWidth: 2,
+              r: 3,
+            }}
+            activeDot={{
+              r: 5,
+              stroke: properties?.color || "hsl(199, 89%, 48%)",
+              strokeWidth: 2,
+            }}
           />
         </LineChart>
       </ResponsiveContainer>

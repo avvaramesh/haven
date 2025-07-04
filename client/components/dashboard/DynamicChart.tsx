@@ -5,6 +5,7 @@ import SalesDistributionChart from "./SalesDistributionChart";
 import SalesOverTimeChart from "./SalesOverTimeChart";
 import ProfitMarginChart from "./ProfitMarginChart";
 import KPIWidget from "./KPIWidget";
+import TableChart from "./TableChart";
 
 interface DynamicChartProps {
   chartType: string;
@@ -19,7 +20,7 @@ export default function DynamicChart({
   switch (chartType) {
     case "line":
     case "smart-chart":
-      return <SmartChart properties={properties} />;
+      return <SmartChart properties={{ ...properties, chartType }} />;
 
     case "bar":
     case "revenue-chart":
@@ -31,7 +32,7 @@ export default function DynamicChart({
 
     case "area":
     case "sales-over-time":
-      return <SalesOverTimeChart properties={properties} />;
+      return <SalesOverTimeChart properties={{ ...properties, chartType }} />;
 
     case "profit-margin":
       return <ProfitMarginChart properties={properties} />;
@@ -45,7 +46,7 @@ export default function DynamicChart({
     case "line-multi":
     case "line-stepped":
     case "line-smooth":
-      return <SmartChart properties={properties} />;
+      return <SmartChart properties={{ ...properties, chartType }} />;
 
     case "bar-vertical":
     case "bar-horizontal":
@@ -63,7 +64,7 @@ export default function DynamicChart({
     case "area-stacked":
     case "area-percentage":
     case "area-stream":
-      return <SalesOverTimeChart properties={properties} />;
+      return <SalesOverTimeChart properties={{ ...properties, chartType }} />;
 
     case "kpi-number":
     case "kpi-progress":
@@ -71,8 +72,11 @@ export default function DynamicChart({
     case "kpi-comparison":
       return <KPIWidget properties={properties} />;
 
-    // Simple placeholder charts for new chart types
+    // Table chart
     case "table":
+      return <TableChart properties={{ ...properties, chartType }} />;
+
+    // Simple placeholder charts for new chart types
     case "gauge":
     case "funnel":
     case "waterfall":

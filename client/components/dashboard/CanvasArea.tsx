@@ -135,6 +135,66 @@ export default function CanvasArea({
 
   const { toast } = useToast();
 
+  // Helper function to get chart data
+  const getChartData = (chartId: string) => {
+    // This should be replaced with actual data retrieval from chart components
+    const sampleDataSets: Record<string, any[]> = {
+      "smart-chart": [
+        { month: "Jan", value: 20, sales: "$20k" },
+        { month: "Feb", value: 35, sales: "$35k" },
+        { month: "Mar", value: 25, sales: "$25k" },
+        { month: "Apr", value: 40, sales: "$40k" },
+        { month: "May", value: 30, sales: "$30k" },
+        { month: "Jun", value: 45, sales: "$45k" },
+      ],
+      "revenue-chart": [
+        { category: "Electronics", value: 30, revenue: "$30k" },
+        { category: "Clothing", value: 45, revenue: "$45k" },
+        { category: "Home", value: 55, revenue: "$55k" },
+        { category: "Sports", value: 60, revenue: "$60k" },
+        { category: "Books", value: 70, revenue: "$70k" },
+      ],
+      "sales-dist": [
+        { name: "Online", value: 40, percentage: "40%", sales: "$40k" },
+        { name: "In-Store", value: 30, percentage: "30%", sales: "$30k" },
+        { name: "Mobile", value: 20, percentage: "20%", sales: "$20k" },
+        { name: "Other", value: 10, percentage: "10%", sales: "$10k" },
+      ],
+      "kpi-widget": [
+        { metric: "Total Revenue", value: "$142,583", trend: "+12.5%" },
+      ],
+    };
+
+    return sampleDataSets[chartId] || [];
+  };
+
+  // Helper function to generate CSV
+  const generateCSV = (data: any[]) => {
+    if (!data || data.length === 0) return "";
+
+    const headers = Object.keys(data[0]);
+    const csvContent = [
+      headers.join(","),
+      ...data.map((row) =>
+        headers
+          .map((header) => {
+            const value = row[header];
+            // Escape commas and quotes in CSV
+            if (
+              typeof value === "string" &&
+              (value.includes(",") || value.includes('"'))
+            ) {
+              return `"${value.replace(/"/g, '""')}"`;
+            }
+            return value;
+          })
+          .join(","),
+      ),
+    ].join("\n");
+
+    return csvContent;
+  };
+
   const getChartTitle = (chartId: string): string => {
     const titles: Record<string, string> = {
       "smart-chart": "Smart Analytics Chart",
@@ -174,6 +234,34 @@ export default function CanvasArea({
           duration: 3000,
         });
         break;
+      case "MODIFY_CHART":
+        if (action.previousState?.property) {
+          setChartProperties((prev) => ({
+            ...prev,
+            [action.chartId]: {
+              ...prev[action.chartId],
+              [action.previousState.property]: action.previousState.value,
+            },
+          }));
+
+          // Handle chart type changes
+          if (action.previousState.property === "chartType") {
+            setChartStates((prev) => ({
+              ...prev,
+              [action.chartId]: {
+                ...prev[action.chartId],
+                chartType: action.previousState.value,
+              },
+            }));
+          }
+
+          toast({
+            title: "Property Restored",
+            description: `${action.previousState.property} has been undone.`,
+            duration: 2000,
+          });
+        }
+        break;
     }
   };
 
@@ -196,6 +284,34 @@ export default function CanvasArea({
           ...prev,
           [action.chartId]: action.newState,
         }));
+        break;
+      case "MODIFY_CHART":
+        if (action.newState?.property) {
+          setChartProperties((prev) => ({
+            ...prev,
+            [action.chartId]: {
+              ...prev[action.chartId],
+              [action.newState.property]: action.newState.value,
+            },
+          }));
+
+          // Handle chart type changes
+          if (action.newState.property === "chartType") {
+            setChartStates((prev) => ({
+              ...prev,
+              [action.chartId]: {
+                ...prev[action.chartId],
+                chartType: action.newState.value,
+              },
+            }));
+          }
+
+          toast({
+            title: "Property Restored",
+            description: `${action.newState.property} has been redone.`,
+            duration: 2000,
+          });
+        }
         break;
     }
   };
@@ -309,8 +425,6 @@ export default function CanvasArea({
       });
 
       const canvas = await html2canvas(chartElement, {
-        backgroundColor: "#1e293b",
-        scale: 2,
         useCORS: true,
         allowTaint: true,
         logging: false,
@@ -330,19 +444,37 @@ export default function CanvasArea({
             return;
           }
 
-          const url = URL.createObjectURL(blob);
-          const link = document.createElement("a");
-          link.href = url;
-          link.download = `${chartId}-${new Date().toISOString().split("T")[0]}.png`;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          URL.revokeObjectURL(url);
+          const timestamp = new Date().toISOString().split("T")[0];
+
+          // Download chart image
+          const imageUrl = URL.createObjectURL(blob);
+          const imageLink = document.createElement("a");
+          imageLink.href = imageUrl;
+          imageLink.download = `${chartId}-chart-${timestamp}.png`;
+          document.body.appendChild(imageLink);
+          imageLink.click();
+          document.body.removeChild(imageLink);
+          URL.revokeObjectURL(imageUrl);
+
+          // Also download chart data as CSV
+          const chartData = getChartData(chartId);
+          if (chartData && chartData.length > 0) {
+            const csvContent = generateCSV(chartData);
+            const csvBlob = new Blob([csvContent], { type: "text/csv" });
+            const csvUrl = URL.createObjectURL(csvBlob);
+            const csvLink = document.createElement("a");
+            csvLink.href = csvUrl;
+            csvLink.download = `${chartId}-data-${timestamp}.csv`;
+            document.body.appendChild(csvLink);
+            csvLink.click();
+            document.body.removeChild(csvLink);
+            URL.revokeObjectURL(csvUrl);
+          }
 
           loadingToast.dismiss();
           toast({
             title: "Download Complete",
-            description: `${getChartTitle(chartId)} has been downloaded as PNG.`,
+            description: `${getChartTitle(chartId)} image and data have been downloaded.`,
             duration: 5000,
           });
         },
@@ -419,6 +551,11 @@ export default function CanvasArea({
           height: newSize.height,
         },
       });
+
+      // Immediate resize event for fast response
+      requestAnimationFrame(() => {
+        window.dispatchEvent(new Event("resize"));
+      });
     }
   };
 
@@ -428,6 +565,37 @@ export default function CanvasArea({
     value: any,
   ) => {
     console.log("CanvasArea: Property change", { chartId, property, value }); // Debug log
+
+    // Store previous value for undo functionality
+    const previousValue = chartProperties[chartId]?.[property];
+
+    // Add to history for significant property changes (not for every minor change)
+    const significantProperties = [
+      "chartType",
+      "color",
+      "title",
+      "showLegend",
+      "showGrid",
+    ];
+    if (significantProperties.includes(property) && previousValue !== value) {
+      onAddToHistory?.({
+        type: "MODIFY_CHART",
+        chartId,
+        previousState: { property, value: previousValue },
+        newState: { property, value },
+      });
+    }
+
+    // Handle chart type changes - update chartStates directly
+    if (property === "chartType") {
+      setChartStates((prev) => ({
+        ...prev,
+        [chartId]: {
+          ...prev[chartId],
+          chartType: value,
+        },
+      }));
+    }
 
     // Immediate state update for smooth real-time updates
     setChartProperties((prev) => {
@@ -439,12 +607,6 @@ export default function CanvasArea({
         },
       };
       console.log("CanvasArea: Updated chart properties", newProps); // Debug log
-
-      // Force immediate re-render by updating at next tick
-      setTimeout(() => {
-        // Trigger a forced update if needed
-        setChartStates((states) => ({ ...states }));
-      }, 0);
 
       return newProps;
     });
@@ -461,6 +623,10 @@ export default function CanvasArea({
       // Make the property change handler available to parent
       (window as any).canvasPropertyChange = handlePropertyChange;
     }
+
+    // Expose grid and zoom controls to parent
+    (window as any).setCanvasGrid = (show: boolean) => setShowGrid(show);
+    (window as any).setCanvasZoom = (level: number) => setZoomLevel(level);
   }, [handlePropertyChange, parentOnPropertyChange]);
 
   const [isDragOver, setIsDragOver] = useState(false);
@@ -637,137 +803,13 @@ export default function CanvasArea({
               }
               onResize={(size) => handleResize(chart.id, size)}
             >
-              {chart.id === "smart-chart" && (
-                <SmartChart properties={chartProperties[chart.id]} />
-              )}
-              {chart.id === "kpi-widget" && <KPIWidget />}
-              {chart.id === "revenue-chart" && (
-                <RevenueByCategoryChart
-                  properties={chartProperties[chart.id]}
-                />
-              )}
-              {chart.id === "sales-dist" && (
-                <SalesDistributionChart
-                  properties={chartProperties[chart.id]}
-                />
-              )}
-              {chart.id === "kpi-1" && (
-                <div className="flex flex-col justify-center items-center h-full">
-                  <div className="text-lg font-bold text-green-400">+12.5%</div>
-                  <div className="text-xs text-dashboard-text-muted">
-                    vs last month
-                  </div>
-                </div>
-              )}
-              {chart.id === "kpi-2" && (
-                <div className="flex flex-col justify-center items-center h-full">
-                  <div className="text-lg font-bold text-dashboard-accent">
-                    24.8k
-                  </div>
-                  <div className="text-xs text-dashboard-text-muted">
-                    this week
-                  </div>
-                </div>
-              )}
-              {chart.id === "kpi-3" && (
-                <div className="flex flex-col justify-center items-center h-full">
-                  <div className="text-lg font-bold text-yellow-400">3.2%</div>
-                  <div className="text-xs text-dashboard-text-muted">
-                    avg rate
-                  </div>
-                </div>
-              )}
-              {chart.id === "kpi-4" && (
-                <div className="flex flex-col justify-center items-center h-full">
-                  <div className="text-lg font-bold text-purple-400">
-                    $1,247
-                  </div>
-                  <div className="text-xs text-dashboard-text-muted">
-                    average
-                  </div>
-                </div>
-              )}
-              {![
-                "smart-chart",
-                "kpi-widget",
-                "revenue-chart",
-                "sales-dist",
-                "kpi-1",
-                "kpi-2",
-                "kpi-3",
-                "kpi-4",
-              ].includes(chart.id) && (
-                <DynamicChart
-                  chartType={chart.chartType || "line"}
-                  properties={chartProperties[chart.id]}
-                />
-              )}
+              {/* Use DynamicChart for all charts to enable type switching */}
+              <DynamicChart
+                chartType={chart.chartType || "line"}
+                properties={chartProperties[chart.id]}
+              />
             </ChartWidget>
           ))}
-      </div>
-
-      {/* Canvas Controls - Positioned at bottom right */}
-      <div className="absolute bottom-4 right-4 bg-dashboard-surface border border-dashboard-border rounded-lg p-3 space-y-2 shadow-lg">
-        <div className="text-xs font-medium text-dashboard-text mb-2">
-          Canvas Controls
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-dashboard-text-muted">Size:</span>
-          <input
-            type="number"
-            value={canvasSize.width}
-            onChange={(e) =>
-              setCanvasSize((prev) => ({
-                ...prev,
-                width: parseInt(e.target.value) || 1920,
-              }))
-            }
-            className="w-16 px-1 py-0.5 text-xs bg-dashboard-muted border border-dashboard-border rounded"
-          />
-          <span className="text-xs text-dashboard-text-muted">×</span>
-          <input
-            type="number"
-            value={canvasSize.height}
-            onChange={(e) =>
-              setCanvasSize((prev) => ({
-                ...prev,
-                height: parseInt(e.target.value) || 1080,
-              }))
-            }
-            className="w-16 px-1 py-0.5 text-xs bg-dashboard-muted border border-dashboard-border rounded"
-          />
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-dashboard-text-muted">Zoom:</span>
-          <input
-            type="range"
-            min="25"
-            max="200"
-            value={zoomLevel}
-            onChange={(e) => setZoomLevel(parseInt(e.target.value))}
-            className="w-20"
-          />
-          <span className="text-xs text-dashboard-text">{zoomLevel}%</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowGrid(!showGrid)}
-            className={`px-2 py-1 text-xs rounded border transition-colors ${showGrid ? "bg-dashboard-accent text-white border-dashboard-accent" : "bg-dashboard-muted text-dashboard-text border-dashboard-border hover:border-dashboard-accent"}`}
-          >
-            Grid
-          </button>
-          <input
-            type="range"
-            min="10"
-            max="50"
-            value={gridSize}
-            onChange={(e) => setGridSize(parseInt(e.target.value))}
-            className="w-16"
-          />
-          <span className="text-xs text-dashboard-text-muted">
-            {gridSize}px
-          </span>
-        </div>
       </div>
 
       {/* Canvas Info */}

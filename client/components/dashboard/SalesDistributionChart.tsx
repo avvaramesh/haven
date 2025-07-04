@@ -16,11 +16,36 @@ const data = [
 
 const getColors = (baseColor?: string) => {
   const base = baseColor || "hsl(199, 89%, 48%)";
+
+  // Extract HSL values from base color
+  const hslMatch = base.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
+  if (hslMatch) {
+    const [, h, s, l] = hslMatch.map(Number);
+
+    // Generate palette with varying lightness and slight hue shifts
+    return [
+      base, // Original color
+      `hsl(${h + 10}, ${s}%, ${Math.min(l + 15, 90)}%)`, // Lighter with slight hue shift
+      `hsl(${h - 10}, ${s}%, ${Math.min(l + 25, 85)}%)`, // Even lighter with hue shift
+      `hsl(${h + 20}, ${Math.max(s - 20, 30)}%, ${Math.min(l + 35, 80)}%)`, // Lightest with more hue shift
+    ];
+  }
+
+  // Fallback if color parsing fails
   return [
     base,
-    "hsl(199, 89%, 60%)",
-    "hsl(199, 89%, 72%)",
-    "hsl(210, 11%, 45%)",
+    base.replace(
+      /(\d+)%\)$/,
+      (match, l) => `${Math.min(parseInt(l) + 15, 90)}%)`,
+    ),
+    base.replace(
+      /(\d+)%\)$/,
+      (match, l) => `${Math.min(parseInt(l) + 25, 85)}%)`,
+    ),
+    base.replace(
+      /(\d+)%\)$/,
+      (match, l) => `${Math.min(parseInt(l) + 35, 80)}%)`,
+    ),
   ];
 };
 
@@ -106,6 +131,18 @@ export default function SalesDistributionChart({
             ))}
           </Pie>
           <Tooltip content={<CustomTooltip />} />
+          {properties?.showLegend && (
+            <Legend
+              verticalAlign="bottom"
+              height={36}
+              iconType="circle"
+              wrapperStyle={{
+                paddingTop: "10px",
+                fontSize: "12px",
+                color: "hsl(215, 20.2%, 65.1%)",
+              }}
+            />
+          )}
         </PieChart>
       </ResponsiveContainer>
     </div>

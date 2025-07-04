@@ -9,14 +9,20 @@ import {
   ChevronRight,
   Bot,
   Settings,
+  Download,
+  Share2,
+  Eye,
+  Upload,
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useToast } from "@/hooks/use-toast";
 import DataConnectionsPanel from "./DataConnectionsPanel";
 import ChartTemplatesPanel from "./ChartTemplatesPanel";
 import AIAssistantUnified from "./AIAssistantUnified";
 import PropertiesPanelIntegrated from "./PropertiesPanelIntegrated";
 import EditingToolbar from "./EditingToolbar";
 import CanvasArea from "./CanvasArea";
+import ExportDialog from "./ExportDialog";
 
 interface DashboardLayoutProps {
   children?: ReactNode;
@@ -36,7 +42,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     "data" | "templates" | "properties" | "copilot"
   >("data");
   const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(100);
+  const [showGrid, setShowGrid] = useState(true);
+  const [showExportDialog, setShowExportDialog] = useState(false);
   const isMobile = useIsMobile();
+  const { toast } = useToast();
 
   // Global undo/redo state
   const [undoStack, setUndoStack] = useState<HistoryAction[]>([]);
@@ -107,6 +117,107 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const canUndo = undoStack.length > 0;
   const canRedo = redoStack.length > 0;
 
+  // Save and export handlers
+  const handleSave = () => {
+    // Get current dashboard state
+    const dashboardState = {
+      charts: (window as any).getCanvasState
+        ? (window as any).getCanvasState()
+        : {},
+      selectedElement,
+      timestamp: new Date().toISOString(),
+    };
+
+    // Save to localStorage for now (could be extended to save to server)
+    try {
+      localStorage.setItem("dashboard-state", JSON.stringify(dashboardState));
+      console.log("Dashboard saved successfully", dashboardState);
+
+      // Show success feedback
+      toast({
+        title: "Dashboard Saved",
+        description: "Your dashboard has been saved successfully.",
+      });
+    } catch (error) {
+      console.error("Failed to save dashboard:", error);
+      toast({
+        title: "Save Failed",
+        description: "Failed to save dashboard. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleExport = () => {
+    setShowExportDialog(true);
+  };
+
+  // Zoom and view handlers
+  const handleZoomIn = () => {
+    setZoomLevel((prev) => Math.min(200, prev + 25));
+    // Notify canvas area if available
+    if ((window as any).setCanvasZoom) {
+      (window as any).setCanvasZoom(Math.min(200, zoomLevel + 25));
+    }
+  };
+
+  const handleZoomOut = () => {
+    setZoomLevel((prev) => Math.max(25, prev - 25));
+    // Notify canvas area if available
+    if ((window as any).setCanvasZoom) {
+      (window as any).setCanvasZoom(Math.max(25, zoomLevel - 25));
+    }
+  };
+
+  const handleFitToScreen = () => {
+    setZoomLevel(100);
+    // Notify canvas area if available
+    if ((window as any).setCanvasZoom) {
+      (window as any).setCanvasZoom(100);
+    }
+  };
+
+  const handlePreview = () => {
+    console.log("Preview dashboard functionality triggered");
+    // TODO: Implement preview functionality
+    if ((window as any).toast) {
+      (window as any).toast({
+        title: "Preview",
+        description: "Preview functionality coming soon.",
+      });
+    }
+  };
+
+  const handlePublish = () => {
+    console.log("Publish dashboard functionality triggered");
+    // TODO: Implement publish functionality
+    if ((window as any).toast) {
+      (window as any).toast({
+        title: "Publish",
+        description: "Publish functionality coming soon.",
+      });
+    }
+  };
+
+  const handleShare = () => {
+    console.log("Share dashboard functionality triggered");
+    // TODO: Implement share functionality
+    if ((window as any).toast) {
+      (window as any).toast({
+        title: "Share",
+        description: "Share functionality coming soon.",
+      });
+    }
+  };
+
+  const handleToggleGrid = () => {
+    setShowGrid((prev) => !prev);
+    // Notify canvas area if available
+    if ((window as any).setCanvasGrid) {
+      (window as any).setCanvasGrid(!showGrid);
+    }
+  };
+
   const handlePropertyChange = (
     elementId: string,
     property: string,
@@ -148,18 +259,35 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <Button
             variant="outline"
             size="sm"
+            onClick={handleExport}
             className="border-dashboard-border text-dashboard-text hover:bg-dashboard-muted"
           >
+            <Download className="w-4 h-4 mr-2" />
+            Export
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleShare}
+            className="border-dashboard-border text-dashboard-text hover:bg-dashboard-muted"
+          >
+            <Share2 className="w-4 h-4 mr-2" />
             Share
           </Button>
           <Button
             variant="outline"
             size="sm"
+            onClick={handlePreview}
             className="border-dashboard-border text-dashboard-text hover:bg-dashboard-muted"
           >
+            <Eye className="w-4 h-4 mr-2" />
             Preview
           </Button>
-          <Button className="bg-dashboard-accent hover:bg-dashboard-accent-light text-white">
+          <Button
+            className="bg-dashboard-accent hover:bg-dashboard-accent-light text-white"
+            onClick={handlePublish}
+          >
+            <Upload className="w-4 h-4 mr-2" />
             Publish
           </Button>
         </div>
@@ -171,6 +299,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         onRedo={handleGlobalRedo}
         canUndo={canUndo}
         canRedo={canRedo}
+        onSave={handleSave}
+        onExport={handleExport}
+        onZoomIn={handleZoomIn}
+        onZoomOut={handleZoomOut}
+        onFitToScreen={handleFitToScreen}
+        onPreview={handlePreview}
+        onPublish={handlePublish}
+        zoomLevel={zoomLevel}
+        showGrid={showGrid}
+        onToggleGrid={handleToggleGrid}
       />
 
       {/* Main Editor Area */}
@@ -397,6 +535,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <span>Performance: Good</span>
         </div>
       </div>
+
+      {/* Export Dialog */}
+      <ExportDialog
+        isOpen={showExportDialog}
+        onClose={() => setShowExportDialog(false)}
+        selectedElement={selectedElement}
+      />
     </div>
   );
 }
