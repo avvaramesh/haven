@@ -78,6 +78,17 @@ export default function PropertiesPanelIntegrated({
           background: "#1e293b",
           width: 600,
           height: 300,
+          // X-Axis properties
+          xAxisLabel: "Months",
+          showXAxis: true,
+          rotateXLabels: false,
+          xLabelAngle: 0,
+          // Y-Axis properties
+          yAxisLabel: "Revenue ($)",
+          showYAxis: true,
+          yMinValue: "",
+          yMaxValue: "",
+          startFromZero: true,
         },
       },
       "revenue-chart": {
