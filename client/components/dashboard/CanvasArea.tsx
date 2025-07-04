@@ -589,13 +589,16 @@ export default function CanvasArea({
 
     // Handle chart type changes - update chartStates directly
     if (property === "chartType" || property === "type") {
+      const actualChartType = value;
       setChartStates((prev) => ({
         ...prev,
         [chartId]: {
           ...prev[chartId],
-          chartType: value,
+          chartType: actualChartType,
         },
       }));
+
+      console.log(`Updated chartType for ${chartId} to ${actualChartType}`);
     }
 
     // Map normalized properties to legacy format for backwards compatibility
