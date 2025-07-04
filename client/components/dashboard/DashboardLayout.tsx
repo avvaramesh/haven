@@ -9,6 +9,10 @@ import {
   ChevronRight,
   Bot,
   Settings,
+  Download,
+  Share2,
+  Eye,
+  Upload,
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useToast } from "@/hooks/use-toast";
@@ -258,6 +262,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             onClick={handleExport}
             className="border-dashboard-border text-dashboard-text hover:bg-dashboard-muted"
           >
+            <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
           <Button
@@ -266,6 +271,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             onClick={handleShare}
             className="border-dashboard-border text-dashboard-text hover:bg-dashboard-muted"
           >
+            <Share2 className="w-4 h-4 mr-2" />
             Share
           </Button>
           <Button
@@ -274,12 +280,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             onClick={handlePreview}
             className="border-dashboard-border text-dashboard-text hover:bg-dashboard-muted"
           >
+            <Eye className="w-4 h-4 mr-2" />
             Preview
           </Button>
           <Button
             className="bg-dashboard-accent hover:bg-dashboard-accent-light text-white"
             onClick={handlePublish}
           >
+            <Upload className="w-4 h-4 mr-2" />
             Publish
           </Button>
         </div>
