@@ -417,6 +417,15 @@ export default function CanvasArea({
           height: newSize.height,
         },
       });
+
+      // Force re-render of charts to make them responsive
+      setTimeout(() => {
+        const chartElement = document.getElementById(`chart-${chartId}`);
+        if (chartElement) {
+          // Trigger a resize event to make ResponsiveContainer re-calculate
+          window.dispatchEvent(new Event("resize"));
+        }
+      }, 50);
     }
   };
 
