@@ -116,70 +116,79 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               </div>
             </div>
           ) : (
-            <>
-              {/* Tab Header */}
-              <div className="flex bg-dashboard-surface border-r border-dashboard-border">
+            <div className="flex h-full">
+              {/* Vertical Tab Sidebar */}
+              <div className="w-16 bg-dashboard-surface border-r border-dashboard-border flex flex-col py-2">
                 <Button
                   variant={leftPanelTab === "data" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setLeftPanelTab("data")}
-                  className={`rounded-none border-b-2 ${
+                  className={`w-12 h-12 mb-1 mx-auto flex flex-col gap-1 ${
                     leftPanelTab === "data"
-                      ? "border-dashboard-accent bg-dashboard-accent text-white"
-                      : "border-transparent text-dashboard-text hover:bg-dashboard-muted"
+                      ? "bg-dashboard-accent text-white"
+                      : "text-dashboard-text hover:bg-dashboard-muted"
                   }`}
+                  title="Data Connections"
                 >
-                  <Database className="w-4 h-4 mr-2" />
-                  Data
+                  <Database className="w-4 h-4" />
+                  <span className="text-xs">Data</span>
                 </Button>
+
                 <Button
                   variant={leftPanelTab === "templates" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setLeftPanelTab("templates")}
-                  className={`rounded-none border-b-2 ${
+                  className={`w-12 h-12 mb-1 mx-auto flex flex-col gap-1 ${
                     leftPanelTab === "templates"
-                      ? "border-dashboard-accent bg-dashboard-accent text-white"
-                      : "border-transparent text-dashboard-text hover:bg-dashboard-muted"
+                      ? "bg-dashboard-accent text-white"
+                      : "text-dashboard-text hover:bg-dashboard-muted"
                   }`}
+                  title="Chart Templates"
                 >
-                  <BarChart3 className="w-4 h-4 mr-2" />
-                  Charts
+                  <BarChart3 className="w-4 h-4" />
+                  <span className="text-xs">Charts</span>
                 </Button>
+
                 <Button
                   variant={leftPanelTab === "properties" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setLeftPanelTab("properties")}
-                  className={`rounded-none border-b-2 relative ${
+                  className={`w-12 h-12 mb-1 mx-auto flex flex-col gap-1 relative ${
                     leftPanelTab === "properties"
-                      ? "border-dashboard-accent bg-dashboard-accent text-white"
-                      : "border-transparent text-dashboard-text hover:bg-dashboard-muted"
+                      ? "bg-dashboard-accent text-white"
+                      : "text-dashboard-text hover:bg-dashboard-muted"
                   }`}
                   disabled={!selectedElement}
+                  title="Properties"
                 >
-                  <Settings className="w-4 h-4 mr-2" />
-                  Properties
+                  <Settings className="w-4 h-4" />
+                  <span className="text-xs">Props</span>
                   {selectedElement && (
                     <div className="absolute -top-1 -right-1 w-2 h-2 bg-dashboard-accent rounded-full" />
                   )}
                 </Button>
+
                 <Button
                   variant={leftPanelTab === "copilot" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setLeftPanelTab("copilot")}
-                  className={`rounded-none border-b-2 ${
+                  className={`w-12 h-12 mb-1 mx-auto flex flex-col gap-1 ${
                     leftPanelTab === "copilot"
-                      ? "border-dashboard-accent bg-dashboard-accent text-white"
-                      : "border-transparent text-dashboard-text hover:bg-dashboard-muted"
+                      ? "bg-dashboard-accent text-white"
+                      : "text-dashboard-text hover:bg-dashboard-muted"
                   }`}
+                  title="AI Copilot"
                 >
-                  <Bot className="w-4 h-4 mr-2" />
-                  AI Copilot
+                  <Bot className="w-4 h-4" />
+                  <span className="text-xs">AI</span>
                 </Button>
+
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setIsLeftPanelCollapsed(true)}
-                  className="ml-auto text-dashboard-text hover:bg-dashboard-muted border-b-2 border-transparent rounded-none"
+                  className="w-12 h-8 mx-auto mt-auto text-dashboard-text hover:bg-dashboard-muted"
+                  title="Collapse Panel"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </Button>
@@ -202,7 +211,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   </div>
                 )}
               </div>
-            </>
+            </div>
           )}
         </div>
 
