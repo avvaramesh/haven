@@ -15,10 +15,9 @@ export default function CanvasArea({
   onElementSelect,
 }: CanvasAreaProps) {
   const [showGrid, setShowGrid] = useState(true);
-  const [selectedElement, setSelectedElement] = useState<string | null>(null);
 
   const handleElementClick = (elementId: string) => {
-    setSelectedElement(elementId);
+    onElementSelect(elementId === selectedElement ? null : elementId);
   };
 
   return (
