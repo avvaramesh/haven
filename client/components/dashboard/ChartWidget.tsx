@@ -150,7 +150,7 @@ export default function ChartWidget({
             e.preventDefault();
             e.stopPropagation();
             console.log(`=== MAXIMIZE BUTTON CLICKED ===`);
-            console.log(`Chart ID: ${id}`);
+            console.log(`Chart: "${title}" (${id})`);
             console.log(`Currently maximized: ${isMaximized}`);
             console.log(`onMaximize function exists:`, !!onMaximize);
             console.log(`onMaximize function type:`, typeof onMaximize);
