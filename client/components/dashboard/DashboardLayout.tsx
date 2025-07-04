@@ -22,6 +22,14 @@ interface DashboardLayoutProps {
   children?: ReactNode;
 }
 
+interface HistoryAction {
+  type: "REMOVE_CHART" | "ADD_CHART" | "MODIFY_CHART";
+  chartId: string;
+  previousState?: any;
+  newState?: any;
+  timestamp: number;
+}
+
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [selectedElement, setSelectedElement] = useState<string | null>(null);
   const [leftPanelTab, setLeftPanelTab] = useState<
@@ -29,6 +37,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   >("data");
   const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false);
   const isMobile = useIsMobile();
+
+  // Global undo/redo state
+  const [undoStack, setUndoStack] = useState<HistoryAction[]>([]);
+  const [redoStack, setRedoStack] = useState<HistoryAction[]>([]);
 
   // Auto-collapse on mobile
   React.useEffect(() => {
@@ -96,7 +108,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       </div>
 
       {/* Editing Toolbar */}
-      <EditingToolbar />
+      <EditingToolbar
+        onUndo={handleGlobalUndo}
+        onRedo={handleGlobalRedo}
+        canUndo={canUndo}
+        canRedo={canRedo}
+      />
 
       {/* Main Editor Area */}
       <div className="flex-1 flex overflow-hidden">
@@ -297,6 +314,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         <CanvasArea
           selectedElement={selectedElement}
           onElementSelect={setSelectedElement}
+          onAddToHistory={addToHistory}
+          onUndo={handleGlobalUndo}
+          onRedo={handleGlobalRedo}
         />
       </div>
 
