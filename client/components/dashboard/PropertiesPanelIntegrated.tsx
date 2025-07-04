@@ -354,10 +354,11 @@ export default function PropertiesPanelIntegrated({
               </Label>
               <Input
                 type="number"
-                value={properties.height}
-                onChange={(e) =>
-                  updateProperty("height", parseInt(e.target.value))
-                }
+                value={properties.height || ""}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value) || 0;
+                  updateProperty("height", value);
+                }}
                 className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
               />
             </div>
