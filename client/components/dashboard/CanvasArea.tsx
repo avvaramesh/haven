@@ -955,7 +955,7 @@ export default function CanvasArea({
 
       {/* Canvas Info */}
       {showCanvasInfo && (
-        <div className="absolute bottom-4 left-4 bg-dashboard-surface border border-dashboard-border rounded-lg overflow-hidden">
+        <div className="fixed bottom-4 left-4 bg-dashboard-surface border border-dashboard-border rounded-lg overflow-hidden z-30">
           <div className="flex items-center justify-between px-2 py-1 border-b border-dashboard-border bg-dashboard-muted/30">
             <span className="text-xs font-medium text-dashboard-text">
               Canvas Info
