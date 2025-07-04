@@ -373,6 +373,119 @@ export default function PropertiesPanel({
           </div>
         </div>
 
+        {/* X/Y Axis Properties - Show for line and bar charts */}
+        {(properties.chartType === "line" ||
+          properties.chartType === "bar") && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Layout className="w-4 h-4 text-dashboard-accent" />
+              <h4 className="font-medium text-dashboard-text">
+                Axis Configuration
+              </h4>
+            </div>
+
+            <div className="space-y-4">
+              {/* X-Axis Properties */}
+              <div className="space-y-3">
+                <Label className="text-sm font-medium text-dashboard-text">
+                  X-Axis
+                </Label>
+
+                <div className="space-y-2">
+                  <Label className="text-xs text-dashboard-text-muted">
+                    Label
+                  </Label>
+                  <Input
+                    placeholder="e.g., Months, Categories"
+                    className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs text-dashboard-text-muted">
+                    Show X-Axis
+                  </Label>
+                  <Switch defaultChecked />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs text-dashboard-text-muted">
+                    Rotate Labels
+                  </Label>
+                  <Switch />
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-xs text-dashboard-text-muted">
+                    Label Angle
+                  </Label>
+                  <Slider
+                    defaultValue={[0]}
+                    max={90}
+                    min={-90}
+                    step={15}
+                    className="w-full"
+                  />
+                </div>
+              </div>
+
+              {/* Y-Axis Properties */}
+              <div className="space-y-3">
+                <Label className="text-sm font-medium text-dashboard-text">
+                  Y-Axis
+                </Label>
+
+                <div className="space-y-2">
+                  <Label className="text-xs text-dashboard-text-muted">
+                    Label
+                  </Label>
+                  <Input
+                    placeholder="e.g., Revenue ($), Count"
+                    className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs text-dashboard-text-muted">
+                    Show Y-Axis
+                  </Label>
+                  <Switch defaultChecked />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label className="text-xs text-dashboard-text-muted">
+                      Min Value
+                    </Label>
+                    <Input
+                      type="number"
+                      placeholder="Auto"
+                      className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs text-dashboard-text-muted">
+                      Max Value
+                    </Label>
+                    <Input
+                      type="number"
+                      placeholder="Auto"
+                      className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs text-dashboard-text-muted">
+                    Start from Zero
+                  </Label>
+                  <Switch defaultChecked />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* AI Suggestions */}
         <div className="p-3 bg-dashboard-surface border border-dashboard-accent/30 rounded-lg">
           <div className="flex items-center gap-2 mb-2">
