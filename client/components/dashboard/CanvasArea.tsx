@@ -376,15 +376,22 @@ export default function CanvasArea({
   };
 
   const handleMaximize = (chartId: string) => {
+    console.log(`=== HANDLE MAXIMIZE CALLED ===`);
+    console.log(`Chart ID: ${chartId}`);
+
     const currentState = chartStates[chartId];
     const newMaximizedState = !currentState?.isMaximized;
 
-    console.log(`Maximizing chart ${chartId}:`, {
-      currentlyMaximized: currentState?.isMaximized,
-      newState: newMaximizedState,
-    });
+    console.log(`Current chartStates:`, chartStates);
+    console.log(`Current state for ${chartId}:`, currentState);
+    console.log(`New maximized state will be:`, newMaximizedState);
 
     updateChartState(chartId, {
+      isMaximized: newMaximizedState,
+      isMinimized: false,
+    });
+
+    console.log(`updateChartState called with:`, {
       isMaximized: newMaximizedState,
       isMinimized: false,
     });
