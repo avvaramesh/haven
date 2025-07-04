@@ -407,13 +407,17 @@ export default function PropertiesPanelIntegrated({
               <div className="flex gap-2">
                 <input
                   type="color"
-                  value={properties.color}
-                  onChange={(e) => updateProperty("color", e.target.value)}
+                  value={normalizedProperties?.primaryColor || "#3b82f6"}
+                  onChange={(e) =>
+                    updateProperty("primaryColor", e.target.value)
+                  }
                   className="w-10 h-8 rounded border border-dashboard-border"
                 />
                 <Input
-                  value={properties.color}
-                  onChange={(e) => updateProperty("color", e.target.value)}
+                  value={normalizedProperties?.primaryColor || "#3b82f6"}
+                  onChange={(e) =>
+                    updateProperty("primaryColor", e.target.value)
+                  }
                   className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
                 />
               </div>
