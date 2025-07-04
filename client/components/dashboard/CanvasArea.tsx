@@ -445,6 +445,14 @@ export default function CanvasArea({
     parentOnPropertyChange?.(chartId, property, value);
   };
 
+  // Expose property change handler to parent
+  React.useEffect(() => {
+    if (parentOnPropertyChange) {
+      // Make the property change handler available to parent
+      (window as any).canvasPropertyChange = handlePropertyChange;
+    }
+  }, [handlePropertyChange, parentOnPropertyChange]);
+
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = "move";
@@ -748,7 +756,7 @@ export default function CanvasArea({
           )}
           {selectedElement && (
             <>
-              <span>•</span>
+              <span>���</span>
               <span className="text-dashboard-accent">
                 Selected: {selectedElement}
               </span>
