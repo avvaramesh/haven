@@ -642,14 +642,77 @@ export default function CanvasArea({
           ))}
       </div>
 
+      {/* Canvas Controls */}
+      <div className="absolute top-4 right-4 bg-dashboard-surface border border-dashboard-border rounded-lg p-3 space-y-2">
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-dashboard-text-muted">Canvas:</span>
+          <input
+            type="number"
+            value={canvasSize.width}
+            onChange={(e) =>
+              setCanvasSize((prev) => ({
+                ...prev,
+                width: parseInt(e.target.value) || 1920,
+              }))
+            }
+            className="w-16 px-1 py-0.5 text-xs bg-dashboard-muted border border-dashboard-border rounded"
+          />
+          <span className="text-xs text-dashboard-text-muted">×</span>
+          <input
+            type="number"
+            value={canvasSize.height}
+            onChange={(e) =>
+              setCanvasSize((prev) => ({
+                ...prev,
+                height: parseInt(e.target.value) || 1080,
+              }))
+            }
+            className="w-16 px-1 py-0.5 text-xs bg-dashboard-muted border border-dashboard-border rounded"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-dashboard-text-muted">Zoom:</span>
+          <input
+            type="range"
+            min="25"
+            max="200"
+            value={zoomLevel}
+            onChange={(e) => setZoomLevel(parseInt(e.target.value))}
+            className="w-20"
+          />
+          <span className="text-xs text-dashboard-text">{zoomLevel}%</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowGrid(!showGrid)}
+            className={`px-2 py-1 text-xs rounded border ${showGrid ? "bg-dashboard-accent text-white" : "bg-dashboard-muted text-dashboard-text"}`}
+          >
+            Grid
+          </button>
+          <input
+            type="range"
+            min="10"
+            max="50"
+            value={gridSize}
+            onChange={(e) => setGridSize(parseInt(e.target.value))}
+            className="w-16"
+          />
+          <span className="text-xs text-dashboard-text-muted">
+            {gridSize}px
+          </span>
+        </div>
+      </div>
+
       {/* Canvas Info */}
       <div className="absolute bottom-4 left-4 bg-dashboard-surface border border-dashboard-border rounded-lg p-2 text-xs text-dashboard-text-muted">
         <div className="flex items-center gap-4">
-          <span>Canvas: 1920x1080</span>
+          <span>
+            Canvas: {canvasSize.width}×{canvasSize.height}
+          </span>
           <span>•</span>
-          <span>Grid: 20px</span>
+          <span>Grid: {gridSize}px</span>
           <span>•</span>
-          <span>Zoom: 100%</span>
+          <span>Zoom: {zoomLevel}%</span>
           <span>•</span>
           <span>{visibleCharts.length} charts visible</span>
           {minimizedCharts.length > 0 && (
