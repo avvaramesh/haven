@@ -112,12 +112,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     property: string,
     value: any,
   ) => {
-    // For now, just log the property change
-    // In a real implementation, this would update the chart's actual properties
-    console.log(`Property changed for ${elementId}: ${property} = ${value}`);
+    console.log(
+      `DashboardLayout: Property changed for ${elementId}: ${property} = ${value}`,
+    );
 
-    // You could store chart properties in state and pass them to charts
-    // or trigger a chart update mechanism here
+    // Call the canvas property change handler directly
+    if ((window as any).canvasPropertyChange) {
+      (window as any).canvasPropertyChange(elementId, property, value);
+    }
   };
   return (
     <div className="h-screen flex flex-col bg-dashboard-background">
