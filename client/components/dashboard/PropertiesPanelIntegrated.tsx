@@ -467,7 +467,7 @@ export default function PropertiesPanelIntegrated({
               Font Size
             </Label>
             <Slider
-              value={[properties.fontSize]}
+              value={[properties.fontSize || 14]}
               onValueChange={(value) => updateProperty("fontSize", value[0])}
               min={8}
               max={48}
@@ -475,7 +475,7 @@ export default function PropertiesPanelIntegrated({
               className="w-full"
             />
             <span className="text-xs text-dashboard-text-muted">
-              {properties.fontSize}px
+              {properties.fontSize || 14}px
             </span>
           </div>
 
