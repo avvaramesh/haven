@@ -473,14 +473,17 @@ export default function CanvasArea({
 
           {/* Revenue by Category */}
           {chartStates["revenue-chart"] &&
-            !chartStates["revenue-chart"].isHidden && (
+            !chartStates["revenue-chart"].isHidden &&
+            !maximizedChart && (
               <div
-                className={`col-span-6 row-span-1 relative group ${chartStates["revenue-chart"].isMinimized ? "col-span-3" : ""}`}
+                className={`col-span-12 lg:col-span-6 relative group transition-all duration-300`}
               >
                 <ChartWidget
                   id="revenue-chart"
                   title="Revenue by Category"
-                  className="h-48"
+                  className={
+                    chartStates["revenue-chart"].isMinimized ? "h-40" : "h-56"
+                  }
                   isSelected={selectedElement === "revenue-chart"}
                   isMinimized={chartStates["revenue-chart"].isMinimized}
                   isMaximized={chartStates["revenue-chart"].isMaximized}
