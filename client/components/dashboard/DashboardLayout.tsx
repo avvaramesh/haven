@@ -351,6 +351,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                       selectedElement={selectedElement}
                       isMobile={isMobile}
                       onClose={() => isMobile && setIsLeftPanelCollapsed(true)}
+                      onPropertyChange={handlePropertyChange}
                     />
                   </div>
                 )}
