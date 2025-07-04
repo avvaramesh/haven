@@ -89,7 +89,7 @@ export default function ChartWidget({
     }
   };
 
-  console.log(`ChartWidget ${id} - isMaximized:`, isMaximized);
+  console.log(`ChartWidget "${title}" (${id}) - isMaximized:`, isMaximized);
 
   const containerClasses = `
     group relative bg-dashboard-surface border border-dashboard-border rounded-lg
@@ -101,7 +101,10 @@ export default function ChartWidget({
     ${className}
   `;
 
-  console.log(`ChartWidget ${id} - containerClasses:`, containerClasses);
+  console.log(
+    `ChartWidget "${title}" (${id}) - containerClasses:`,
+    containerClasses,
+  );
 
   const containerStyle =
     position && !isMaximized
