@@ -1012,10 +1012,10 @@ export default function CanvasArea({
           variant="ghost"
           size="sm"
           onClick={() => setShowCanvasInfo(true)}
-          className="absolute bottom-4 left-4 h-8 px-3 bg-dashboard-surface border border-dashboard-border text-xs text-dashboard-text-muted hover:text-dashboard-text"
+          className="absolute bottom-4 left-4 h-7 w-7 p-0 bg-dashboard-surface border border-dashboard-border text-dashboard-text-muted hover:text-dashboard-text"
           title="Show Canvas Info"
         >
-          Canvas Info
+          <MoreVertical className="w-3 h-3" />
         </Button>
       )}
     </div>
