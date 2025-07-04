@@ -41,6 +41,28 @@ export default function PropertiesPanel({
   isCollapsed,
   onToggleCollapse,
 }: PropertiesPanelProps) {
+  // Determine chart type based on selected element
+  const getChartTypeFromElement = (elementId: string | null): string => {
+    if (!elementId) return "line";
+
+    if (
+      elementId.includes("smart-chart") ||
+      elementId.includes("profit") ||
+      elementId.includes("sales-over")
+    ) {
+      return "line";
+    }
+    if (elementId.includes("revenue-chart")) {
+      return "bar";
+    }
+    if (elementId.includes("sales-dist")) {
+      return "pie";
+    }
+    if (elementId.includes("kpi")) {
+      return "kpi";
+    }
+    return "line";
+  };
   const [properties, setProperties] = useState({
     title: "Q4 Revenue Analysis",
     width: 400,
