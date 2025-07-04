@@ -133,51 +133,12 @@ export default function RevenueByCategoryChart({
               }}
             />
           )}
-          {isStacked || isGrouped ? (
-            <>
-              <Bar
-                dataKey="Q1"
-                name="Q1 2024"
-                fill={properties?.color || "hsl(199, 89%, 48%)"}
-                stackId={isStacked ? "quarters" : undefined}
-                radius={isHorizontal ? [0, 3, 3, 0] : [3, 3, 0, 0]}
-                maxBarSize={isGrouped ? 15 : 40}
-              />
-              <Bar
-                dataKey="Q2"
-                name="Q2 2024"
-                fill="hsl(142, 76%, 36%)"
-                stackId={isStacked ? "quarters" : undefined}
-                radius={isHorizontal ? [0, 3, 3, 0] : [3, 3, 0, 0]}
-                maxBarSize={isGrouped ? 15 : 40}
-              />
-              <Bar
-                dataKey="Q3"
-                name="Q3 2024"
-                fill="hsl(271, 81%, 56%)"
-                stackId={isStacked ? "quarters" : undefined}
-                radius={isHorizontal ? [0, 3, 3, 0] : [3, 3, 0, 0]}
-                maxBarSize={isGrouped ? 15 : 40}
-              />
-              <Bar
-                dataKey="Q4"
-                name="Q4 2024"
-                fill="hsl(48, 96%, 53%)"
-                stackId={isStacked ? "quarters" : undefined}
-                radius={isHorizontal ? [0, 3, 3, 0] : [3, 3, 0, 0]}
-                maxBarSize={isGrouped ? 15 : 40}
-              />
-            </>
-          ) : (
-            <Bar
-              dataKey="value"
-              name="Revenue"
-              fill={properties?.color || "#3b82f6"}
-              radius={isHorizontal ? [0, 4, 4, 0] : [4, 4, 0, 0]}
-              maxBarSize={40}
-              cursor="pointer"
-            />
-          )}
+          <Bar
+            dataKey="value"
+            name="Revenue"
+            fill={properties?.color || "#3b82f6"}
+            radius={[4, 4, 0, 0]}
+          />
         </BarChart>
       </ResponsiveContainer>
     </div>
