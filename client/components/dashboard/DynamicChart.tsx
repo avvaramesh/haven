@@ -19,7 +19,7 @@ export default function DynamicChart({
   switch (chartType) {
     case "line":
     case "smart-chart":
-      return <SmartChart properties={properties} />;
+      return <SmartChart properties={{ ...properties, chartType }} />;
 
     case "bar":
     case "revenue-chart":
@@ -31,7 +31,7 @@ export default function DynamicChart({
 
     case "area":
     case "sales-over-time":
-      return <SalesOverTimeChart properties={properties} />;
+      return <SalesOverTimeChart properties={{ ...properties, chartType }} />;
 
     case "profit-margin":
       return <ProfitMarginChart properties={properties} />;
@@ -45,7 +45,7 @@ export default function DynamicChart({
     case "line-multi":
     case "line-stepped":
     case "line-smooth":
-      return <SmartChart properties={properties} />;
+      return <SmartChart properties={{ ...properties, chartType }} />;
 
     case "bar-vertical":
     case "bar-horizontal":
@@ -63,7 +63,7 @@ export default function DynamicChart({
     case "area-stacked":
     case "area-percentage":
     case "area-stream":
-      return <SalesOverTimeChart properties={properties} />;
+      return <SalesOverTimeChart properties={{ ...properties, chartType }} />;
 
     case "kpi-number":
     case "kpi-progress":
