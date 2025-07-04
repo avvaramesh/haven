@@ -79,18 +79,6 @@ export default function SalesOverTimeChart({
   // Ensure data is always available and properly formatted
   const chartData = isStacked || isPercentage || isStream ? stackedData : data;
 
-  // Debug log to verify data
-  React.useEffect(() => {
-    console.log("Area chart data:", {
-      chartType,
-      chartData,
-      isAreaChart,
-      isStacked,
-      isPercentage,
-      isStream,
-    });
-  }, [chartType, chartData, isAreaChart, isStacked, isPercentage, isStream]);
-
   return (
     <div className="h-40">
       <ResponsiveContainer width="100%" height="100%">
