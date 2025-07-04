@@ -38,7 +38,9 @@ export default function DynamicChart({
     case "bar-horizontal-bar":
     case "bar-stacked-bar":
     case "bar-grouped-bar":
-      return <RevenueByCategoryChart properties={properties} />;
+      return (
+        <RevenueByCategoryChart properties={{ ...properties, chartType }} />
+      );
 
     case "pie":
     case "sales-dist":
@@ -94,7 +96,9 @@ export default function DynamicChart({
     case "Horizontal Bar":
     case "Stacked Bar":
     case "Grouped Bar":
-      return <RevenueByCategoryChart properties={properties} />;
+      return (
+        <RevenueByCategoryChart properties={{ ...properties, chartType }} />
+      );
 
     case "pie-standard":
     case "pie-donut":
