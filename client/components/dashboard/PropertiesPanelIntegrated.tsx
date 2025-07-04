@@ -705,6 +705,73 @@ export default function PropertiesPanelIntegrated({
                       </div>
                     )}
 
+                  {/* Table Chart Specific */}
+                  {elementInfo.type === "table" && (
+                    <>
+                      <div className="flex items-center justify-between">
+                        <Label className="text-xs text-dashboard-text-muted">
+                          Show Header
+                        </Label>
+                        <Switch
+                          checked={properties.showHeader !== false}
+                          onCheckedChange={(checked) =>
+                            updateProperty("showHeader", checked)
+                          }
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <Label className="text-xs text-dashboard-text-muted">
+                          Alternate Rows
+                        </Label>
+                        <Switch
+                          checked={properties.alternateRows || false}
+                          onCheckedChange={(checked) =>
+                            updateProperty("alternateRows", checked)
+                          }
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <Label className="text-xs text-dashboard-text-muted">
+                          Show Borders
+                        </Label>
+                        <Switch
+                          checked={properties.showBorders !== false}
+                          onCheckedChange={(checked) =>
+                            updateProperty("showBorders", checked)
+                          }
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <Label className="text-xs text-dashboard-text-muted">
+                          Editable
+                        </Label>
+                        <Switch
+                          checked={properties.editable || false}
+                          onCheckedChange={(checked) =>
+                            updateProperty("editable", checked)
+                          }
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-xs text-dashboard-text-muted">
+                          Header Color
+                        </Label>
+                        <Input
+                          type="color"
+                          value={properties.headerColor || "#1e293b"}
+                          onChange={(e) =>
+                            updateProperty("headerColor", e.target.value)
+                          }
+                          className="w-full h-8"
+                        />
+                      </div>
+                    </>
+                  )}
+
                   {/* Pie Chart Specific */}
                   {elementInfo.type === "pie-chart" && (
                     <>
