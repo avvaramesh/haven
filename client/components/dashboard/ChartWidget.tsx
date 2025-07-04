@@ -119,6 +119,7 @@ export default function ChartWidget({
         transition-opacity duration-200
         ${showToolbar || isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"}
       `}
+        style={{ pointerEvents: "auto" }}
       >
         {/* Quick Actions */}
         <Button
