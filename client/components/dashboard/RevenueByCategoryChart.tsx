@@ -75,8 +75,13 @@ export default function RevenueByCategoryChart({
   const layout = isHorizontal ? "horizontal" : "vertical";
 
   return (
-    <div className="h-40">
-      <ResponsiveContainer width="100%" height="100%">
+    <div className="h-40" style={{ minWidth: "200px", minHeight: "160px" }}>
+      <ResponsiveContainer
+        width="100%"
+        height="100%"
+        minWidth={200}
+        minHeight={160}
+      >
         <BarChart
           layout={layout}
           data={chartData}
