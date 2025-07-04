@@ -61,14 +61,17 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
       {/* Main Editor Area */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Left Panel - Layers & Components */}
-        <LayersPanel />
+        {/* Left Panel - Data Connections */}
+        <DataConnectionsPanel />
 
         {/* Center Canvas Area */}
-        <CanvasArea />
+        <CanvasArea
+          selectedElement={selectedElement}
+          onElementSelect={setSelectedElement}
+        />
 
-        {/* Right Panel - Properties */}
-        <PropertiesPanel />
+        {/* Right Panel - Properties (only when element selected) */}
+        <PropertiesPanel selectedElement={selectedElement} />
       </div>
 
       {/* Status Bar */}
