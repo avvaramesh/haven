@@ -30,6 +30,7 @@ interface TableChartProps {
     sortColumn?: string;
     sortDirection?: "asc" | "desc";
     editable?: boolean;
+    chartType?: string;
   };
 }
 
