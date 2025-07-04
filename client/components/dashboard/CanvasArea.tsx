@@ -71,6 +71,7 @@ export default function CanvasArea({
   const [canvasSize, setCanvasSize] = useState(initialCanvasSize);
   const [zoomLevel, setZoomLevel] = useState(initialZoomLevel);
   const [gridSize, setGridSize] = useState(initialGridSize);
+  const [showCanvasInfo, setShowCanvasInfo] = useState(true);
   const [chartProperties, setChartProperties] = useState<Record<string, any>>(
     {},
   );
