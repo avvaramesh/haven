@@ -141,6 +141,159 @@ export default function EditingToolbar({
           >
             <Maximize className="w-4 h-4" />
           </Button>
+
+          {/* Canvas Settings */}
+          <div className="w-px h-6 bg-dashboard-border mx-2" />
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-dashboard-text hover:bg-dashboard-muted"
+                title="Canvas Settings"
+              >
+                <Settings className="w-4 h-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80 bg-dashboard-surface border-dashboard-border">
+              <div className="space-y-4">
+                <h4 className="font-medium text-dashboard-text">
+                  Canvas Settings
+                </h4>
+
+                {/* Zoom Level */}
+                <div className="space-y-2">
+                  <Label className="text-xs text-dashboard-text">
+                    Zoom Level
+                  </Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="number"
+                      min="25"
+                      max="500"
+                      step="25"
+                      value={zoomLevel}
+                      onChange={(e) => onZoomChange?.(Number(e.target.value))}
+                      className="bg-dashboard-muted border-dashboard-border text-dashboard-text"
+                    />
+                    <span className="text-xs text-dashboard-text-muted">%</span>
+                  </div>
+                </div>
+
+                {/* Grid Size */}
+                <div className="space-y-2">
+                  <Label className="text-xs text-dashboard-text">
+                    Grid Size
+                  </Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="number"
+                      min="10"
+                      max="100"
+                      step="5"
+                      value={gridSize}
+                      onChange={(e) =>
+                        onGridSizeChange?.(Number(e.target.value))
+                      }
+                      className="bg-dashboard-muted border-dashboard-border text-dashboard-text"
+                    />
+                    <span className="text-xs text-dashboard-text-muted">
+                      px
+                    </span>
+                  </div>
+                </div>
+
+                {/* Canvas Size */}
+                <div className="space-y-2">
+                  <Label className="text-xs text-dashboard-text">
+                    Canvas Size
+                  </Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-1">
+                      <Label className="text-xs text-dashboard-text-muted">
+                        Width
+                      </Label>
+                      <div className="flex items-center gap-1">
+                        <Input
+                          type="number"
+                          min="800"
+                          max="7680"
+                          step="100"
+                          value={canvasSize.width}
+                          onChange={(e) =>
+                            onCanvasSizeChange?.({
+                              ...canvasSize,
+                              width: Number(e.target.value),
+                            })
+                          }
+                          className="bg-dashboard-muted border-dashboard-border text-dashboard-text text-xs"
+                        />
+                        <span className="text-xs text-dashboard-text-muted">
+                          px
+                        </span>
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs text-dashboard-text-muted">
+                        Height
+                      </Label>
+                      <div className="flex items-center gap-1">
+                        <Input
+                          type="number"
+                          min="600"
+                          max="4320"
+                          step="100"
+                          value={canvasSize.height}
+                          onChange={(e) =>
+                            onCanvasSizeChange?.({
+                              ...canvasSize,
+                              height: Number(e.target.value),
+                            })
+                          }
+                          className="bg-dashboard-muted border-dashboard-border text-dashboard-text text-xs"
+                        />
+                        <span className="text-xs text-dashboard-text-muted">
+                          px
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-1 text-xs text-dashboard-text-muted">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 px-2 text-xs"
+                      onClick={() =>
+                        onCanvasSizeChange?.({ width: 1920, height: 1080 })
+                      }
+                    >
+                      1920×1080
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 px-2 text-xs"
+                      onClick={() =>
+                        onCanvasSizeChange?.({ width: 1280, height: 720 })
+                      }
+                    >
+                      1280×720
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 px-2 text-xs"
+                      onClick={() =>
+                        onCanvasSizeChange?.({ width: 3840, height: 2160 })
+                      }
+                    >
+                      4K
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
     </div>
