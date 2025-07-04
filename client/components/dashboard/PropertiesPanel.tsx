@@ -408,6 +408,10 @@ export default function PropertiesPanel({
                   </Label>
                   <Input
                     placeholder="e.g., Months, Categories"
+                    value={properties.xAxisLabel}
+                    onChange={(e) =>
+                      updateProperty("xAxisLabel", e.target.value)
+                    }
                     className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
                   />
                 </div>
@@ -416,14 +420,24 @@ export default function PropertiesPanel({
                   <Label className="text-xs text-dashboard-text-muted">
                     Show X-Axis
                   </Label>
-                  <Switch defaultChecked />
+                  <Switch
+                    checked={properties.showXAxis}
+                    onCheckedChange={(checked) =>
+                      updateProperty("showXAxis", checked)
+                    }
+                  />
                 </div>
 
                 <div className="flex items-center justify-between">
                   <Label className="text-xs text-dashboard-text-muted">
                     Rotate Labels
                   </Label>
-                  <Switch />
+                  <Switch
+                    checked={properties.rotateXLabels}
+                    onCheckedChange={(checked) =>
+                      updateProperty("rotateXLabels", checked)
+                    }
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -431,12 +445,18 @@ export default function PropertiesPanel({
                     Label Angle
                   </Label>
                   <Slider
-                    defaultValue={[0]}
+                    value={[properties.xLabelAngle]}
+                    onValueChange={(value) =>
+                      updateProperty("xLabelAngle", value[0])
+                    }
                     max={90}
                     min={-90}
                     step={15}
                     className="w-full"
                   />
+                  <span className="text-xs text-dashboard-text-muted">
+                    {properties.xLabelAngle}°
+                  </span>
                 </div>
               </div>
 
