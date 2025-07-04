@@ -479,7 +479,7 @@ export default function PropertiesPanelIntegrated({
                 ].map((color) => (
                   <button
                     key={color}
-                    className={`w-8 h-8 rounded border-2 transition-all hover:scale-110 ${
+                    className={`w-6 h-6 rounded border-2 transition-all hover:scale-110 ${
                       properties.color === color
                         ? "border-dashboard-accent ring-2 ring-dashboard-accent/30"
                         : "border-dashboard-border hover:border-dashboard-accent/50"
