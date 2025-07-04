@@ -255,6 +255,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <Button
             variant="outline"
             size="sm"
+            onClick={handleExport}
+            className="border-dashboard-border text-dashboard-text hover:bg-dashboard-muted"
+          >
+            Export
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
             onClick={handleShare}
             className="border-dashboard-border text-dashboard-text hover:bg-dashboard-muted"
           >
