@@ -18,7 +18,16 @@ import {
   Cloud,
   Server,
   Zap,
+  Users,
+  Target,
+  DollarSign,
+  TrendingUp,
 } from "lucide-react";
+import {
+  allDatasets,
+  getDatasetsByCategory,
+  Dataset,
+} from "../../data/sampleData";
 
 interface DataConnection {
   id: string;
