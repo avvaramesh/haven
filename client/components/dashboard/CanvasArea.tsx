@@ -394,8 +394,8 @@ export default function CanvasArea({
       )}
 
       {/* Canvas Content */}
-      <div className="relative p-8 min-h-full">
-        <div className="grid grid-cols-12 gap-6 auto-rows-min">
+      <div className="relative p-6 min-h-full">
+        <div className="grid grid-cols-12 gap-4 auto-rows-auto">
           {/* Smart Chart - Featured */}
           {chartStates["smart-chart"] &&
             !chartStates["smart-chart"].isHidden && (
