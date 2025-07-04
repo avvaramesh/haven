@@ -112,6 +112,7 @@ export default function RevenueByCategoryChart({
               tick={{ fill: "hsl(215, 20.2%, 65.1%)", fontSize: 10 }}
               width={isHorizontal ? 75 : 35}
               interval={0}
+              domain={isHorizontal ? undefined : [0, "dataMax + 10"]}
             />
           )}
           <Tooltip content={<CustomTooltip />} />
