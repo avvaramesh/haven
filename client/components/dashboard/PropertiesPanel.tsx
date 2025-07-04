@@ -94,6 +94,12 @@ export default function PropertiesPanel({
     setProperties((prev) => ({ ...prev, [key]: value }));
   };
 
+  // Update chart type when selected element changes
+  React.useEffect(() => {
+    const detectedType = getChartTypeFromElement(selectedElement);
+    updateProperty("chartType", detectedType);
+  }, [selectedElement]);
+
   // Collapsed state
   if (isCollapsed) {
     return (
