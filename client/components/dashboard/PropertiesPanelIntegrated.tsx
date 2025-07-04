@@ -1066,9 +1066,11 @@ export default function PropertiesPanelIntegrated({
                         </Label>
                         <Input
                           placeholder="e.g., Revenue ($), Count"
-                          value={properties.yAxisLabel || ""}
+                          value={
+                            (normalizedProperties as any).yAxis?.label || ""
+                          }
                           onChange={(e) =>
-                            updateProperty("yAxisLabel", e.target.value)
+                            updateProperty("yAxis.label", e.target.value)
                           }
                           className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
                         />
@@ -1079,9 +1081,27 @@ export default function PropertiesPanelIntegrated({
                           Show Y-Axis
                         </Label>
                         <Switch
-                          checked={properties.showYAxis !== false}
+                          checked={
+                            (normalizedProperties as any).yAxis?.enabled !==
+                            false
+                          }
                           onCheckedChange={(checked) =>
-                            updateProperty("showYAxis", checked)
+                            updateProperty("yAxis.enabled", checked)
+                          }
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <Label className="text-xs text-dashboard-text-muted">
+                          Show Grid Lines
+                        </Label>
+                        <Switch
+                          checked={
+                            (normalizedProperties as any).yAxis
+                              ?.showGridLines !== false
+                          }
+                          onCheckedChange={(checked) =>
+                            updateProperty("yAxis.showGridLines", checked)
                           }
                         />
                       </div>
@@ -1094,10 +1114,17 @@ export default function PropertiesPanelIntegrated({
                           <Input
                             type="number"
                             placeholder="Auto"
-                            value={properties.yMinValue || ""}
-                            onChange={(e) =>
-                              updateProperty("yMinValue", e.target.value)
+                            value={
+                              (normalizedProperties as any).yAxis?.minValue ||
+                              ""
                             }
+                            onChange={(e) => {
+                              const value = e.target.value
+                                ? Number(e.target.value)
+                                : undefined;
+                              updateProperty("yAxis.minValue", value);
+                              updateProperty("yAxis.autoScale", !value);
+                            }}
                             className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
                           />
                         </div>
@@ -1108,10 +1135,17 @@ export default function PropertiesPanelIntegrated({
                           <Input
                             type="number"
                             placeholder="Auto"
-                            value={properties.yMaxValue || ""}
-                            onChange={(e) =>
-                              updateProperty("yMaxValue", e.target.value)
+                            value={
+                              (normalizedProperties as any).yAxis?.maxValue ||
+                              ""
                             }
+                            onChange={(e) => {
+                              const value = e.target.value
+                                ? Number(e.target.value)
+                                : undefined;
+                              updateProperty("yAxis.maxValue", value);
+                              updateProperty("yAxis.autoScale", !value);
+                            }}
                             className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
                           />
                         </div>
@@ -1122,9 +1156,12 @@ export default function PropertiesPanelIntegrated({
                           Start from Zero
                         </Label>
                         <Switch
-                          checked={properties.startFromZero !== false}
+                          checked={
+                            (normalizedProperties as any).yAxis
+                              ?.startFromZero !== false
+                          }
                           onCheckedChange={(checked) =>
-                            updateProperty("startFromZero", checked)
+                            updateProperty("yAxis.startFromZero", checked)
                           }
                         />
                       </div>
