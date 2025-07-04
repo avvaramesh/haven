@@ -33,6 +33,11 @@ interface EditingToolbarProps {
   zoomLevel?: number;
   showGrid?: boolean;
   onToggleGrid?: () => void;
+  gridSize?: number;
+  canvasSize?: { width: number; height: number };
+  onZoomChange?: (zoom: number) => void;
+  onGridSizeChange?: (size: number) => void;
+  onCanvasSizeChange?: (size: { width: number; height: number }) => void;
 }
 
 export default function EditingToolbar({
