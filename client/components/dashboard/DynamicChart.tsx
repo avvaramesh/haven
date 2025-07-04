@@ -5,6 +5,7 @@ import SalesDistributionChart from "./SalesDistributionChart";
 import SalesOverTimeChart from "./SalesOverTimeChart";
 import ProfitMarginChart from "./ProfitMarginChart";
 import KPIWidget from "./KPIWidget";
+import TableChart from "./TableChart";
 
 interface DynamicChartProps {
   chartType: string;
@@ -71,8 +72,11 @@ export default function DynamicChart({
     case "kpi-comparison":
       return <KPIWidget properties={properties} />;
 
-    // Simple placeholder charts for new chart types
+    // Table chart
     case "table":
+      return <TableChart properties={{ ...properties, chartType }} />;
+
+    // Simple placeholder charts for new chart types
     case "gauge":
     case "funnel":
     case "waterfall":
