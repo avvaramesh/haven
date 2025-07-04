@@ -24,14 +24,19 @@ import {
   AlignCenter,
   AlignRight,
   Zap,
+  X,
 } from "lucide-react";
 
 interface PropertiesPanelIntegratedProps {
   selectedElement: string | null;
+  isMobile?: boolean;
+  onClose?: () => void;
 }
 
 export default function PropertiesPanelIntegrated({
   selectedElement,
+  isMobile = false,
+  onClose,
 }: PropertiesPanelIntegratedProps) {
   const [properties, setProperties] = useState({
     title: "Q4 Revenue Analysis",
@@ -80,18 +85,33 @@ export default function PropertiesPanelIntegrated({
   }
 
   return (
-    <div className="bg-dashboard-background border-r border-dashboard-border h-full overflow-y-auto">
+    <div
+      className={`bg-dashboard-background border-r border-dashboard-border h-full overflow-y-auto ${isMobile ? "touch-pan-y" : ""}`}
+    >
       <div className="p-4 border-b border-dashboard-border">
-        <div className="flex items-center gap-2 mb-3">
-          <Settings className="w-5 h-5 text-dashboard-accent" />
-          <h3 className="font-semibold text-dashboard-text">Properties</h3>
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <Settings className="w-5 h-5 text-dashboard-accent" />
+            <h3 className="font-semibold text-dashboard-text">Properties</h3>
+          </div>
+          {isMobile && onClose && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              className="h-8 w-8 p-0 text-dashboard-text hover:bg-dashboard-muted"
+              title="Close Properties"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          )}
         </div>
         <Badge className="bg-dashboard-accent/20 text-dashboard-accent text-xs">
           {selectedElement} Selected
         </Badge>
       </div>
 
-      <div className="p-4 space-y-6">
+      <div className={`${isMobile ? "p-3 space-y-4" : "p-4 space-y-6"}`}>
         {/* Quick Actions */}
         <div className="grid grid-cols-2 gap-2">
           <Button
