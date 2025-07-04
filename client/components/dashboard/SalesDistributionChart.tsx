@@ -25,7 +25,7 @@ const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
-      <div className="bg-dashboard-surface border border-dashboard-border rounded-lg p-3 shadow-lg">
+      <div className="bg-dashboard-surface border border-dashboard-border rounded-lg p-3 shadow-lg z-50">
         <p className="text-dashboard-text font-medium">{data.name}</p>
         <p className="text-dashboard-accent">Sales: {data.sales}</p>
         <p className="text-dashboard-text-muted">Share: {data.percentage}</p>
