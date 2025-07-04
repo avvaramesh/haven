@@ -134,7 +134,7 @@ export default function WaterfallChart({
         </div>
       </div>
 
-      <div className="relative h-48">
+      <div className="relative h-full min-h-48">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={transformedData}

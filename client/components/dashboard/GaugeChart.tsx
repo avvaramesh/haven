@@ -61,7 +61,7 @@ export default function GaugeChart({ properties }: GaugeChartProps = {}) {
         </div>
       </div>
 
-      <div className="relative h-40 flex flex-col items-center justify-center">
+      <div className="relative h-full min-h-40 flex flex-col items-center justify-center">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             {/* Background circle */}
