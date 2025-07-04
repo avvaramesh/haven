@@ -34,11 +34,11 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export default function RevenueByCategoryChart() {
   return (
-    <div className="h-32">
+    <div className="h-40">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
           data={data}
-          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+          margin={{ top: 10, right: 10, left: 10, bottom: 40 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(210, 11%, 20%)" />
           <XAxis
@@ -48,12 +48,13 @@ export default function RevenueByCategoryChart() {
             tick={{ fill: "hsl(215, 20.2%, 65.1%)", fontSize: 10 }}
             angle={-45}
             textAnchor="end"
-            height={60}
+            height={40}
           />
           <YAxis
             axisLine={false}
             tickLine={false}
             tick={{ fill: "hsl(215, 20.2%, 65.1%)", fontSize: 10 }}
+            width={30}
           />
           <Tooltip content={<CustomTooltip />} />
           <Bar
