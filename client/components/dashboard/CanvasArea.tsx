@@ -463,9 +463,17 @@ export default function CanvasArea({
     }
   }, [handlePropertyChange, parentOnPropertyChange]);
 
+  const [isDragOver, setIsDragOver] = useState(false);
+
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
+    e.dataTransfer.dropEffect = "copy";
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -566,9 +574,17 @@ export default function CanvasArea({
 
   return (
     <div
-      className="flex-1 bg-dashboard-muted/30 relative overflow-auto"
+      className={`flex-1 bg-dashboard-muted/30 relative overflow-auto transition-colors ${
+        isDragOver
+          ? "bg-dashboard-accent/10 border-2 border-dashed border-dashboard-accent"
+          : ""
+      }`}
       onDragOver={handleDragOver}
-      onDrop={handleDrop}
+      onDragLeave={handleDragLeave}
+      onDrop={(e) => {
+        handleDrop(e);
+        setIsDragOver(false);
+      }}
     >
       {/* Grid Background */}
       {showGrid && (
