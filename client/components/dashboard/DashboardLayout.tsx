@@ -13,7 +13,7 @@ import {
 import DataConnectionsPanel from "./DataConnectionsPanel";
 import ChartTemplatesPanel from "./ChartTemplatesPanel";
 import AICopilotIntegrated from "./AICopilotIntegrated";
-import PropertiesPanel from "./PropertiesPanel";
+import PropertiesPanelIntegrated from "./PropertiesPanelIntegrated";
 import EditingToolbar from "./EditingToolbar";
 import CanvasArea from "./CanvasArea";
 
