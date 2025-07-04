@@ -18,6 +18,7 @@ import AIAssistantUnified from "./AIAssistantUnified";
 import PropertiesPanelIntegrated from "./PropertiesPanelIntegrated";
 import EditingToolbar from "./EditingToolbar";
 import CanvasArea from "./CanvasArea";
+import ExportDialog from "./ExportDialog";
 
 interface DashboardLayoutProps {
   children?: ReactNode;
@@ -39,6 +40,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(100);
   const [showGrid, setShowGrid] = useState(true);
+  const [showExportDialog, setShowExportDialog] = useState(false);
   const isMobile = useIsMobile();
   const { toast } = useToast();
 
@@ -142,50 +144,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     }
   };
 
-  const handleExport = async () => {
-    try {
-      // Get dashboard state
-      const dashboardState = {
-        charts: (window as any).getCanvasState
-          ? (window as any).getCanvasState()
-          : {},
-        selectedElement,
-        timestamp: new Date().toISOString(),
-        metadata: {
-          version: "1.0",
-          exportedBy: "Dashboard Designer",
-          exportDate: new Date().toISOString(),
-        },
-      };
-
-      // Create JSON file
-      const dataStr = JSON.stringify(dashboardState, null, 2);
-      const dataBlob = new Blob([dataStr], { type: "application/json" });
-
-      // Create download link
-      const url = URL.createObjectURL(dataBlob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `dashboard-export-${new Date().toISOString().split("T")[0]}.json`;
-
-      // Trigger download
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-
-      toast({
-        title: "Export Successful",
-        description: "Dashboard has been exported as JSON file.",
-      });
-    } catch (error) {
-      console.error("Export failed:", error);
-      toast({
-        title: "Export Failed",
-        description: "Failed to export dashboard. Please try again.",
-        variant: "destructive",
-      });
-    }
+  const handleExport = () => {
+    setShowExportDialog(true);
   };
 
   // Zoom and view handlers
@@ -559,6 +519,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <span>Performance: Good</span>
         </div>
       </div>
+
+      {/* Export Dialog */}
+      <ExportDialog
+        isOpen={showExportDialog}
+        onClose={() => setShowExportDialog(false)}
+        selectedElement={selectedElement}
+      />
     </div>
   );
 }
