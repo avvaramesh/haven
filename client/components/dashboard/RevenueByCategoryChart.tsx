@@ -19,14 +19,20 @@ const data = [
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
+    const data = payload[0]?.payload;
     return (
       <div className="bg-dashboard-surface border border-dashboard-border rounded-lg p-3 shadow-lg z-50">
         <p className="text-dashboard-text font-medium">
-          {payload[0]?.payload?.category}
+          {data?.category || label}
         </p>
-        <p className="text-dashboard-accent">
-          Revenue: {payload[0]?.payload?.revenue}
-        </p>
+        {payload.map((entry: any, index: number) => (
+          <p key={index} className="text-dashboard-accent">
+            {entry.name}:{" "}
+            {entry.dataKey === "value"
+              ? entry.payload?.revenue || `$${entry.value}k`
+              : `$${entry.value}k`}
+          </p>
+        ))}
       </div>
     );
   }
@@ -55,13 +61,13 @@ export default function RevenueByCategoryChart({
   const isStacked = chartType.includes("stacked");
   const isGrouped = chartType.includes("grouped");
 
-  // Prepare data for stacked/grouped charts
+  // Prepare data for stacked/grouped charts with proper revenue values
   const stackedData = [
-    { category: "Electronics", Q1: 20, Q2: 25, Q3: 30, Q4: 35 },
-    { category: "Clothing", Q1: 30, Q2: 35, Q3: 40, Q4: 45 },
-    { category: "Home", Q1: 40, Q2: 45, Q3: 50, Q4: 55 },
-    { category: "Sports", Q1: 45, Q2: 50, Q3: 55, Q4: 60 },
-    { category: "Books", Q1: 50, Q2: 55, Q3: 60, Q4: 70 },
+    { category: "Electronics", Q1: 20, Q2: 25, Q3: 30, Q4: 35, total: "$110k" },
+    { category: "Clothing", Q1: 30, Q2: 35, Q3: 40, Q4: 45, total: "$150k" },
+    { category: "Home", Q1: 40, Q2: 45, Q3: 50, Q4: 55, total: "$190k" },
+    { category: "Sports", Q1: 45, Q2: 50, Q3: 55, Q4: 60, total: "$210k" },
+    { category: "Books", Q1: 50, Q2: 55, Q3: 60, Q4: 70, total: "$235k" },
   ];
 
   const chartData = isStacked || isGrouped ? stackedData : data;
