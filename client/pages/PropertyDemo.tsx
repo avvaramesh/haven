@@ -7,7 +7,7 @@ import {
   BarChart3,
   LineChart,
   PieChart,
-  Scatter,
+  Zap,
   Target,
   Table,
   CheckCircle2,
