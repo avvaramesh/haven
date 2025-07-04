@@ -28,7 +28,7 @@ import {
   formatTooltipValue,
   getColorPalette,
   CHART_COLORS,
-} from "@/data/chartDataManager";
+} from "../../data/chartDataManager";
 
 // Specialized chart imports for complex types
 import GaugeChart from "./GaugeChart";
@@ -100,8 +100,26 @@ export default function UnifiedChartComponent({
   chartType,
   properties = {},
 }: UnifiedChartProps) {
-  // Get appropriate data for chart type
-  const dataset = getDataForChartType(chartType);
+  // Get appropriate data for chart type with fallback
+  let dataset;
+  try {
+    dataset = getDataForChartType(chartType);
+  } catch (error) {
+    console.error("Error getting chart data:", error);
+    // Fallback data
+    dataset = {
+      id: "fallback",
+      name: "Sample Data",
+      description: "Fallback sample data",
+      data: [
+        { id: "1", label: "Category A", value: 30, category: "sample" },
+        { id: "2", label: "Category B", value: 45, category: "sample" },
+        { id: "3", label: "Category C", value: 55, category: "sample" },
+        { id: "4", label: "Category D", value: 60, category: "sample" },
+        { id: "5", label: "Category E", value: 70, category: "sample" },
+      ],
+    };
+  }
 
   // Determine chart configuration
   const isHorizontal = chartType.includes("horizontal");
