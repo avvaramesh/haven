@@ -191,10 +191,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 {leftPanelTab === "templates" && <ChartTemplatesPanel />}
                 {leftPanelTab === "properties" && (
                   <div className="w-80 h-full">
-                    <PropertiesPanel
+                    <PropertiesPanelIntegrated
                       selectedElement={selectedElement}
-                      isCollapsed={false}
-                      onToggleCollapse={() => {}}
                     />
                   </div>
                 )}
