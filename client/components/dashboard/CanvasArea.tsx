@@ -62,11 +62,15 @@ export default function CanvasArea({
   undoRef,
   redoRef,
   onPropertyChange: parentOnPropertyChange,
+  initialZoomLevel = 100,
+  initialGridSize = 20,
+  initialCanvasSize = { width: 1920, height: 1080 },
+  initialShowGrid = true,
 }: CanvasAreaProps) {
-  const [showGrid, setShowGrid] = useState(true);
-  const [canvasSize, setCanvasSize] = useState({ width: 1920, height: 1080 });
-  const [zoomLevel, setZoomLevel] = useState(100);
-  const [gridSize, setGridSize] = useState(20);
+  const [showGrid, setShowGrid] = useState(initialShowGrid);
+  const [canvasSize, setCanvasSize] = useState(initialCanvasSize);
+  const [zoomLevel, setZoomLevel] = useState(initialZoomLevel);
+  const [gridSize, setGridSize] = useState(initialGridSize);
   const [chartProperties, setChartProperties] = useState<Record<string, any>>(
     {},
   );
