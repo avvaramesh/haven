@@ -38,6 +38,8 @@ export default function CanvasArea({
   onAddToHistory,
   onUndo,
   onRedo,
+  undoRef,
+  redoRef,
 }: CanvasAreaProps) {
   const [showGrid, setShowGrid] = useState(true);
   const [chartStates, setChartStates] = useState<Record<string, ChartState>>({
@@ -92,6 +94,16 @@ export default function CanvasArea({
   });
 
   const { toast } = useToast();
+
+  // Set up refs for direct undo/redo communication
+  React.useEffect(() => {
+    if (undoRef) {
+      undoRef.current = handleUndoAction;
+    }
+    if (redoRef) {
+      redoRef.current = handleRedoAction;
+    }
+  }, []);
 
   const handleElementClick = (elementId: string) => {
     onElementSelect(elementId === selectedElement ? null : elementId);
