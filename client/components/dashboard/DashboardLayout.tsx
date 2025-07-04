@@ -101,7 +101,17 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Main Editor Area */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Panel - Collapsible Tabbed Interface */}
-        <div className="flex flex-col">
+        <div
+          className={`flex flex-col ${isMobile && !isLeftPanelCollapsed ? "absolute inset-y-0 left-0 z-50 bg-dashboard-background/95 backdrop-blur-sm" : ""}`}
+        >
+          {/* Mobile Overlay */}
+          {isMobile && !isLeftPanelCollapsed && (
+            <div
+              className="fixed inset-0 bg-black/20 z-40"
+              onClick={() => setIsLeftPanelCollapsed(true)}
+            />
+          )}
+
           {/* Collapsed State */}
           {isLeftPanelCollapsed ? (
             <div className="w-12 bg-dashboard-background border-r border-dashboard-border h-full flex flex-col items-center py-4">
@@ -178,7 +188,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               </div>
             </div>
           ) : (
-            <div className="flex h-full">
+            <div className={`flex h-full ${isMobile ? "relative z-50" : ""}`}>
               {/* Vertical Tab Sidebar */}
               <div className="w-16 bg-dashboard-surface border-r border-dashboard-border flex flex-col py-2">
                 <Button
@@ -261,7 +271,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 {leftPanelTab === "data" && <DataConnectionsPanel />}
                 {leftPanelTab === "templates" && <ChartTemplatesPanel />}
                 {leftPanelTab === "properties" && (
-                  <div className="w-80 md:w-80 sm:w-72 h-full">
+                  <div
+                    className={`${isMobile ? "w-screen max-w-sm" : "w-80"} h-full`}
+                  >
                     <PropertiesPanelIntegrated
                       selectedElement={selectedElement}
                       isMobile={isMobile}
@@ -270,7 +282,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   </div>
                 )}
                 {leftPanelTab === "copilot" && (
-                  <div className="w-80 md:w-80 sm:w-72 h-full">
+                  <div
+                    className={`${isMobile ? "w-screen max-w-sm" : "w-80"} h-full`}
+                  >
                     <AICopilotIntegrated />
                   </div>
                 )}
