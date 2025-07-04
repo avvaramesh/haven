@@ -59,7 +59,11 @@ export default function PropertiesPanelIntegrated({
     setProperties((prev) => ({ ...prev, [key]: value }));
 
     // Notify parent component of property change
-    if (selectedElement && onPropertyChange) {
+    if (
+      selectedElement &&
+      onPropertyChange &&
+      typeof onPropertyChange === "function"
+    ) {
       onPropertyChange(selectedElement, key, value);
     }
   };
