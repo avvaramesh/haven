@@ -57,6 +57,7 @@ export default function CanvasArea({
   onRedo,
   undoRef,
   redoRef,
+  onPropertyChange: parentOnPropertyChange,
 }: CanvasAreaProps) {
   const [showGrid, setShowGrid] = useState(true);
   const [chartProperties, setChartProperties] = useState<Record<string, any>>(
