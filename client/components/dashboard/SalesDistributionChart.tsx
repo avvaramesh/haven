@@ -130,7 +130,7 @@ export default function SalesDistributionChart({
   }
 
   return (
-    <div className="h-full min-h-32 flex items-center justify-center">
+    <div className="h-32 flex items-center justify-center">
       <ResponsiveContainer width="100%" height="100%">
         <PieChart margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
           <Pie

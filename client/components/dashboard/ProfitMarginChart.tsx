@@ -54,7 +54,7 @@ export default function ProfitMarginChart({
   properties,
 }: ProfitMarginChartProps = {}) {
   return (
-    <div className="h-full min-h-40">
+    <div className="h-40">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={data}

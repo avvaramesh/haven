@@ -100,7 +100,7 @@ export default function SmartChart({ properties }: SmartChartProps = {}) {
         </div>
       </div>
 
-      <div className="relative h-full min-h-40">
+      <div className="relative h-40">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
             data={chartData}
