@@ -71,8 +71,8 @@ export default function RevenueByCategoryChart({
           margin={{
             top: 10,
             right: 10,
-            left: isHorizontal ? 60 : 10,
-            bottom: isHorizontal ? 10 : 40,
+            left: 10,
+            bottom: 40,
           }}
         >
           {properties?.showGrid !== false && (
