@@ -67,7 +67,6 @@ export default function RevenueByCategoryChart({
         minHeight={160}
       >
         <BarChart
-          layout={layout}
           data={chartData}
           margin={{
             top: 10,
