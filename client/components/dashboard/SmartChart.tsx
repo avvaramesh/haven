@@ -3,24 +3,41 @@ import {
   Line,
   ResponsiveContainer,
   ReferenceLine,
-  Dot,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
 } from "recharts";
 import { Brain, TrendingUp } from "lucide-react";
 
 const data = [
-  { value: 20, month: "Jan" },
-  { value: 35, month: "Feb" },
-  { value: 25, month: "Mar" },
-  { value: 40, month: "Apr" },
-  { value: 30, month: "May" },
-  { value: 45, month: "Jun" },
-  { value: 35, month: "Jul" },
-  { value: 50, month: "Aug" },
-  { value: 40, month: "Sep" },
-  { value: 55, month: "Oct" },
-  { value: 45, month: "Nov" },
-  { value: 60, month: "Dec" },
+  { value: 20, month: "Jan", sales: "$20k" },
+  { value: 35, month: "Feb", sales: "$35k" },
+  { value: 25, month: "Mar", sales: "$25k" },
+  { value: 40, month: "Apr", sales: "$40k" },
+  { value: 30, month: "May", sales: "$30k" },
+  { value: 45, month: "Jun", sales: "$45k" },
+  { value: 35, month: "Jul", sales: "$35k" },
+  { value: 50, month: "Aug", sales: "$50k" },
+  { value: 40, month: "Sep", sales: "$40k" },
+  { value: 55, month: "Oct", sales: "$55k" },
+  { value: 45, month: "Nov", sales: "$45k" },
+  { value: 60, month: "Dec", sales: "$60k" },
 ];
+
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-dashboard-surface border border-dashboard-border rounded-lg p-3 shadow-lg">
+        <p className="text-dashboard-text font-medium">{`${label}`}</p>
+        <p className="text-dashboard-accent">
+          Sales: {payload[0]?.payload?.sales}
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
 
 export default function SmartChart() {
   return (
@@ -42,13 +59,30 @@ export default function SmartChart() {
 
       <div className="relative h-40">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data}>
+          <LineChart
+            data={data}
+            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(210, 11%, 20%)" />
+            <XAxis
+              dataKey="month"
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: "hsl(215, 20.2%, 65.1%)", fontSize: 12 }}
+            />
+            <YAxis
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: "hsl(215, 20.2%, 65.1%)", fontSize: 12 }}
+            />
+            <Tooltip content={<CustomTooltip />} />
             <Line
               type="monotone"
               dataKey="value"
               stroke="hsl(199, 89%, 48%)"
               strokeWidth={2}
-              dot={false}
+              dot={{ fill: "hsl(199, 89%, 48%)", strokeWidth: 2, r: 4 }}
+              activeDot={{ r: 6, stroke: "hsl(199, 89%, 48%)", strokeWidth: 2 }}
             />
             <ReferenceLine
               x="Oct"
