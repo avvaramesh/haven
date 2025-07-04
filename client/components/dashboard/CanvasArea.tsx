@@ -444,9 +444,18 @@ export default function CanvasArea({
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     const data = e.dataTransfer.getData("text/plain");
-    const rect = e.currentTarget.getBoundingClientRect();
-    const dropX = e.clientX - rect.left;
-    const dropY = e.clientY - rect.top;
+
+    // Get the canvas container for proper coordinate calculation
+    const canvasContainer = e.currentTarget.querySelector(
+      ".relative.p-6.min-h-full",
+    ) as HTMLElement;
+    if (!canvasContainer) return;
+
+    const canvasRect = canvasContainer.getBoundingClientRect();
+    const dropX = e.clientX - canvasRect.left - 24; // Account for padding
+    const dropY = e.clientY - canvasRect.top - 24;
+
+    console.log("Drop event:", { data, dropX, dropY }); // Debug log
 
     if (data.startsWith("new-chart:")) {
       const chartType = data.replace("new-chart:", "");
@@ -458,13 +467,15 @@ export default function CanvasArea({
         isMaximized: false,
         isHidden: false,
         position: {
-          x: dropX - 150,
-          y: dropY - 100,
+          x: Math.max(0, dropX - 150),
+          y: Math.max(0, dropY - 100),
           width: 300,
           height: 200,
         },
         chartType: chartType,
       };
+
+      console.log("Creating new chart:", newChartState); // Debug log
 
       setChartStates((prev) => ({
         ...prev,
@@ -483,11 +494,12 @@ export default function CanvasArea({
         duration: 2000,
       });
     } else {
+      // Handle existing chart movement
       const chartId = data;
       if (chartStates[chartId]) {
         const updatedPosition = {
-          x: dropX - 150,
-          y: dropY - 100,
+          x: Math.max(0, dropX - 150),
+          y: Math.max(0, dropY - 100),
           width: chartStates[chartId].position?.width || 300,
           height: chartStates[chartId].position?.height || 200,
         };
