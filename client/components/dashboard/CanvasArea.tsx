@@ -417,6 +417,20 @@ export default function CanvasArea({
     }
   };
 
+  const handlePropertyChange = (
+    chartId: string,
+    property: string,
+    value: any,
+  ) => {
+    setChartProperties((prev) => ({
+      ...prev,
+      [chartId]: {
+        ...prev[chartId],
+        [property]: value,
+      },
+    }));
+  };
+
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = "move";
