@@ -689,7 +689,7 @@ export default function PropertiesPanelIntegrated({
                             Start Angle
                           </Label>
                           <Slider
-                            value={[properties.startAngle]}
+                            value={[properties.startAngle || 0]}
                             onValueChange={(value) =>
                               updateProperty("startAngle", value[0])
                             }
