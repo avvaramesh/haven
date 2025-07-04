@@ -15,70 +15,101 @@ export default function DynamicChart({
   chartType,
   properties,
 }: DynamicChartProps) {
-  // Render different chart types based on chartType
+  // Render different chart types based on chartType, passing properties for real-time updates
   switch (chartType) {
     case "line":
     case "smart-chart":
-      return <SmartChart />;
+      return <SmartChart properties={properties} />;
 
     case "bar":
     case "revenue-chart":
-      return <RevenueByCategoryChart />;
+      return <RevenueByCategoryChart properties={properties} />;
 
     case "pie":
     case "sales-dist":
-      return <SalesDistributionChart />;
+      return <SalesDistributionChart properties={properties} />;
 
     case "area":
     case "sales-over-time":
-      return <SalesOverTimeChart />;
+      return <SalesOverTimeChart properties={properties} />;
 
     case "profit-margin":
-      return <ProfitMarginChart />;
+      return <ProfitMarginChart properties={properties} />;
 
     case "kpi":
     case "kpi-widget":
-      return <KPIWidget />;
+      return <KPIWidget properties={properties} />;
 
-    // New chart type variants
+    // New chart type variants - all pass properties for smooth updates
     case "line-simple":
     case "line-multi":
     case "line-stepped":
     case "line-smooth":
-      return <SmartChart />;
+      return <SmartChart properties={properties} />;
 
     case "bar-vertical":
     case "bar-horizontal":
     case "bar-stacked":
     case "bar-grouped":
-      return <RevenueByCategoryChart />;
+      return <RevenueByCategoryChart properties={properties} />;
 
     case "pie-standard":
     case "pie-donut":
     case "pie-semi-circle":
     case "pie-nested":
-      return <SalesDistributionChart />;
+      return <SalesDistributionChart properties={properties} />;
 
     case "area-filled":
     case "area-stacked":
     case "area-percentage":
     case "area-stream":
-      return <SalesOverTimeChart />;
+      return <SalesOverTimeChart properties={properties} />;
 
     case "kpi-number":
     case "kpi-progress":
     case "kpi-trend":
     case "kpi-comparison":
-      return <KPIWidget />;
+      return <KPIWidget properties={properties} />;
+
+    // Simple placeholder charts for new chart types
+    case "table":
+    case "gauge":
+    case "funnel":
+    case "waterfall":
+    case "heatmap":
+    case "treemap":
+    case "scatter":
+      return (
+        <div className="flex items-center justify-center h-full p-4">
+          <div className="text-center">
+            <div className="text-lg font-medium text-dashboard-text mb-2">
+              {chartType.charAt(0).toUpperCase() + chartType.slice(1)} Chart
+            </div>
+            <div className="text-sm text-dashboard-text-muted mb-4">
+              Chart implementation coming soon
+            </div>
+            <div className="w-full h-32 bg-dashboard-muted rounded-lg border-2 border-dashed border-dashboard-border flex items-center justify-center">
+              <span className="text-dashboard-text-muted text-sm">
+                {chartType} visualization
+              </span>
+            </div>
+          </div>
+        </div>
+      );
 
     default:
       return (
         <div className="flex items-center justify-center h-full">
           <div className="text-center">
             <div className="text-dashboard-text-muted mb-2">
-              Unsupported Chart Type
+              Chart Type: {chartType}
             </div>
-            <div className="text-xs text-dashboard-text-muted">{chartType}</div>
+            <div className="text-xs text-dashboard-text-muted">
+              Implementation in progress
+            </div>
+            <div className="w-full h-24 bg-dashboard-surface rounded border border-dashboard-border mt-3 flex items-center justify-center">
+              <span className="text-dashboard-accent">New Chart</span>
+            </div>
           </div>
         </div>
       );
