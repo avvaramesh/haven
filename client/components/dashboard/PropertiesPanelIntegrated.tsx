@@ -61,6 +61,17 @@ export default function PropertiesPanelIntegrated({
     showPercentages: true,
     startAngle: 0,
     value: "",
+    showTrend: true,
+    subtitle: "",
+    xAxisLabel: "",
+    yAxisLabel: "",
+    showXAxis: true,
+    showYAxis: true,
+    rotateXLabels: false,
+    xLabelAngle: 0,
+    yMinValue: "",
+    yMaxValue: "",
+    startFromZero: true,
   });
 
   const updateProperty = (key: string, value: any) => {
