@@ -309,7 +309,6 @@ export default function CanvasArea({
       });
 
       const canvas = await html2canvas(chartElement, {
-        backgroundColor: "#1e293b",
         useCORS: true,
         allowTaint: true,
         logging: false,
