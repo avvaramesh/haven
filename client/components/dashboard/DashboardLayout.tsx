@@ -10,6 +10,7 @@ import {
   Bot,
   Settings,
 } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import DataConnectionsPanel from "./DataConnectionsPanel";
 import ChartTemplatesPanel from "./ChartTemplatesPanel";
 import AICopilotIntegrated from "./AICopilotIntegrated";
@@ -27,6 +28,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     "data" | "templates" | "properties" | "copilot"
   >("data");
   const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false);
+  const isMobile = useIsMobile();
+
+  // Auto-collapse on mobile
+  React.useEffect(() => {
+    if (isMobile) {
+      setIsLeftPanelCollapsed(true);
+    }
+  }, [isMobile]);
 
   // Auto-switch to properties when element is selected
   React.useEffect(() => {
@@ -34,6 +43,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       setLeftPanelTab("properties");
     }
   }, [selectedElement, isLeftPanelCollapsed]);
+
+  // Handle collapsed icon clicks - expand and switch to tab
+  const handleCollapsedTabClick = (
+    tab: "data" | "templates" | "properties" | "copilot",
+  ) => {
+    setLeftPanelTab(tab);
+    setIsLeftPanelCollapsed(false);
+  };
   return (
     <div className="h-screen flex flex-col bg-dashboard-background">
       {/* Top Header */}
@@ -92,27 +109,72 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsLeftPanelCollapsed(false)}
-                className="text-dashboard-text hover:bg-dashboard-muted mb-4"
+                className="text-dashboard-text hover:bg-dashboard-muted mb-4 p-0 h-8 w-8"
+                title="Expand Panel"
               >
                 <ChevronRight className="w-4 h-4" />
               </Button>
-              <div className="flex flex-col gap-3">
-                <Database
-                  className="w-5 h-5 text-dashboard-text-muted"
-                  title="Data"
-                />
-                <BarChart3
-                  className="w-5 h-5 text-dashboard-text-muted"
-                  title="Charts"
-                />
-                <Settings
-                  className={`w-5 h-5 ${selectedElement ? "text-dashboard-accent" : "text-dashboard-text-muted"}`}
-                  title="Properties"
-                />
-                <Bot
-                  className="w-5 h-5 text-dashboard-text-muted"
+              <div className="flex flex-col gap-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleCollapsedTabClick("data")}
+                  className={`p-0 h-8 w-8 hover:bg-dashboard-muted ${
+                    leftPanelTab === "data"
+                      ? "text-dashboard-accent"
+                      : "text-dashboard-text-muted"
+                  }`}
+                  title="Data Connections"
+                >
+                  <Database className="w-5 h-5" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleCollapsedTabClick("templates")}
+                  className={`p-0 h-8 w-8 hover:bg-dashboard-muted ${
+                    leftPanelTab === "templates"
+                      ? "text-dashboard-accent"
+                      : "text-dashboard-text-muted"
+                  }`}
+                  title="Chart Templates"
+                >
+                  <BarChart3 className="w-5 h-5" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleCollapsedTabClick("properties")}
+                  disabled={!selectedElement}
+                  className={`p-0 h-8 w-8 hover:bg-dashboard-muted relative ${
+                    leftPanelTab === "properties" && selectedElement
+                      ? "text-dashboard-accent"
+                      : "text-dashboard-text-muted"
+                  } ${!selectedElement ? "opacity-50 cursor-not-allowed" : ""}`}
+                  title={
+                    selectedElement
+                      ? "Properties"
+                      : "Select an element to view properties"
+                  }
+                >
+                  <Settings className="w-5 h-5" />
+                  {selectedElement && (
+                    <div className="absolute -top-1 -right-1 w-2 h-2 bg-dashboard-accent rounded-full" />
+                  )}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleCollapsedTabClick("copilot")}
+                  className={`p-0 h-8 w-8 hover:bg-dashboard-muted ${
+                    leftPanelTab === "copilot"
+                      ? "text-dashboard-accent"
+                      : "text-dashboard-text-muted"
+                  }`}
                   title="AI Copilot"
-                />
+                >
+                  <Bot className="w-5 h-5" />
+                </Button>
               </div>
             </div>
           ) : (
