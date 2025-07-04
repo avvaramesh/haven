@@ -356,7 +356,7 @@ export default function PropertiesPanelIntegrated({
           <div className="space-y-2">
             <Label className="text-xs text-dashboard-text-muted">Title</Label>
             <Input
-              value={properties.title}
+              value={normalizedProperties?.title || ""}
               onChange={(e) => updateProperty("title", e.target.value)}
               className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
             />
@@ -367,7 +367,7 @@ export default function PropertiesPanelIntegrated({
               <Label className="text-xs text-dashboard-text-muted">Width</Label>
               <Input
                 type="number"
-                value={properties.width || ""}
+                value={normalizedProperties?.width || ""}
                 onChange={(e) => {
                   const value = parseInt(e.target.value) || 0;
                   updateProperty("width", value);
@@ -381,7 +381,7 @@ export default function PropertiesPanelIntegrated({
               </Label>
               <Input
                 type="number"
-                value={properties.height || ""}
+                value={normalizedProperties?.height || ""}
                 onChange={(e) => {
                   const value = parseInt(e.target.value) || 0;
                   updateProperty("height", value);
