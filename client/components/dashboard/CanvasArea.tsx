@@ -902,9 +902,14 @@ export default function CanvasArea({
                     },
                   };
 
-                  console.log(`Chart state updated for ${chart.id}`);
+                  console.log(
+                    `Chart state updated for ${getChartTitle(chart.id)} (${chart.id})`,
+                  );
                   console.log(`New chartStates:`, newStates);
-                  console.log(`Specific chart state:`, newStates[chart.id]);
+                  console.log(
+                    `Specific chart state for ${getChartTitle(chart.id)}:`,
+                    newStates[chart.id],
+                  );
 
                   return newStates;
                 });
@@ -941,7 +946,7 @@ export default function CanvasArea({
           </span>
           <span>•</span>
           <span>Grid: {gridSize}px</span>
-          <span>•</span>
+          <span>���</span>
           <span>Zoom: {zoomLevel}%</span>
           <span>•</span>
           <span>{visibleCharts.length} charts visible</span>
