@@ -93,7 +93,7 @@ export default function ChartWidget({
     group relative bg-dashboard-surface border border-dashboard-border rounded-lg
     transition-all duration-200
     ${isSelected ? "ring-2 ring-dashboard-accent ring-offset-2 ring-offset-dashboard-background" : ""}
-    ${isMaximized ? "fixed inset-4 z-50 shadow-2xl" : ""}
+    ${isMaximized ? "fixed inset-8 z-[100] shadow-2xl" : ""}
     ${isMinimized ? "h-12 overflow-hidden" : ""}
     ${isDragging ? "z-50 shadow-2xl" : ""}
     ${className}
@@ -290,9 +290,9 @@ export default function ChartWidget({
       {!isMinimized && (
         <div
           id={`chart-${id}`}
-          className={`px-4 pb-4 ${isMaximized ? "h-full" : ""}`}
+          className={`px-4 pb-4 ${isMaximized ? "h-full overflow-auto" : ""}`}
         >
-          <div className={isMaximized ? "h-full" : ""}>{children}</div>
+          <div className={isMaximized ? "h-full w-full" : ""}>{children}</div>
         </div>
       )}
 
@@ -419,8 +419,9 @@ export default function ChartWidget({
       {/* Maximize Overlay Background */}
       {isMaximized && (
         <div
-          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[90]"
           onClick={onMaximize}
+          style={{ zIndex: 90 }}
         />
       )}
     </div>
