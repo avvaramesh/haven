@@ -208,19 +208,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           )}
         </div>
 
-        {/* Center Canvas Area */}
+        {/* Canvas Area - Full Width */}
         <CanvasArea
           selectedElement={selectedElement}
           onElementSelect={setSelectedElement}
-        />
-
-        {/* Right Panel - Properties (collapsible) */}
-        <PropertiesPanel
-          selectedElement={selectedElement}
-          isCollapsed={isRightPanelCollapsed}
-          onToggleCollapse={() =>
-            setIsRightPanelCollapsed(!isRightPanelCollapsed)
-          }
         />
       </div>
 
