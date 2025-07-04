@@ -1182,30 +1182,79 @@ export default function PropertiesPanelIntegrated({
             </span>
           </div>
           <p className="text-xs text-dashboard-text-muted mb-2">
-            {elementInfo.type === "line-chart" &&
+            {normalizedProperties?.type === "line" &&
               "Try adding smooth curves and data point markers to make trends more visible."}
-            {elementInfo.type === "bar-chart" &&
+            {normalizedProperties?.type === "area" &&
+              "Adjust the area opacity and try gradient fills for better visual appeal."}
+            {(normalizedProperties?.type === "bar" ||
+              normalizedProperties?.type === "column") &&
               "Consider using gradient colors and adjusting bar spacing for better visual impact."}
-            {elementInfo.type === "pie-chart" &&
-              "Enable percentage labels and try a donut style for modern appearance."}
-            {elementInfo.type.includes("kpi") &&
+            {(normalizedProperties?.type === "pie" ||
+              normalizedProperties?.type === "donut") &&
+              "Enable percentage labels and adjust the start angle for better data presentation."}
+            {normalizedProperties?.type === "scatter" &&
+              "Try adding a trend line and adjust point sizes for better data visualization."}
+            {normalizedProperties?.type === "metric" &&
               "Add trend indicators and optimize the font size for better readability."}
-            {!elementInfo.type.includes("chart") &&
-              !elementInfo.type.includes("kpi") &&
-              "Select a chart or KPI element to get AI-powered suggestions."}
+            {normalizedProperties?.type === "table" &&
+              "Enable alternate row colors and borders for better data organization."}
+            {!normalizedProperties &&
+              "Select a chart or element to get AI-powered suggestions."}
           </p>
           <Button
             size="sm"
             variant="ghost"
             className="h-6 px-2 text-xs text-dashboard-accent hover:bg-dashboard-accent/20 w-full"
+            onClick={() => {
+              if (!normalizedProperties) return;
+
+              // Apply smart defaults based on chart type
+              switch (normalizedProperties.type) {
+                case "line":
+                  updateProperty("smoothCurve", true);
+                  updateProperty("showDataPoints", true);
+                  break;
+                case "area":
+                  updateProperty("areaOpacity", 0.7);
+                  updateProperty("gradientEnabled", true);
+                  break;
+                case "bar":
+                case "column":
+                  updateProperty("gradientEnabled", true);
+                  updateProperty("barSpacing", 0.2);
+                  break;
+                case "pie":
+                case "donut":
+                  updateProperty("showPercentages", true);
+                  updateProperty("labelPosition", "outside");
+                  break;
+                case "scatter":
+                  updateProperty("showTrendLine", true);
+                  updateProperty("pointSize", 8);
+                  break;
+                case "metric":
+                  updateProperty("showTrend", true);
+                  updateProperty("titleFontSize", 18);
+                  break;
+                case "table":
+                  updateProperty("alternateRowColors", true);
+                  updateProperty("borderEnabled", true);
+                  break;
+              }
+            }}
           >
-            {elementInfo.type === "line-chart" && "Optimize Line Chart"}
-            {elementInfo.type === "bar-chart" && "Apply Gradient"}
-            {elementInfo.type === "pie-chart" && "Enable Donut Mode"}
-            {elementInfo.type.includes("kpi") && "Optimize KPI"}
-            {!elementInfo.type.includes("chart") &&
-              !elementInfo.type.includes("kpi") &&
-              "Get Suggestions"}
+            {normalizedProperties?.type === "line" && "Optimize Line Chart"}
+            {normalizedProperties?.type === "area" && "Apply Gradient Fill"}
+            {(normalizedProperties?.type === "bar" ||
+              normalizedProperties?.type === "column") &&
+              "Apply Gradient"}
+            {(normalizedProperties?.type === "pie" ||
+              normalizedProperties?.type === "donut") &&
+              "Enable Labels"}
+            {normalizedProperties?.type === "scatter" && "Add Trend Line"}
+            {normalizedProperties?.type === "metric" && "Optimize KPI"}
+            {normalizedProperties?.type === "table" && "Style Table"}
+            {!normalizedProperties && "Get Suggestions"}
           </Button>
         </div>
       </div>
