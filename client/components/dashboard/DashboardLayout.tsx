@@ -201,6 +201,17 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     }
   };
 
+  const handleShare = () => {
+    console.log("Share dashboard functionality triggered");
+    // TODO: Implement share functionality
+    if ((window as any).toast) {
+      (window as any).toast({
+        title: "Share",
+        description: "Share functionality coming soon.",
+      });
+    }
+  };
+
   const handlePropertyChange = (
     elementId: string,
     property: string,
