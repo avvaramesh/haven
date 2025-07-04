@@ -518,49 +518,63 @@ export default function CanvasArea({
       {/* Canvas Content */}
       <div className="relative p-6 min-h-full overflow-hidden" style={{ minHeight: '1000px' }}>
         {/* All Charts - Absolute Positioned */}
-          {/* Smart Chart - Featured */}
-          {chartStates["smart-chart"] &&
-            !chartStates["smart-chart"].isHidden && (
-              <div
-                className={`${
-                  chartStates["smart-chart"].isMaximized
-                    ? "col-span-12"
-                    : chartStates["smart-chart"].isMinimized
-                      ? "col-span-6 lg:col-span-4"
-                      : "col-span-12 lg:col-span-8"
-                } relative group transition-all duration-300`}
-              >
-                <ChartWidget
-                  id="smart-chart"
-                  title="Smart Analytics Chart"
-                  className={
-                    chartStates["smart-chart"].isMaximized
-                      ? "h-96"
-                      : chartStates["smart-chart"].isMinimized
-                        ? "h-48"
-                        : "h-72"
-                  }
-                  isSelected={selectedElement === "smart-chart"}
-                  isMinimized={chartStates["smart-chart"].isMinimized}
-                  isMaximized={chartStates["smart-chart"].isMaximized}
-                  isHidden={chartStates["smart-chart"].isHidden}
-                  onSelect={() => handleElementClick("smart-chart")}
-                  onMinimize={() => handleMinimize("smart-chart")}
-                  onMaximize={() => handleMaximize("smart-chart")}
-                  onHide={() => handleHide("smart-chart")}
-                  onRemove={() => handleRemove("smart-chart")}
-                  onDownload={() => handleDownload("smart-chart")}
-                  onDuplicate={() => handleDuplicate("smart-chart")}
-                  onEdit={() => handleEdit("smart-chart")}
-                  onPositionChange={(position) =>
-                    handlePositionChange("smart-chart", position)
-                  }
-                  onResize={(size) => handleResize("smart-chart", size)}
-                >
-                  <SmartChart />
-                </ChartWidget>
-              </div>
-            )}
+        {Object.values(chartStates)
+          .filter((chart) => !chart.isHidden)
+          .map((chart) => (
+            <ChartWidget
+              key={chart.id}
+              id={chart.id}
+              title={getChartTitle(chart.id)}
+              className=""
+              isSelected={selectedElement === chart.id}
+              isMinimized={chart.isMinimized}
+              isMaximized={chart.isMaximized}
+              isHidden={chart.isHidden}
+              position={chart.position}
+              onSelect={() => handleElementClick(chart.id)}
+              onMinimize={() => handleMinimize(chart.id)}
+              onMaximize={() => handleMaximize(chart.id)}
+              onHide={() => handleHide(chart.id)}
+              onRemove={() => handleRemove(chart.id)}
+              onDownload={() => handleDownload(chart.id)}
+              onDuplicate={() => handleDuplicate(chart.id)}
+              onEdit={() => handleEdit(chart.id)}
+              onPositionChange={(position) => handlePositionChange(chart.id, position)}
+              onResize={(size) => handleResize(chart.id, size)}
+            >
+              {chart.id === "smart-chart" && <SmartChart />}
+              {chart.id === "kpi-widget" && <KPIWidget />}
+              {chart.id === "revenue-chart" && <RevenueByCategoryChart />}
+              {chart.id === "sales-dist" && <SalesDistributionChart />}
+              {chart.id === "kpi-1" && (
+                <div className="flex flex-col justify-center items-center h-full">
+                  <div className="text-lg font-bold text-green-400">+12.5%</div>
+                  <div className="text-xs text-dashboard-text-muted">vs last month</div>
+                </div>
+              )}
+              {chart.id === "kpi-2" && (
+                <div className="flex flex-col justify-center items-center h-full">
+                  <div className="text-lg font-bold text-dashboard-accent">24.8k</div>
+                  <div className="text-xs text-dashboard-text-muted">this week</div>
+                </div>
+              )}
+              {chart.id === "kpi-3" && (
+                <div className="flex flex-col justify-center items-center h-full">
+                  <div className="text-lg font-bold text-yellow-400">3.2%</div>
+                  <div className="text-xs text-dashboard-text-muted">avg rate</div>
+                </div>
+              )}
+              {chart.id === "kpi-4" && (
+                <div className="flex flex-col justify-center items-center h-full">
+                  <div className="text-lg font-bold text-purple-400">$1,247</div>
+                  <div className="text-xs text-dashboard-text-muted">average</div>
+                </div>
+              )}
+              {!["smart-chart", "kpi-widget", "revenue-chart", "sales-dist", "kpi-1", "kpi-2", "kpi-3", "kpi-4"].includes(chart.id) && (
+                <DynamicChart chartType={chart.chartType || "line"} />
+              )}
+            </ChartWidget>
+          ))}
 
           {/* KPI Widget */}
           {chartStates["kpi-widget"] &&
