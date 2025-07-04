@@ -968,9 +968,8 @@ export default function PropertiesPanelIntegrated({
                 </>
               )}
 
-              {/* X/Y Axis Properties - Show for line and bar charts */}
-              {(elementInfo.type === "line-chart" ||
-                elementInfo.type === "bar-chart") && (
+              {/* X/Y Axis Properties - Show for charts that support axes */}
+              {chartSupportsAxes(normalizedProperties.type) && (
                 <div className="space-y-4 mt-6">
                   <div className="flex items-center gap-2">
                     <Layout className="w-4 h-4 text-dashboard-accent" />
@@ -992,9 +991,11 @@ export default function PropertiesPanelIntegrated({
                         </Label>
                         <Input
                           placeholder="e.g., Months, Categories"
-                          value={properties.xAxisLabel || ""}
+                          value={
+                            (normalizedProperties as any).xAxis?.label || ""
+                          }
                           onChange={(e) =>
-                            updateProperty("xAxisLabel", e.target.value)
+                            updateProperty("xAxis.label", e.target.value)
                           }
                           className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
                         />
@@ -1005,33 +1006,45 @@ export default function PropertiesPanelIntegrated({
                           Show X-Axis
                         </Label>
                         <Switch
-                          checked={properties.showXAxis !== false}
+                          checked={
+                            (normalizedProperties as any).xAxis?.enabled !==
+                            false
+                          }
                           onCheckedChange={(checked) =>
-                            updateProperty("showXAxis", checked)
+                            updateProperty("xAxis.enabled", checked)
                           }
                         />
                       </div>
 
                       <div className="flex items-center justify-between">
                         <Label className="text-xs text-dashboard-text-muted">
-                          Rotate Labels
+                          Show Grid Lines
                         </Label>
                         <Switch
-                          checked={properties.rotateXLabels === true}
+                          checked={
+                            (normalizedProperties as any).xAxis
+                              ?.showGridLines !== false
+                          }
                           onCheckedChange={(checked) =>
-                            updateProperty("rotateXLabels", checked)
+                            updateProperty("xAxis.showGridLines", checked)
                           }
                         />
                       </div>
 
                       <div className="space-y-2">
                         <Label className="text-xs text-dashboard-text-muted">
-                          Label Angle: {properties.xLabelAngle || 0}°
+                          Label Rotation:{" "}
+                          {(normalizedProperties as any).xAxis?.tickRotation ||
+                            0}
+                          °
                         </Label>
                         <Slider
-                          value={[properties.xLabelAngle || 0]}
+                          value={[
+                            (normalizedProperties as any).xAxis?.tickRotation ||
+                              0,
+                          ]}
                           onValueChange={(value) =>
-                            updateProperty("xLabelAngle", value[0])
+                            updateProperty("xAxis.tickRotation", value[0])
                           }
                           max={90}
                           min={-90}
