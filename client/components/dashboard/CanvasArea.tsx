@@ -545,6 +545,10 @@ export default function CanvasArea({
       // Make the property change handler available to parent
       (window as any).canvasPropertyChange = handlePropertyChange;
     }
+
+    // Expose grid and zoom controls to parent
+    (window as any).setCanvasGrid = (show: boolean) => setShowGrid(show);
+    (window as any).setCanvasZoom = (level: number) => setZoomLevel(level);
   }, [handlePropertyChange, parentOnPropertyChange]);
 
   const [isDragOver, setIsDragOver] = useState(false);
