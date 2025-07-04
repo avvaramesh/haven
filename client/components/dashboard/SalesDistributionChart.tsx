@@ -14,12 +14,15 @@ const data = [
   { value: 10, name: "Other", percentage: "10%", sales: "$10k" },
 ];
 
-const COLORS = [
-  "hsl(199, 89%, 48%)",
-  "hsl(199, 89%, 60%)",
-  "hsl(199, 89%, 72%)",
-  "hsl(210, 11%, 45%)",
-];
+const getColors = (baseColor?: string) => {
+  const base = baseColor || "hsl(199, 89%, 48%)";
+  return [
+    base,
+    "hsl(199, 89%, 60%)",
+    "hsl(199, 89%, 72%)",
+    "hsl(210, 11%, 45%)",
+  ];
+};
 
 const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
