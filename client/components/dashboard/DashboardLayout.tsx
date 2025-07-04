@@ -261,14 +261,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 {leftPanelTab === "data" && <DataConnectionsPanel />}
                 {leftPanelTab === "templates" && <ChartTemplatesPanel />}
                 {leftPanelTab === "properties" && (
-                  <div className="w-80 h-full">
+                  <div className="w-80 md:w-80 sm:w-72 h-full">
                     <PropertiesPanelIntegrated
                       selectedElement={selectedElement}
+                      isMobile={isMobile}
+                      onClose={() => isMobile && setIsLeftPanelCollapsed(true)}
                     />
                   </div>
                 )}
                 {leftPanelTab === "copilot" && (
-                  <div className="w-80 h-full">
+                  <div className="w-80 md:w-80 sm:w-72 h-full">
                     <AICopilotIntegrated />
                   </div>
                 )}
