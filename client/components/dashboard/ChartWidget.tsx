@@ -122,7 +122,7 @@ export default function ChartWidget({
       {/* Maximize Overlay Background - rendered at root level */}
       {isMaximized && (
         <div
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[90]"
+          className="absolute inset-0 bg-black/40 backdrop-blur-sm z-[90]"
           onClick={(e) => {
             e.preventDefault();
             console.log(`Overlay clicked for maximized chart ${id}`);
