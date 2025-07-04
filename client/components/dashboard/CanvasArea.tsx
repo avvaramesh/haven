@@ -885,16 +885,22 @@ export default function CanvasArea({
                 console.log(`Current state:`, currentState);
                 console.log(`New maximized state:`, newMaximizedState);
 
-                setChartStates((prev) => ({
-                  ...prev,
-                  [chart.id]: {
-                    ...prev[chart.id],
-                    isMaximized: newMaximizedState,
-                    isMinimized: false,
-                  },
-                }));
+                setChartStates((prev) => {
+                  const newStates = {
+                    ...prev,
+                    [chart.id]: {
+                      ...prev[chart.id],
+                      isMaximized: newMaximizedState,
+                      isMinimized: false,
+                    },
+                  };
 
-                console.log(`Chart state updated for ${chart.id}`);
+                  console.log(`Chart state updated for ${chart.id}`);
+                  console.log(`New chartStates:`, newStates);
+                  console.log(`Specific chart state:`, newStates[chart.id]);
+
+                  return newStates;
+                });
               }}
               onHide={() => handleHide(chart.id)}
               onRemove={() => handleRemove(chart.id)}
