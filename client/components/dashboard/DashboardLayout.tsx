@@ -107,6 +107,52 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const canUndo = undoStack.length > 0;
   const canRedo = redoStack.length > 0;
 
+  // Save and export handlers
+  const handleSave = () => {
+    // Get current dashboard state
+    const dashboardState = {
+      charts: (window as any).getCanvasState
+        ? (window as any).getCanvasState()
+        : {},
+      selectedElement,
+      timestamp: new Date().toISOString(),
+    };
+
+    // Save to localStorage for now (could be extended to save to server)
+    try {
+      localStorage.setItem("dashboard-state", JSON.stringify(dashboardState));
+      console.log("Dashboard saved successfully", dashboardState);
+
+      // Show success feedback
+      if ((window as any).toast) {
+        (window as any).toast({
+          title: "Dashboard Saved",
+          description: "Your dashboard has been saved successfully.",
+        });
+      }
+    } catch (error) {
+      console.error("Failed to save dashboard:", error);
+      if ((window as any).toast) {
+        (window as any).toast({
+          title: "Save Failed",
+          description: "Failed to save dashboard. Please try again.",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+  const handleExport = () => {
+    console.log("Export dashboard functionality triggered");
+    // TODO: Implement export functionality (PDF, image, JSON, etc.)
+    if ((window as any).toast) {
+      (window as any).toast({
+        title: "Export",
+        description: "Export functionality coming soon.",
+      });
+    }
+  };
+
   const handlePropertyChange = (
     elementId: string,
     property: string,
@@ -171,6 +217,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         onRedo={handleGlobalRedo}
         canUndo={canUndo}
         canRedo={canRedo}
+        onSave={handleSave}
+        onExport={handleExport}
       />
 
       {/* Main Editor Area */}
