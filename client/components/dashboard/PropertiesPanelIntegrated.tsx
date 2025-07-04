@@ -687,6 +687,158 @@ export default function PropertiesPanelIntegrated({
                   )}
                 </>
               )}
+
+              {/* X/Y Axis Properties - Show for line and bar charts */}
+              {(elementInfo.type === "line-chart" ||
+                elementInfo.type === "bar-chart") && (
+                <div className="space-y-4 mt-6">
+                  <div className="flex items-center gap-2">
+                    <Layout className="w-4 h-4 text-dashboard-accent" />
+                    <h4 className="font-medium text-dashboard-text">
+                      Axis Configuration
+                    </h4>
+                  </div>
+
+                  <div className="space-y-4">
+                    {/* X-Axis Properties */}
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium text-dashboard-text">
+                        X-Axis
+                      </Label>
+
+                      <div className="space-y-2">
+                        <Label className="text-xs text-dashboard-text-muted">
+                          Label
+                        </Label>
+                        <Input
+                          placeholder="e.g., Months, Categories"
+                          value={properties.xAxisLabel || ""}
+                          onChange={(e) =>
+                            updateProperty("xAxisLabel", e.target.value)
+                          }
+                          className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <Label className="text-xs text-dashboard-text-muted">
+                          Show X-Axis
+                        </Label>
+                        <Switch
+                          checked={properties.showXAxis !== false}
+                          onCheckedChange={(checked) =>
+                            updateProperty("showXAxis", checked)
+                          }
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <Label className="text-xs text-dashboard-text-muted">
+                          Rotate Labels
+                        </Label>
+                        <Switch
+                          checked={properties.rotateXLabels === true}
+                          onCheckedChange={(checked) =>
+                            updateProperty("rotateXLabels", checked)
+                          }
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-xs text-dashboard-text-muted">
+                          Label Angle: {properties.xLabelAngle || 0}°
+                        </Label>
+                        <Slider
+                          value={[properties.xLabelAngle || 0]}
+                          onValueChange={(value) =>
+                            updateProperty("xLabelAngle", value[0])
+                          }
+                          max={90}
+                          min={-90}
+                          step={15}
+                          className="w-full"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Y-Axis Properties */}
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium text-dashboard-text">
+                        Y-Axis
+                      </Label>
+
+                      <div className="space-y-2">
+                        <Label className="text-xs text-dashboard-text-muted">
+                          Label
+                        </Label>
+                        <Input
+                          placeholder="e.g., Revenue ($), Count"
+                          value={properties.yAxisLabel || ""}
+                          onChange={(e) =>
+                            updateProperty("yAxisLabel", e.target.value)
+                          }
+                          className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <Label className="text-xs text-dashboard-text-muted">
+                          Show Y-Axis
+                        </Label>
+                        <Switch
+                          checked={properties.showYAxis !== false}
+                          onCheckedChange={(checked) =>
+                            updateProperty("showYAxis", checked)
+                          }
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-2">
+                          <Label className="text-xs text-dashboard-text-muted">
+                            Min Value
+                          </Label>
+                          <Input
+                            type="number"
+                            placeholder="Auto"
+                            value={properties.yMinValue || ""}
+                            onChange={(e) =>
+                              updateProperty("yMinValue", e.target.value)
+                            }
+                            className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-xs text-dashboard-text-muted">
+                            Max Value
+                          </Label>
+                          <Input
+                            type="number"
+                            placeholder="Auto"
+                            value={properties.yMaxValue || ""}
+                            onChange={(e) =>
+                              updateProperty("yMaxValue", e.target.value)
+                            }
+                            className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <Label className="text-xs text-dashboard-text-muted">
+                          Start from Zero
+                        </Label>
+                        <Switch
+                          checked={properties.startFromZero !== false}
+                          onCheckedChange={(checked) =>
+                            updateProperty("startFromZero", checked)
+                          }
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
