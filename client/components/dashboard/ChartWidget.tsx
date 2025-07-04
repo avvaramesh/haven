@@ -89,6 +89,8 @@ export default function ChartWidget({
     }
   };
 
+  console.log(`ChartWidget ${id} - isMaximized:`, isMaximized);
+
   const containerClasses = `
     group relative bg-dashboard-surface border border-dashboard-border rounded-lg
     transition-all duration-200
@@ -98,6 +100,8 @@ export default function ChartWidget({
     ${isDragging ? "z-50 shadow-2xl" : ""}
     ${className}
   `;
+
+  console.log(`ChartWidget ${id} - containerClasses:`, containerClasses);
 
   const containerStyle =
     position && !isMaximized
