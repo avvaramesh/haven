@@ -516,9 +516,8 @@ export default function CanvasArea({
       )}
 
       {/* Canvas Content */}
-      <div className="relative p-6 min-h-full">
-        {/* Fixed Layout Charts */}
-        <div className="grid grid-cols-12 gap-4 auto-rows-auto mb-8">
+      <div className="relative p-6 min-h-full overflow-hidden" style={{ minHeight: '1000px' }}>
+        {/* All Charts - Absolute Positioned */}
           {/* Smart Chart - Featured */}
           {chartStates["smart-chart"] &&
             !chartStates["smart-chart"].isHidden && (
