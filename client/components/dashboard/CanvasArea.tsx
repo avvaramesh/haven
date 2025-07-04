@@ -977,7 +977,7 @@ export default function CanvasArea({
               </span>
               <span>•</span>
               <span>Grid: {gridSize}px</span>
-              <span>���</span>
+              <span>����</span>
               <span>Zoom: {zoomLevel}%</span>
               <span>•</span>
               <span>{visibleCharts.length} charts visible</span>
@@ -1012,7 +1012,7 @@ export default function CanvasArea({
           variant="ghost"
           size="sm"
           onClick={() => setShowCanvasInfo(true)}
-          className="absolute bottom-4 left-4 h-7 w-7 p-0 bg-dashboard-surface border border-dashboard-border text-dashboard-text-muted hover:text-dashboard-text"
+          className="fixed bottom-4 left-4 h-7 w-7 p-0 bg-dashboard-surface border border-dashboard-border text-dashboard-text-muted hover:text-dashboard-text z-30"
           title="Show Canvas Info"
         >
           <MoreVertical className="w-3 h-3" />
