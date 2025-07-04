@@ -617,17 +617,18 @@ export default function CanvasArea({
     }
   };
 
-  // Expose property change handler to parent
+  // Expose utility functions to parent
   React.useEffect(() => {
-    if (parentOnPropertyChange) {
-      // Make the property change handler available to parent
-      (window as any).canvasPropertyChange = handlePropertyChange;
-    }
-
     // Expose grid and zoom controls to parent
     (window as any).setCanvasGrid = (show: boolean) => setShowGrid(show);
     (window as any).setCanvasZoom = (level: number) => setZoomLevel(level);
-  }, [handlePropertyChange, parentOnPropertyChange]);
+
+    // Clean up function
+    return () => {
+      delete (window as any).setCanvasGrid;
+      delete (window as any).setCanvasZoom;
+    };
+  }, []);
 
   const [isDragOver, setIsDragOver] = useState(false);
 
