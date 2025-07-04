@@ -51,6 +51,7 @@ interface SmartChartProps {
     showYAxis?: boolean;
     showDataPoints?: boolean;
     smoothCurves?: boolean;
+    chartType?: string;
   };
 }
 
