@@ -143,7 +143,6 @@ export default function ExportDialog({
       const canvas = await html2canvas(chartElement, {
         useCORS: true,
         allowTaint: true,
-        scale: 2,
       });
 
       return new Promise<Blob>((resolve) => {
