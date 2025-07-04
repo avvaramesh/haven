@@ -7,6 +7,7 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
+  Legend,
 } from "recharts";
 import { Brain, TrendingUp } from "lucide-react";
 
@@ -115,9 +116,22 @@ export default function SmartChart({ properties }: SmartChartProps = {}) {
               />
             )}
             <Tooltip content={<CustomTooltip />} />
+            {properties?.showLegend && (
+              <Legend
+                verticalAlign="top"
+                height={36}
+                iconType="line"
+                wrapperStyle={{
+                  paddingBottom: "10px",
+                  fontSize: "12px",
+                  color: "hsl(215, 20.2%, 65.1%)",
+                }}
+              />
+            )}
             <Line
               type="monotone"
               dataKey="value"
+              name="Sales"
               stroke={properties?.color || "hsl(199, 89%, 48%)"}
               strokeWidth={2}
               dot={{
