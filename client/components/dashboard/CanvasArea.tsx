@@ -878,12 +878,19 @@ export default function CanvasArea({
               onMaximize={() => {
                 console.log(`=== INLINE MAXIMIZE CALLED ===`);
                 console.log(`Chart ID: ${chart.id}`);
+                console.log(`Chart Name: ${getChartTitle(chart.id)}`);
 
                 const currentState = chartStates[chart.id];
                 const newMaximizedState = !currentState?.isMaximized;
 
-                console.log(`Current state:`, currentState);
-                console.log(`New maximized state:`, newMaximizedState);
+                console.log(
+                  `Current state for ${getChartTitle(chart.id)}:`,
+                  currentState,
+                );
+                console.log(
+                  `New maximized state for ${getChartTitle(chart.id)}:`,
+                  newMaximizedState,
+                );
 
                 setChartStates((prev) => {
                   const newStates = {
