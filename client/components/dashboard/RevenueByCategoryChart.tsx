@@ -78,31 +78,17 @@ export default function RevenueByCategoryChart({
           {properties?.showGrid !== false && (
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(210, 11%, 20%)" />
           )}
-          {properties?.showXAxis !== false && (
-            <XAxis
-              type={isHorizontal ? "number" : "category"}
-              dataKey={isHorizontal ? undefined : "category"}
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: "hsl(215, 20.2%, 65.1%)", fontSize: 10 }}
-              angle={isHorizontal ? 0 : -45}
-              textAnchor={isHorizontal ? "middle" : "end"}
-              height={isHorizontal ? 25 : 45}
-              interval={0}
-            />
-          )}
-          {properties?.showYAxis !== false && (
-            <YAxis
-              type={isHorizontal ? "category" : "number"}
-              dataKey={isHorizontal ? "category" : undefined}
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: "hsl(215, 20.2%, 65.1%)", fontSize: 10 }}
-              width={isHorizontal ? 75 : 35}
-              interval={0}
-              domain={isHorizontal ? undefined : [0, "dataMax + 10"]}
-            />
-          )}
+          <XAxis
+            dataKey="category"
+            axisLine={false}
+            tickLine={false}
+            tick={{ fill: "hsl(215, 20.2%, 65.1%)", fontSize: 12 }}
+          />
+          <YAxis
+            axisLine={false}
+            tickLine={false}
+            tick={{ fill: "hsl(215, 20.2%, 65.1%)", fontSize: 12 }}
+          />
           <Tooltip content={<CustomTooltip />} />
           {properties?.showLegend && (
             <Legend
