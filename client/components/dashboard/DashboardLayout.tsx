@@ -227,10 +227,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       `DashboardLayout: Property changed for ${elementId}: ${property} = ${value}`,
     );
 
-    // Call the canvas property change handler directly
-    if ((window as any).canvasPropertyChange) {
-      (window as any).canvasPropertyChange(elementId, property, value);
-    }
+    // Don't call canvasPropertyChange to avoid circular dependency
+    // The canvas area will handle its own property changes internally
   };
   return (
     <div className="h-screen flex flex-col bg-dashboard-background">
