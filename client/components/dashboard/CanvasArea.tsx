@@ -503,31 +503,35 @@ export default function CanvasArea({
             )}
 
           {/* Sales Distribution */}
-          {chartStates["sales-dist"] && !chartStates["sales-dist"].isHidden && (
-            <div
-              className={`col-span-6 row-span-1 relative group ${chartStates["sales-dist"].isMinimized ? "col-span-3" : ""}`}
-            >
-              <ChartWidget
-                id="sales-dist"
-                title="Sales Distribution"
-                className="h-48"
-                isSelected={selectedElement === "sales-dist"}
-                isMinimized={chartStates["sales-dist"].isMinimized}
-                isMaximized={chartStates["sales-dist"].isMaximized}
-                isHidden={chartStates["sales-dist"].isHidden}
-                onSelect={() => handleElementClick("sales-dist")}
-                onMinimize={() => handleMinimize("sales-dist")}
-                onMaximize={() => handleMaximize("sales-dist")}
-                onHide={() => handleHide("sales-dist")}
-                onRemove={() => handleRemove("sales-dist")}
-                onDownload={() => handleDownload("sales-dist")}
-                onDuplicate={() => handleDuplicate("sales-dist")}
-                onEdit={() => handleEdit("sales-dist")}
+          {chartStates["sales-dist"] &&
+            !chartStates["sales-dist"].isHidden &&
+            !maximizedChart && (
+              <div
+                className={`col-span-12 lg:col-span-6 relative group transition-all duration-300`}
               >
-                <SalesDistributionChart />
-              </ChartWidget>
-            </div>
-          )}
+                <ChartWidget
+                  id="sales-dist"
+                  title="Sales Distribution"
+                  className={
+                    chartStates["sales-dist"].isMinimized ? "h-40" : "h-56"
+                  }
+                  isSelected={selectedElement === "sales-dist"}
+                  isMinimized={chartStates["sales-dist"].isMinimized}
+                  isMaximized={chartStates["sales-dist"].isMaximized}
+                  isHidden={chartStates["sales-dist"].isHidden}
+                  onSelect={() => handleElementClick("sales-dist")}
+                  onMinimize={() => handleMinimize("sales-dist")}
+                  onMaximize={() => handleMaximize("sales-dist")}
+                  onHide={() => handleHide("sales-dist")}
+                  onRemove={() => handleRemove("sales-dist")}
+                  onDownload={() => handleDownload("sales-dist")}
+                  onDuplicate={() => handleDuplicate("sales-dist")}
+                  onEdit={() => handleEdit("sales-dist")}
+                >
+                  <SalesDistributionChart />
+                </ChartWidget>
+              </div>
+            )}
 
           {/* Additional KPI Cards */}
           {chartStates["kpi-1"] && !chartStates["kpi-1"].isHidden && (
