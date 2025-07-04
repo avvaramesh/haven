@@ -64,13 +64,10 @@ export default function ChartWidget({
     return null;
   }
 
-  const handleDownload = () => {
-    // Create download functionality
-    const element = document.getElementById(`chart-${id}`);
-    if (element) {
-      // In a real implementation, you'd use html2canvas or similar
-      console.log("Downloading chart:", id);
-      onDownload?.();
+  const handleDownload = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent chart selection
+    if (onDownload) {
+      await onDownload();
     }
   };
 
