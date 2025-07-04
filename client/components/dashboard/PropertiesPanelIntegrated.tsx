@@ -31,6 +31,7 @@ interface PropertiesPanelIntegratedProps {
   selectedElement: string | null;
   isMobile?: boolean;
   onClose?: () => void;
+  onPropertyChange?: (elementId: string, property: string, value: any) => void;
 }
 
 export default function PropertiesPanelIntegrated({
