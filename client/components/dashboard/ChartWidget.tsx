@@ -182,9 +182,8 @@ export default function ChartWidget({
                 console.error(`Error calling onMaximize:`, error);
               }
             }}
-            className="h-6 w-6 p-0 bg-red-500 border border-dashboard-border hover:bg-red-600 z-50"
+            className="h-6 w-6 p-0 bg-dashboard-surface border border-dashboard-border hover:bg-dashboard-muted"
             title={isMaximized ? "Restore" : "Maximize"}
-            style={{ backgroundColor: "red", zIndex: 50 }}
           >
             {isMaximized ? (
               <Shrink className="w-3 h-3" />
