@@ -22,6 +22,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+interface ChartPosition {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 interface ChartWidgetProps {
   id: string;
   title: string;
@@ -31,6 +38,7 @@ interface ChartWidgetProps {
   isMinimized?: boolean;
   isMaximized?: boolean;
   isHidden?: boolean;
+  position?: ChartPosition;
   onSelect?: () => void;
   onMinimize?: () => void;
   onMaximize?: () => void;
@@ -39,6 +47,8 @@ interface ChartWidgetProps {
   onDownload?: () => void;
   onDuplicate?: () => void;
   onEdit?: () => void;
+  onPositionChange?: (position: ChartPosition) => void;
+  onResize?: (size: { width: number; height: number }) => void;
 }
 
 export default function ChartWidget({
