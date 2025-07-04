@@ -69,16 +69,17 @@ const renderCustomLabel = ({
 
 export default function SalesDistributionChart() {
   return (
-    <div className="h-32">
+    <div className="h-32 flex items-center justify-center">
       <ResponsiveContainer width="100%" height="100%">
-        <PieChart>
+        <PieChart margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
           <Pie
             data={data}
             cx="50%"
             cy="50%"
             labelLine={false}
             label={renderCustomLabel}
-            outerRadius={45}
+            outerRadius={50}
+            innerRadius={0}
             dataKey="value"
           >
             {data.map((entry, index) => (
