@@ -146,12 +146,20 @@ export default function ChartWidget({
             console.log(`Chart ID: ${id}`);
             console.log(`Currently maximized: ${isMaximized}`);
             console.log(`onMaximize function exists:`, !!onMaximize);
+            console.log(`onMaximize function type:`, typeof onMaximize);
+            console.log(`onMaximize function:`, onMaximize);
 
-            if (onMaximize) {
-              console.log(`Calling onMaximize...`);
-              onMaximize();
-            } else {
-              console.error(`onMaximize function is missing!`);
+            try {
+              if (onMaximize) {
+                console.log(`About to call onMaximize...`);
+                const result = onMaximize();
+                console.log(`onMaximize result:`, result);
+                console.log(`onMaximize called successfully`);
+              } else {
+                console.error(`onMaximize function is missing!`);
+              }
+            } catch (error) {
+              console.error(`Error calling onMaximize:`, error);
             }
           }}
           className="h-6 w-6 p-0 bg-red-500 border border-dashboard-border hover:bg-red-600 z-50"
