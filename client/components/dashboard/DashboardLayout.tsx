@@ -1,7 +1,8 @@
 import React, { ReactNode, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Brain, Sparkles } from "lucide-react";
+import { Brain, Sparkles, Database, BarChart3 } from "lucide-react";
 import DataConnectionsPanel from "./DataConnectionsPanel";
+import ChartTemplatesPanel from "./ChartTemplatesPanel";
 import EditingToolbar from "./EditingToolbar";
 import PropertiesPanel from "./PropertiesPanel";
 import CanvasArea from "./CanvasArea";
@@ -12,6 +13,9 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [selectedElement, setSelectedElement] = useState<string | null>(null);
+  const [leftPanelTab, setLeftPanelTab] = useState<"data" | "templates">(
+    "data",
+  );
   return (
     <div className="h-screen flex flex-col bg-dashboard-background">
       {/* Top Header */}
