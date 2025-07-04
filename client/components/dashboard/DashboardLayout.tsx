@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import DataConnectionsPanel from "./DataConnectionsPanel";
 import ChartTemplatesPanel from "./ChartTemplatesPanel";
-import AICopilot from "./AICopilot";
+import AICopilotIntegrated from "./AICopilotIntegrated";
 import EditingToolbar from "./EditingToolbar";
 import PropertiesPanel from "./PropertiesPanel";
 import CanvasArea from "./CanvasArea";
