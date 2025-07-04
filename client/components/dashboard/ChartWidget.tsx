@@ -222,24 +222,36 @@ export default function ChartWidget({
         onClick={onSelect}
         onMouseEnter={() => setShowToolbar(true)}
         onMouseLeave={() => setShowToolbar(false)}
-        draggable={isSelected}
-        onDragStart={(e) => {
-          if (!isSelected) {
-            e.preventDefault();
-            return;
-          }
+        onMouseDown={(e) => {
+          if (!isSelected) return;
+
           setIsDragging(true);
           const rect = widgetRef.current?.getBoundingClientRect();
-          if (rect) {
-            setDragStart({
-              x: e.clientX - rect.left,
-              y: e.clientY - rect.top,
+          const startX = e.clientX - rect.left;
+          const startY = e.clientY - rect.top;
+
+          const handleMouseMove = (moveEvent: MouseEvent) => {
+            if (!position || !onPositionChange) return;
+
+            const newX = moveEvent.clientX - startX;
+            const newY = moveEvent.clientY - startY;
+
+            onPositionChange({
+              ...position,
+              x: Math.max(0, newX),
+              y: Math.max(0, newY),
             });
-          }
-          e.dataTransfer.setData("text/plain", id);
-          e.dataTransfer.effectAllowed = "move";
+          };
+
+          const handleMouseUp = () => {
+            setIsDragging(false);
+            document.removeEventListener("mousemove", handleMouseMove);
+            document.removeEventListener("mouseup", handleMouseUp);
+          };
+
+          document.addEventListener("mousemove", handleMouseMove);
+          document.addEventListener("mouseup", handleMouseUp);
         }}
-        onDragEnd={() => setIsDragging(false)}
         title={isSelected ? "Drag to move" : "Click to select"}
       >
         <div className="flex items-center gap-2 flex-1">
