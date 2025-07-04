@@ -55,12 +55,29 @@ export default function PropertiesPanel({
     setProperties((prev) => ({ ...prev, [key]: value }));
   };
 
+  if (!selectedElement) {
+    return (
+      <div className="w-80 bg-dashboard-background border-l border-dashboard-border h-full flex items-center justify-center">
+        <div className="text-center p-6">
+          <Settings className="w-12 h-12 text-dashboard-text-muted mx-auto mb-3 opacity-50" />
+          <h3 className="font-medium text-dashboard-text mb-2">No Selection</h3>
+          <p className="text-sm text-dashboard-text-muted">
+            Select a chart or KPI to edit its properties
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-80 bg-dashboard-background border-l border-dashboard-border h-full overflow-y-auto">
       <div className="p-4 border-b border-dashboard-border">
         <div className="flex items-center gap-2">
           <Settings className="w-5 h-5 text-dashboard-accent" />
           <h3 className="font-semibold text-dashboard-text">Properties</h3>
+          <Badge className="bg-dashboard-accent/20 text-dashboard-accent text-xs">
+            {selectedElement}
+          </Badge>
         </div>
       </div>
 
