@@ -70,7 +70,19 @@ export default function RevenueByCategoryChart({
     { category: "Books", Q1: 50, Q2: 55, Q3: 60, Q4: 70, total: "$235k" },
   ];
 
+  // Ensure data is always available and properly formatted
   const chartData = isStacked || isGrouped ? stackedData : data;
+
+  // Debug log to verify data
+  React.useEffect(() => {
+    console.log("Bar chart data:", {
+      chartType,
+      chartData,
+      isStacked,
+      isGrouped,
+      isHorizontal,
+    });
+  }, [chartType, chartData, isStacked, isGrouped, isHorizontal]);
   const layout = isHorizontal ? "horizontal" : "vertical";
 
   return (

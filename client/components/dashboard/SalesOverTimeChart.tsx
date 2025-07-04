@@ -76,7 +76,20 @@ export default function SalesOverTimeChart({
     { period: "Week 6", mobile: 20, desktop: 25, tablet: 12 },
   ];
 
+  // Ensure data is always available and properly formatted
   const chartData = isStacked || isPercentage || isStream ? stackedData : data;
+
+  // Debug log to verify data
+  React.useEffect(() => {
+    console.log("Area chart data:", {
+      chartType,
+      chartData,
+      isAreaChart,
+      isStacked,
+      isPercentage,
+      isStream,
+    });
+  }, [chartType, chartData, isAreaChart, isStacked, isPercentage, isStream]);
 
   return (
     <div className="h-40">
