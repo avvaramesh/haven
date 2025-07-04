@@ -67,7 +67,16 @@ const renderCustomLabel = ({
   return null;
 };
 
-export default function SalesDistributionChart() {
+interface SalesDistributionChartProps {
+  properties?: {
+    color?: string;
+    showLegend?: boolean;
+  };
+}
+
+export default function SalesDistributionChart({
+  properties,
+}: SalesDistributionChartProps = {}) {
   return (
     <div className="h-32 flex items-center justify-center">
       <ResponsiveContainer width="100%" height="100%">
