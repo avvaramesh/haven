@@ -109,10 +109,10 @@ export default function DynamicChart({
               Chart Type: {chartType}
             </div>
             <div className="text-xs text-dashboard-text-muted">
-              Implementation in progress
+              Chart type not recognized
             </div>
             <div className="w-full h-24 bg-dashboard-surface rounded border border-dashboard-border mt-3 flex items-center justify-center">
-              <span className="text-dashboard-accent">New Chart</span>
+              <span className="text-dashboard-accent">Select Chart Type</span>
             </div>
           </div>
         </div>
