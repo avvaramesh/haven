@@ -131,13 +131,8 @@ export default function PropertiesPanelIntegrated({
           yMinValue: "",
           yMaxValue: "",
           startFromZero: true,
-          showGrid: true,
           barSpacing: 0.3,
           showValues: true,
-          color: "#10b981",
-          background: "#1e293b",
-          width: 400,
-          height: 280,
         },
       },
       "sales-dist": {
