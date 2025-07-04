@@ -575,8 +575,7 @@ export default function CanvasArea({
               )}
             </ChartWidget>
           ))}
-
-          {/* KPI Widget */}
+      </div>
           {chartStates["kpi-widget"] &&
             !chartStates["kpi-widget"].isHidden &&
             !chartStates["smart-chart"]?.isMaximized && (
