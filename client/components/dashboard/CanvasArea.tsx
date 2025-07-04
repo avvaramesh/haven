@@ -400,12 +400,24 @@ export default function CanvasArea({
           {chartStates["smart-chart"] &&
             !chartStates["smart-chart"].isHidden && (
               <div
-                className={`col-span-8 row-span-1 relative group ${chartStates["smart-chart"].isMinimized ? "col-span-4" : ""}`}
+                className={`${
+                  chartStates["smart-chart"].isMaximized
+                    ? "col-span-12"
+                    : chartStates["smart-chart"].isMinimized
+                      ? "col-span-6 lg:col-span-4"
+                      : "col-span-12 lg:col-span-8"
+                } relative group transition-all duration-300`}
               >
                 <ChartWidget
                   id="smart-chart"
                   title="Smart Analytics Chart"
-                  className="h-64"
+                  className={
+                    chartStates["smart-chart"].isMaximized
+                      ? "h-96"
+                      : chartStates["smart-chart"].isMinimized
+                        ? "h-48"
+                        : "h-72"
+                  }
                   isSelected={selectedElement === "smart-chart"}
                   isMinimized={chartStates["smart-chart"].isMinimized}
                   isMaximized={chartStates["smart-chart"].isMaximized}
