@@ -90,196 +90,182 @@ export default function PropertiesPanelIntegrated({
     }
   };
 
-  // Get element type and relevant properties
-  const getElementInfo = (elementId: string | null) => {
-    if (!elementId) return { type: "none", title: "", properties: {} };
+  // Initialize or get properties for the selected element
+  const initializeProperties = (elementId: string) => {
+    // Try to get existing properties
+    let properties = getChartProperties(elementId);
 
-    const elementConfigs = {
-      "smart-chart": {
-        type: "line-chart",
-        title: "Smart Analytics Chart",
-        properties: {
-          title: "Q4 Revenue Trends",
-          chartType: "line",
-          showLegend: true,
-          showGrid: true,
-          showDataPoints: true,
-          smoothCurves: true,
-          color: "#3b82f6",
-          background: "#1e293b",
-          width: 600,
-          height: 300,
-          // X-Axis properties
-          xAxisLabel: "Months",
-          showXAxis: true,
-          rotateXLabels: false,
-          xLabelAngle: 0,
-          // Y-Axis properties
-          yAxisLabel: "Revenue ($)",
-          showYAxis: true,
-          yMinValue: "",
-          yMaxValue: "",
-          startFromZero: true,
-        },
-      },
-      "revenue-chart": {
-        type: "bar-chart",
-        title: "Revenue by Category Chart",
-        properties: {
-          title: "Revenue by Category",
-          chartType: "bar",
-          showLegend: true,
-          showGrid: true,
-          color: "#3b82f6",
-          background: "#1e293b",
-          width: 400,
-          height: 250,
-          // X-Axis properties
-          xAxisLabel: "Categories",
-          showXAxis: true,
-          rotateXLabels: true,
-          xLabelAngle: -45,
-          // Y-Axis properties
-          yAxisLabel: "Revenue ($)",
-          showYAxis: true,
-          yMinValue: "",
-          yMaxValue: "",
-          startFromZero: true,
-          barSpacing: 0.3,
-          showValues: true,
-        },
-      },
-      "sales-dist": {
-        type: "pie-chart",
-        title: "Sales Distribution Chart",
-        properties: {
-          title: "Sales Distribution",
-          chartType: "pie",
-          showLegend: true,
-          showPercentages: true,
-          donutMode: false,
-          startAngle: 0,
-          color: "#f59e0b",
-          background: "#1e293b",
-          width: 350,
-          height: 280,
-        },
-      },
-      "kpi-widget": {
-        type: "kpi-large",
-        title: "KPI Widget",
-        properties: {
-          title: "Total Revenue",
-          value: "$142,583",
-          trend: "+12.5%",
-          trendDirection: "up",
-          fontSize: 24,
-          color: "#3b82f6",
-          background: "#1e293b",
-          showTrend: true,
-          width: 300,
-          height: 150,
-        },
-      },
-      "kpi-1": {
-        type: "kpi-card",
-        title: "Growth KPI",
-        properties: {
-          title: "Monthly Growth",
-          value: "+12.5%",
-          subtitle: "vs last month",
-          color: "#10b981",
-          background: "#1e293b",
-          fontSize: 18,
-          width: 200,
-          height: 120,
-        },
-      },
-      "kpi-2": {
-        type: "kpi-card",
-        title: "Users KPI",
-        properties: {
-          title: "Active Users",
-          value: "24.8k",
-          subtitle: "this week",
-          color: "#3b82f6",
-          background: "#1e293b",
-          fontSize: 18,
-          width: 200,
-          height: 120,
-        },
-      },
-      "kpi-3": {
-        type: "kpi-card",
-        title: "Conversion KPI",
-        properties: {
-          title: "Conversion Rate",
-          value: "3.2%",
-          subtitle: "avg rate",
-          color: "#f59e0b",
-          background: "#1e293b",
-          fontSize: 18,
-          width: 200,
-          height: 120,
-        },
-      },
-      "kpi-4": {
-        type: "kpi-card",
-        title: "LTV KPI",
-        properties: {
-          title: "Customer LTV",
-          value: "$1,247",
-          subtitle: "average",
-          color: "#8b5cf6",
-          background: "#1e293b",
-          fontSize: 18,
-          width: 200,
-          height: 120,
-        },
-      },
-      "table-chart": {
-        type: "table",
-        title: "Data Table",
-        properties: {
-          title: "Data Table",
-          chartType: "table",
-          showHeader: true,
-          alternateRows: true,
-          showBorders: true,
-          fontSize: 12,
-          headerColor: "#1e293b",
-          rowColor: "#transparent",
-          alternateRowColor: "#374151",
-          editable: true,
-          width: 500,
-          height: 300,
-        },
-      },
-    };
+    if (!properties) {
+      // Determine chart type from element ID
+      const chartType = getChartTypeFromElementId(elementId);
 
-    return (
-      elementConfigs[elementId as keyof typeof elementConfigs] || {
-        type: "unknown",
-        title: elementId,
-        properties: {},
-      }
-    );
+      // Create default properties for this chart type
+      properties = createDefaultChartProperties(chartType, elementId);
+
+      // Apply element-specific overrides
+      properties = applyElementSpecificDefaults(elementId, properties);
+    }
+
+    return properties;
   };
 
-  const elementInfo = getElementInfo(selectedElement);
+  const getChartTypeFromElementId = (elementId: string): VisualizationType => {
+    // Map element IDs to chart types
+    const typeMap: Record<string, VisualizationType> = {
+      "smart-chart": "line",
+      "revenue-chart": "bar",
+      "sales-dist": "pie",
+      "kpi-widget": "metric",
+      "kpi-1": "metric",
+      "kpi-2": "metric",
+      "kpi-3": "metric",
+      "kpi-4": "metric",
+      "table-chart": "table",
+    };
+
+    return typeMap[elementId] || "line";
+  };
+
+  const applyElementSpecificDefaults = (
+    elementId: string,
+    properties: AllVisualizationProperties,
+  ): AllVisualizationProperties => {
+    const updates = { ...properties };
+
+    // Apply element-specific customizations
+    switch (elementId) {
+      case "smart-chart":
+        updates.title = "Q4 Revenue Trends";
+        updates.width = 600;
+        updates.height = 300;
+        if (chartSupportsAxes(updates.type)) {
+          (updates as any).xAxis.label = "Months";
+          (updates as any).yAxis.label = "Revenue ($)";
+        }
+        break;
+
+      case "revenue-chart":
+        updates.title = "Revenue by Category";
+        updates.width = 400;
+        updates.height = 250;
+        if (chartSupportsAxes(updates.type)) {
+          (updates as any).xAxis.label = "Categories";
+          (updates as any).yAxis.label = "Revenue ($)";
+          (updates as any).xAxis.tickRotation = -45;
+        }
+        break;
+
+      case "sales-dist":
+        updates.title = "Sales Distribution";
+        updates.primaryColor = "#f59e0b";
+        updates.width = 350;
+        updates.height = 280;
+        break;
+
+      case "kpi-widget":
+        updates.title = "Total Revenue";
+        updates.width = 300;
+        updates.height = 150;
+        updates.titleFontSize = 24;
+        if (updates.type === "metric") {
+          (updates as any).value = "$142,583";
+          (updates as any).trend = "up";
+          (updates as any).trendPercentage = 12.5;
+        }
+        break;
+
+      case "kpi-1":
+        updates.title = "Monthly Growth";
+        updates.primaryColor = "#10b981";
+        if (updates.type === "metric") {
+          (updates as any).value = "+12.5%";
+          (updates as any).unit = "vs last month";
+        }
+        break;
+
+      case "kpi-2":
+        updates.title = "Active Users";
+        if (updates.type === "metric") {
+          (updates as any).value = "24.8k";
+          (updates as any).unit = "this week";
+        }
+        break;
+
+      case "kpi-3":
+        updates.title = "Conversion Rate";
+        updates.primaryColor = "#f59e0b";
+        if (updates.type === "metric") {
+          (updates as any).value = "3.2%";
+          (updates as any).unit = "avg rate";
+        }
+        break;
+
+      case "kpi-4":
+        updates.title = "Customer LTV";
+        updates.primaryColor = "#8b5cf6";
+        if (updates.type === "metric") {
+          (updates as any).value = "$1,247";
+          (updates as any).unit = "average";
+        }
+        break;
+
+      case "table-chart":
+        updates.title = "Data Table";
+        updates.width = 500;
+        updates.height = 300;
+        break;
+    }
+
+    return updates;
+  };
+
+  const getElementDisplayInfo = (elementId: string | null) => {
+    if (!elementId || !normalizedProperties) {
+      return { type: "none", title: "", displayType: "" };
+    }
+
+    const displayTypeMap: Record<VisualizationType, string> = {
+      line: "Line Chart",
+      area: "Area Chart",
+      bar: "Bar Chart",
+      column: "Column Chart",
+      pie: "Pie Chart",
+      donut: "Donut Chart",
+      scatter: "Scatter Chart",
+      radar: "Radar Chart",
+      funnel: "Funnel Chart",
+      gauge: "Gauge Chart",
+      metric: "KPI Metric",
+      trend: "KPI Trend",
+      progress: "KPI Progress",
+      comparison: "KPI Comparison",
+      table: "Data Table",
+    };
+
+    return {
+      type: normalizedProperties.type,
+      title: normalizedProperties.title,
+      displayType:
+        displayTypeMap[normalizedProperties.type] || normalizedProperties.type,
+    };
+  };
 
   // Update properties when element changes
-  React.useEffect(() => {
-    if (selectedElement && elementInfo.properties) {
-      // Filter out undefined values to prevent NaN issues
-      const filteredProperties = Object.fromEntries(
-        Object.entries(elementInfo.properties).filter(
-          ([_, value]) => value !== undefined,
-        ),
-      );
-      setProperties((prev) => ({ ...prev, ...filteredProperties }));
+  useEffect(() => {
+    if (selectedElement) {
+      const properties = initializeProperties(selectedElement);
+      setNormalizedProperties(properties);
+
+      // Convert to legacy format for compatibility
+      const legacyFormat = chartPropertyManager.toLegacyFormat(selectedElement);
+      setLegacyProperties(legacyFormat);
+    } else {
+      setNormalizedProperties(null);
+      setLegacyProperties({});
     }
   }, [selectedElement]);
+
+  const elementInfo = getElementDisplayInfo(selectedElement);
 
   if (!selectedElement) {
     return (
