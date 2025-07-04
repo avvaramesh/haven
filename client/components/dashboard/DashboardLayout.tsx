@@ -76,9 +76,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   };
 
   const handleGlobalUndo = () => {
+    console.log("handleGlobalUndo called, undoStack length:", undoStack.length);
     if (undoStack.length === 0) return null;
 
     const lastAction = undoStack[undoStack.length - 1];
+    console.log("Undoing action:", lastAction);
     setUndoStack((prev) => prev.slice(0, -1));
     setRedoStack((prev) => [lastAction, ...prev]);
 
