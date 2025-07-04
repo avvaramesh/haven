@@ -31,12 +31,14 @@ interface PropertiesPanelIntegratedProps {
   selectedElement: string | null;
   isMobile?: boolean;
   onClose?: () => void;
+  onPropertyChange?: (elementId: string, property: string, value: any) => void;
 }
 
 export default function PropertiesPanelIntegrated({
   selectedElement,
   isMobile = false,
   onClose,
+  onPropertyChange = () => {},
 }: PropertiesPanelIntegratedProps) {
   const [properties, setProperties] = useState({
     title: "Q4 Revenue Analysis",
@@ -55,7 +57,23 @@ export default function PropertiesPanelIntegrated({
   });
 
   const updateProperty = (key: string, value: any) => {
+    // Update local state immediately for responsive UI
     setProperties((prev) => ({ ...prev, [key]: value }));
+
+    // Immediately notify parent component for real-time chart updates
+    if (
+      selectedElement &&
+      onPropertyChange &&
+      typeof onPropertyChange === "function"
+    ) {
+      // Use immediate callback to ensure smooth updates
+      onPropertyChange(selectedElement, key, value);
+
+      // Also try to call the global canvas property change if available
+      if ((window as any).canvasPropertyChange) {
+        (window as any).canvasPropertyChange(selectedElement, key, value);
+      }
+    }
   };
 
   // Get element type and relevant properties
@@ -77,6 +95,17 @@ export default function PropertiesPanelIntegrated({
           background: "#1e293b",
           width: 600,
           height: 300,
+          // X-Axis properties
+          xAxisLabel: "Months",
+          showXAxis: true,
+          rotateXLabels: false,
+          xLabelAngle: 0,
+          // Y-Axis properties
+          yAxisLabel: "Revenue ($)",
+          showYAxis: true,
+          yMinValue: "",
+          yMaxValue: "",
+          startFromZero: true,
         },
       },
       "revenue-chart": {
@@ -86,6 +115,22 @@ export default function PropertiesPanelIntegrated({
           title: "Revenue by Category",
           chartType: "bar",
           showLegend: true,
+          showGrid: true,
+          color: "#3b82f6",
+          background: "#1e293b",
+          width: 400,
+          height: 250,
+          // X-Axis properties
+          xAxisLabel: "Categories",
+          showXAxis: true,
+          rotateXLabels: true,
+          xLabelAngle: -45,
+          // Y-Axis properties
+          yAxisLabel: "Revenue ($)",
+          showYAxis: true,
+          yMinValue: "",
+          yMaxValue: "",
+          startFromZero: true,
           showGrid: true,
           barSpacing: 0.3,
           showValues: true,
@@ -199,7 +244,13 @@ export default function PropertiesPanelIntegrated({
   // Update properties when element changes
   React.useEffect(() => {
     if (selectedElement && elementInfo.properties) {
-      setProperties((prev) => ({ ...prev, ...elementInfo.properties }));
+      // Filter out undefined values to prevent NaN issues
+      const filteredProperties = Object.fromEntries(
+        Object.entries(elementInfo.properties).filter(
+          ([_, value]) => value !== undefined,
+        ),
+      );
+      setProperties((prev) => ({ ...prev, ...filteredProperties }));
     }
   }, [selectedElement]);
 
@@ -303,10 +354,11 @@ export default function PropertiesPanelIntegrated({
               <Label className="text-xs text-dashboard-text-muted">Width</Label>
               <Input
                 type="number"
-                value={properties.width}
-                onChange={(e) =>
-                  updateProperty("width", parseInt(e.target.value))
-                }
+                value={properties.width || ""}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value) || 0;
+                  updateProperty("width", value);
+                }}
                 className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
               />
             </div>
@@ -316,10 +368,11 @@ export default function PropertiesPanelIntegrated({
               </Label>
               <Input
                 type="number"
-                value={properties.height}
-                onChange={(e) =>
-                  updateProperty("height", parseInt(e.target.value))
-                }
+                value={properties.height || ""}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value) || 0;
+                  updateProperty("height", value);
+                }}
                 className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
               />
             </div>
@@ -350,6 +403,41 @@ export default function PropertiesPanelIntegrated({
                   onChange={(e) => updateProperty("color", e.target.value)}
                   className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
                 />
+              </div>
+            </div>
+
+            {/* Color Palette */}
+            <div className="space-y-2">
+              <Label className="text-xs text-dashboard-text-muted">
+                Quick Colors
+              </Label>
+              <div className="grid grid-cols-6 gap-2">
+                {[
+                  "#3b82f6", // Blue
+                  "#ef4444", // Red
+                  "#10b981", // Green
+                  "#f59e0b", // Yellow
+                  "#8b5cf6", // Purple
+                  "#06b6d4", // Cyan
+                  "#ec4899", // Pink
+                  "#84cc16", // Lime
+                  "#f97316", // Orange
+                  "#6366f1", // Indigo
+                  "#14b8a6", // Teal
+                  "#a855f7", // Violet
+                ].map((color) => (
+                  <button
+                    key={color}
+                    className={`w-8 h-8 rounded border-2 transition-all hover:scale-110 ${
+                      properties.color === color
+                        ? "border-dashboard-accent ring-2 ring-dashboard-accent/30"
+                        : "border-dashboard-border hover:border-dashboard-accent/50"
+                    }`}
+                    style={{ backgroundColor: color }}
+                    onClick={() => updateProperty("color", color)}
+                    title={color}
+                  />
+                ))}
               </div>
             </div>
 
@@ -386,7 +474,7 @@ export default function PropertiesPanelIntegrated({
               Font Size
             </Label>
             <Slider
-              value={[properties.fontSize]}
+              value={[properties.fontSize || 14]}
               onValueChange={(value) => updateProperty("fontSize", value[0])}
               min={8}
               max={48}
@@ -394,7 +482,7 @@ export default function PropertiesPanelIntegrated({
               className="w-full"
             />
             <span className="text-xs text-dashboard-text-muted">
-              {properties.fontSize}px
+              {properties.fontSize || 14}px
             </span>
           </div>
 
@@ -571,7 +659,7 @@ export default function PropertiesPanelIntegrated({
                           Bar Spacing
                         </Label>
                         <Slider
-                          value={[properties.barSpacing * 100]}
+                          value={[(properties.barSpacing || 0.1) * 100]}
                           onValueChange={(value) =>
                             updateProperty("barSpacing", value[0] / 100)
                           }
@@ -581,7 +669,7 @@ export default function PropertiesPanelIntegrated({
                           className="w-full"
                         />
                         <span className="text-xs text-dashboard-text-muted">
-                          {Math.round(properties.barSpacing * 100)}%
+                          {Math.round((properties.barSpacing || 0.1) * 100)}%
                         </span>
                       </div>
                     )}
@@ -608,7 +696,7 @@ export default function PropertiesPanelIntegrated({
                             Start Angle
                           </Label>
                           <Slider
-                            value={[properties.startAngle]}
+                            value={[properties.startAngle || 0]}
                             onValueChange={(value) =>
                               updateProperty("startAngle", value[0])
                             }
@@ -618,7 +706,7 @@ export default function PropertiesPanelIntegrated({
                             className="w-full"
                           />
                           <span className="text-xs text-dashboard-text-muted">
-                            {properties.startAngle}°
+                            {properties.startAngle || 0}°
                           </span>
                         </div>
                       )}
@@ -658,6 +746,158 @@ export default function PropertiesPanelIntegrated({
                     </div>
                   )}
                 </>
+              )}
+
+              {/* X/Y Axis Properties - Show for line and bar charts */}
+              {(elementInfo.type === "line-chart" ||
+                elementInfo.type === "bar-chart") && (
+                <div className="space-y-4 mt-6">
+                  <div className="flex items-center gap-2">
+                    <Layout className="w-4 h-4 text-dashboard-accent" />
+                    <h4 className="font-medium text-dashboard-text">
+                      Axis Configuration
+                    </h4>
+                  </div>
+
+                  <div className="space-y-4">
+                    {/* X-Axis Properties */}
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium text-dashboard-text">
+                        X-Axis
+                      </Label>
+
+                      <div className="space-y-2">
+                        <Label className="text-xs text-dashboard-text-muted">
+                          Label
+                        </Label>
+                        <Input
+                          placeholder="e.g., Months, Categories"
+                          value={properties.xAxisLabel || ""}
+                          onChange={(e) =>
+                            updateProperty("xAxisLabel", e.target.value)
+                          }
+                          className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <Label className="text-xs text-dashboard-text-muted">
+                          Show X-Axis
+                        </Label>
+                        <Switch
+                          checked={properties.showXAxis !== false}
+                          onCheckedChange={(checked) =>
+                            updateProperty("showXAxis", checked)
+                          }
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <Label className="text-xs text-dashboard-text-muted">
+                          Rotate Labels
+                        </Label>
+                        <Switch
+                          checked={properties.rotateXLabels === true}
+                          onCheckedChange={(checked) =>
+                            updateProperty("rotateXLabels", checked)
+                          }
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-xs text-dashboard-text-muted">
+                          Label Angle: {properties.xLabelAngle || 0}°
+                        </Label>
+                        <Slider
+                          value={[properties.xLabelAngle || 0]}
+                          onValueChange={(value) =>
+                            updateProperty("xLabelAngle", value[0])
+                          }
+                          max={90}
+                          min={-90}
+                          step={15}
+                          className="w-full"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Y-Axis Properties */}
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium text-dashboard-text">
+                        Y-Axis
+                      </Label>
+
+                      <div className="space-y-2">
+                        <Label className="text-xs text-dashboard-text-muted">
+                          Label
+                        </Label>
+                        <Input
+                          placeholder="e.g., Revenue ($), Count"
+                          value={properties.yAxisLabel || ""}
+                          onChange={(e) =>
+                            updateProperty("yAxisLabel", e.target.value)
+                          }
+                          className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <Label className="text-xs text-dashboard-text-muted">
+                          Show Y-Axis
+                        </Label>
+                        <Switch
+                          checked={properties.showYAxis !== false}
+                          onCheckedChange={(checked) =>
+                            updateProperty("showYAxis", checked)
+                          }
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-2">
+                          <Label className="text-xs text-dashboard-text-muted">
+                            Min Value
+                          </Label>
+                          <Input
+                            type="number"
+                            placeholder="Auto"
+                            value={properties.yMinValue || ""}
+                            onChange={(e) =>
+                              updateProperty("yMinValue", e.target.value)
+                            }
+                            className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-xs text-dashboard-text-muted">
+                            Max Value
+                          </Label>
+                          <Input
+                            type="number"
+                            placeholder="Auto"
+                            value={properties.yMaxValue || ""}
+                            onChange={(e) =>
+                              updateProperty("yMaxValue", e.target.value)
+                            }
+                            className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <Label className="text-xs text-dashboard-text-muted">
+                          Start from Zero
+                        </Label>
+                        <Switch
+                          checked={properties.startFromZero !== false}
+                          onCheckedChange={(checked) =>
+                            updateProperty("startFromZero", checked)
+                          }
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
           </div>

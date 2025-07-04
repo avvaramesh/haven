@@ -106,6 +106,21 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   const canUndo = undoStack.length > 0;
   const canRedo = redoStack.length > 0;
+
+  const handlePropertyChange = (
+    elementId: string,
+    property: string,
+    value: any,
+  ) => {
+    console.log(
+      `DashboardLayout: Property changed for ${elementId}: ${property} = ${value}`,
+    );
+
+    // Call the canvas property change handler directly
+    if ((window as any).canvasPropertyChange) {
+      (window as any).canvasPropertyChange(elementId, property, value);
+    }
+  };
   return (
     <div className="h-screen flex flex-col bg-dashboard-background">
       {/* Top Header */}
@@ -338,6 +353,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                       selectedElement={selectedElement}
                       isMobile={isMobile}
                       onClose={() => isMobile && setIsLeftPanelCollapsed(true)}
+                      onPropertyChange={handlePropertyChange}
                     />
                   </div>
                 )}
@@ -362,6 +378,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           onRedo={handleGlobalRedo}
           undoRef={canvasUndoRef}
           redoRef={canvasRedoRef}
+          onPropertyChange={handlePropertyChange}
         />
       </div>
 

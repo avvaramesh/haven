@@ -8,12 +8,22 @@ import SmartChart from "./SmartChart";
 import RevenueByCategoryChart from "./RevenueByCategoryChart";
 import KPIWidget from "./KPIWidget";
 import SalesDistributionChart from "./SalesDistributionChart";
+import DynamicChart from "./DynamicChart";
+
+interface ChartPosition {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
 
 interface ChartState {
   id: string;
   isMinimized: boolean;
   isMaximized: boolean;
   isHidden: boolean;
+  position?: ChartPosition;
+  chartType?: string;
 }
 
 interface HistoryAction {
@@ -36,6 +46,7 @@ interface CanvasAreaProps {
   redoRef?: React.MutableRefObject<
     ((action: HistoryAction) => void) | undefined
   >;
+  onPropertyChange?: (chartId: string, property: string, value: any) => void;
 }
 
 export default function CanvasArea({
@@ -46,65 +57,101 @@ export default function CanvasArea({
   onRedo,
   undoRef,
   redoRef,
+  onPropertyChange: parentOnPropertyChange,
 }: CanvasAreaProps) {
   const [showGrid, setShowGrid] = useState(true);
+  const [canvasSize, setCanvasSize] = useState({ width: 1920, height: 1080 });
+  const [zoomLevel, setZoomLevel] = useState(100);
+  const [gridSize, setGridSize] = useState(20);
+  const [chartProperties, setChartProperties] = useState<Record<string, any>>(
+    {},
+  );
   const [chartStates, setChartStates] = useState<Record<string, ChartState>>({
     "smart-chart": {
       id: "smart-chart",
       isMinimized: false,
       isMaximized: false,
       isHidden: false,
+      position: { x: 50, y: 50, width: 600, height: 300 },
+      chartType: "line",
     },
     "kpi-widget": {
       id: "kpi-widget",
       isMinimized: false,
       isMaximized: false,
       isHidden: false,
+      position: { x: 700, y: 50, width: 300, height: 150 },
+      chartType: "kpi",
     },
     "revenue-chart": {
       id: "revenue-chart",
       isMinimized: false,
       isMaximized: false,
       isHidden: false,
+      position: { x: 50, y: 400, width: 450, height: 250 },
+      chartType: "bar",
     },
     "sales-dist": {
       id: "sales-dist",
       isMinimized: false,
       isMaximized: false,
       isHidden: false,
+      position: { x: 550, y: 400, width: 450, height: 250 },
+      chartType: "pie",
     },
     "kpi-1": {
       id: "kpi-1",
       isMinimized: false,
       isMaximized: false,
       isHidden: false,
+      position: { x: 50, y: 700, width: 220, height: 120 },
+      chartType: "kpi",
     },
     "kpi-2": {
       id: "kpi-2",
       isMinimized: false,
       isMaximized: false,
       isHidden: false,
+      position: { x: 290, y: 700, width: 220, height: 120 },
+      chartType: "kpi",
     },
     "kpi-3": {
       id: "kpi-3",
       isMinimized: false,
       isMaximized: false,
       isHidden: false,
+      position: { x: 530, y: 700, width: 220, height: 120 },
+      chartType: "kpi",
     },
     "kpi-4": {
       id: "kpi-4",
       isMinimized: false,
       isMaximized: false,
       isHidden: false,
+      position: { x: 770, y: 700, width: 220, height: 120 },
+      chartType: "kpi",
     },
   });
 
   const { toast } = useToast();
 
+  const getChartTitle = (chartId: string): string => {
+    const titles: Record<string, string> = {
+      "smart-chart": "Smart Analytics Chart",
+      "kpi-widget": "Total Revenue",
+      "revenue-chart": "Revenue by Category",
+      "sales-dist": "Sales Distribution",
+      "kpi-1": "Monthly Growth",
+      "kpi-2": "Active Users",
+      "kpi-3": "Conversion Rate",
+      "kpi-4": "Customer LTV",
+    };
+    return titles[chartId] || chartId;
+  };
+
   const handleUndoAction = (action: HistoryAction) => {
     switch (action.type) {
       case "REMOVE_CHART":
-        // Restore the removed chart
         setChartStates((prev) => ({
           ...prev,
           [action.chartId]: action.previousState,
@@ -116,7 +163,6 @@ export default function CanvasArea({
         });
         break;
       case "ADD_CHART":
-        // Remove the added chart
         setChartStates((prev) => {
           const newStates = { ...prev };
           delete newStates[action.chartId];
@@ -134,7 +180,6 @@ export default function CanvasArea({
   const handleRedoAction = (action: HistoryAction) => {
     switch (action.type) {
       case "REMOVE_CHART":
-        // Remove the chart again
         setChartStates((prev) => {
           const newStates = { ...prev };
           delete newStates[action.chartId];
@@ -147,7 +192,6 @@ export default function CanvasArea({
         });
         break;
       case "ADD_CHART":
-        // Add the chart again
         setChartStates((prev) => ({
           ...prev,
           [action.chartId]: action.newState,
@@ -156,21 +200,6 @@ export default function CanvasArea({
     }
   };
 
-  const getChartTitle = (chartId: string): string => {
-    const titles: Record<string, string> = {
-      "smart-chart": "Smart Analytics Chart",
-      "kpi-widget": "Total Revenue",
-      "revenue-chart": "Revenue by Category",
-      "sales-dist": "Sales Distribution",
-      "kpi-1": "Monthly Growth",
-      "kpi-2": "Active Users",
-      "kpi-3": "Conversion Rate",
-      "kpi-4": "Customer LTV",
-    };
-    return titles[chartId] || chartId;
-  };
-
-  // Set up refs for direct undo/redo communication
   React.useEffect(() => {
     if (undoRef) {
       undoRef.current = handleUndoAction;
@@ -194,14 +223,14 @@ export default function CanvasArea({
   const handleMinimize = (chartId: string) => {
     updateChartState(chartId, {
       isMinimized: !chartStates[chartId]?.isMinimized,
-      isMaximized: false, // Can't be both minimized and maximized
+      isMaximized: false,
     });
   };
 
   const handleMaximize = (chartId: string) => {
     updateChartState(chartId, {
       isMaximized: !chartStates[chartId]?.isMaximized,
-      isMinimized: false, // Can't be both minimized and maximized
+      isMinimized: false,
     });
   };
 
@@ -213,26 +242,22 @@ export default function CanvasArea({
     const chartToRemove = chartStates[chartId];
     if (!chartToRemove) return;
 
-    // Add to history before removing
     onAddToHistory?.({
       type: "REMOVE_CHART",
       chartId,
       previousState: chartToRemove,
     });
 
-    // Remove from active charts
     setChartStates((prev) => {
       const newStates = { ...prev };
       delete newStates[chartId];
       return newStates;
     });
 
-    // Clear selection if this chart was selected
     if (selectedElement === chartId) {
       onElementSelect(null);
     }
 
-    // Show simple removal notification
     toast({
       title: "Chart Removed",
       description: `${getChartTitle(chartId)} has been removed. Use Ctrl+Z to undo.`,
@@ -240,7 +265,6 @@ export default function CanvasArea({
     });
   };
 
-  // Handle global undo/redo actions
   React.useEffect(() => {
     const handleKeyboard = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "z" && !e.shiftKey) {
@@ -278,17 +302,15 @@ export default function CanvasArea({
         return;
       }
 
-      // Show loading toast
       const loadingToast = toast({
         title: "Preparing Download",
         description: "Generating chart image...",
         duration: 30000,
       });
 
-      // Capture the chart as canvas
       const canvas = await html2canvas(chartElement, {
-        backgroundColor: "#1e293b", // dashboard-surface color
-        scale: 2, // Higher quality
+        backgroundColor: "#1e293b",
+        scale: 2,
         useCORS: true,
         allowTaint: true,
         logging: false,
@@ -296,7 +318,6 @@ export default function CanvasArea({
         height: chartElement.offsetHeight,
       });
 
-      // Convert to blob and download
       canvas.toBlob(
         (blob) => {
           if (!blob) {
@@ -318,7 +339,6 @@ export default function CanvasArea({
           document.body.removeChild(link);
           URL.revokeObjectURL(url);
 
-          // Dismiss loading toast and show success
           loadingToast.dismiss();
           toast({
             title: "Download Complete",
@@ -344,9 +364,18 @@ export default function CanvasArea({
     const newId = `${chartId}-copy-${Date.now()}`;
     const originalState = chartStates[chartId];
     if (originalState) {
-      const newChartState = { ...originalState, id: newId };
+      const newChartState = {
+        ...originalState,
+        id: newId,
+        position: originalState.position
+          ? {
+              ...originalState.position,
+              x: originalState.position.x + 20,
+              y: originalState.position.y + 20,
+            }
+          : undefined,
+      };
 
-      // Add to history
       onAddToHistory?.({
         type: "ADD_CHART",
         chartId: newId,
@@ -370,7 +399,173 @@ export default function CanvasArea({
     onElementSelect(chartId);
   };
 
-  // Count visible charts
+  const handlePositionChange = (
+    chartId: string,
+    newPosition: ChartPosition,
+  ) => {
+    updateChartState(chartId, { position: newPosition });
+  };
+
+  const handleResize = (
+    chartId: string,
+    newSize: { width: number; height: number },
+  ) => {
+    const currentPosition = chartStates[chartId]?.position;
+    if (currentPosition) {
+      updateChartState(chartId, {
+        position: {
+          ...currentPosition,
+          width: newSize.width,
+          height: newSize.height,
+        },
+      });
+    }
+  };
+
+  const handlePropertyChange = (
+    chartId: string,
+    property: string,
+    value: any,
+  ) => {
+    console.log("CanvasArea: Property change", { chartId, property, value }); // Debug log
+
+    // Immediate state update for smooth real-time updates
+    setChartProperties((prev) => {
+      const newProps = {
+        ...prev,
+        [chartId]: {
+          ...prev[chartId],
+          [property]: value,
+        },
+      };
+      console.log("CanvasArea: Updated chart properties", newProps); // Debug log
+
+      // Force immediate re-render by updating at next tick
+      setTimeout(() => {
+        // Trigger a forced update if needed
+        setChartStates((states) => ({ ...states }));
+      }, 0);
+
+      return newProps;
+    });
+
+    // Notify parent component immediately
+    if (parentOnPropertyChange) {
+      parentOnPropertyChange(chartId, property, value);
+    }
+  };
+
+  // Expose property change handler to parent
+  React.useEffect(() => {
+    if (parentOnPropertyChange) {
+      // Make the property change handler available to parent
+      (window as any).canvasPropertyChange = handlePropertyChange;
+    }
+  }, [handlePropertyChange, parentOnPropertyChange]);
+
+  const [isDragOver, setIsDragOver] = useState(false);
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "copy";
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const data = e.dataTransfer.getData("text/plain");
+
+    // Get better coordinates for drop location
+    const dropX = e.clientX - e.currentTarget.getBoundingClientRect().left;
+    const dropY = e.clientY - e.currentTarget.getBoundingClientRect().top;
+
+    console.log("Drop event:", { data, dropX, dropY }); // Debug log
+
+    if (data.startsWith("new-chart:")) {
+      const chartType = data.replace("new-chart:", "");
+      const newId = `${chartType}-${Date.now()}`;
+
+      // Determine chart size based on type
+      let chartWidth = 400;
+      let chartHeight = 250;
+
+      if (chartType === "kpi") {
+        chartWidth = 200;
+        chartHeight = 120;
+      } else if (chartType === "pie") {
+        chartWidth = 300;
+        chartHeight = 300;
+      }
+
+      const newChartState: ChartState = {
+        id: newId,
+        isMinimized: false,
+        isMaximized: false,
+        isHidden: false,
+        position: {
+          x: Math.max(0, dropX - 100), // Center the chart on drop point
+          y: Math.max(0, dropY - 50),
+          width: chartWidth,
+          height: chartHeight,
+        },
+        chartType: chartType,
+      };
+
+      console.log("Creating new chart:", newChartState); // Debug log
+
+      setChartStates((prev) => {
+        const newStates = {
+          ...prev,
+          [newId]: newChartState,
+        };
+        console.log(
+          "Chart states updated. New chart count:",
+          Object.keys(newStates).length,
+        ); // Debug log
+        return newStates;
+      });
+
+      onAddToHistory?.({
+        type: "ADD_CHART",
+        chartId: newId,
+        newState: newChartState,
+      });
+
+      toast({
+        title: "Chart Created Successfully!",
+        description: `New ${chartType} chart added to canvas at position (${Math.round(dropX)}, ${Math.round(dropY)})`,
+        duration: 3000,
+      });
+
+      // Auto-select the new chart
+      onElementSelect(newId);
+    } else {
+      // Handle existing chart movement
+      const chartId = data;
+      if (chartStates[chartId]) {
+        const updatedPosition = {
+          x: Math.max(0, dropX - 150),
+          y: Math.max(0, dropY - 100),
+          width: chartStates[chartId].position?.width || 300,
+          height: chartStates[chartId].position?.height || 200,
+        };
+
+        updateChartState(chartId, { position: updatedPosition });
+
+        toast({
+          title: "Chart Moved",
+          description: `${getChartTitle(chartId)} position updated`,
+          duration: 2000,
+        });
+      }
+    }
+  };
+
   const visibleCharts = Object.values(chartStates).filter(
     (state) => !state.isHidden,
   );
@@ -378,7 +573,19 @@ export default function CanvasArea({
   const maximizedChart = visibleCharts.find((state) => state.isMaximized);
 
   return (
-    <div className="flex-1 bg-dashboard-muted/30 relative overflow-auto">
+    <div
+      className={`flex-1 bg-dashboard-muted/30 relative overflow-auto transition-colors ${
+        isDragOver
+          ? "bg-dashboard-accent/10 border-2 border-dashed border-dashboard-accent"
+          : ""
+      }`}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={(e) => {
+        handleDrop(e);
+        setIsDragOver(false);
+      }}
+    >
       {/* Grid Background */}
       {showGrid && (
         <div
@@ -388,177 +595,71 @@ export default function CanvasArea({
               linear-gradient(to right, hsl(var(--dashboard-border)) 1px, transparent 1px),
               linear-gradient(to bottom, hsl(var(--dashboard-border)) 1px, transparent 1px)
             `,
-            backgroundSize: "20px 20px",
+            backgroundSize: `${gridSize}px ${gridSize}px`,
           }}
         />
       )}
 
       {/* Canvas Content */}
-      <div className="relative p-8 min-h-full">
-        <div className="grid grid-cols-12 gap-6 auto-rows-min">
-          {/* Smart Chart - Featured */}
-          {chartStates["smart-chart"] &&
-            !chartStates["smart-chart"].isHidden && (
-              <div
-                className={`col-span-8 row-span-1 relative group ${chartStates["smart-chart"].isMinimized ? "col-span-4" : ""}`}
-              >
-                <ChartWidget
-                  id="smart-chart"
-                  title="Smart Analytics Chart"
-                  className="h-64"
-                  isSelected={selectedElement === "smart-chart"}
-                  isMinimized={chartStates["smart-chart"].isMinimized}
-                  isMaximized={chartStates["smart-chart"].isMaximized}
-                  isHidden={chartStates["smart-chart"].isHidden}
-                  onSelect={() => handleElementClick("smart-chart")}
-                  onMinimize={() => handleMinimize("smart-chart")}
-                  onMaximize={() => handleMaximize("smart-chart")}
-                  onHide={() => handleHide("smart-chart")}
-                  onRemove={() => handleRemove("smart-chart")}
-                  onDownload={() => handleDownload("smart-chart")}
-                  onDuplicate={() => handleDuplicate("smart-chart")}
-                  onEdit={() => handleEdit("smart-chart")}
-                >
-                  <SmartChart />
-                </ChartWidget>
-              </div>
-            )}
-
-          {/* KPI Widget */}
-          {chartStates["kpi-widget"] && !chartStates["kpi-widget"].isHidden && (
-            <div
-              className={`col-span-4 row-span-1 relative group ${chartStates["kpi-widget"].isMinimized ? "col-span-2" : ""}`}
+      <div
+        className="relative p-6 min-h-full overflow-hidden"
+        style={{
+          minHeight: `${canvasSize.height}px`,
+          width: `${canvasSize.width}px`,
+          transform: `scale(${zoomLevel / 100})`,
+          transformOrigin: "top left",
+        }}
+      >
+        {/* All Charts - Absolute Positioned */}
+        {Object.values(chartStates)
+          .filter((chart) => !chart.isHidden)
+          .map((chart) => (
+            <ChartWidget
+              key={chart.id}
+              id={chart.id}
+              title={getChartTitle(chart.id)}
+              className=""
+              isSelected={selectedElement === chart.id}
+              isMinimized={chart.isMinimized}
+              isMaximized={chart.isMaximized}
+              isHidden={chart.isHidden}
+              position={chart.position}
+              onSelect={() => handleElementClick(chart.id)}
+              onMinimize={() => handleMinimize(chart.id)}
+              onMaximize={() => handleMaximize(chart.id)}
+              onHide={() => handleHide(chart.id)}
+              onRemove={() => handleRemove(chart.id)}
+              onDownload={() => handleDownload(chart.id)}
+              onDuplicate={() => handleDuplicate(chart.id)}
+              onEdit={() => handleEdit(chart.id)}
+              onPositionChange={(position) =>
+                handlePositionChange(chart.id, position)
+              }
+              onResize={(size) => handleResize(chart.id, size)}
             >
-              <ChartWidget
-                id="kpi-widget"
-                title="Total Revenue"
-                className="h-32"
-                isSelected={selectedElement === "kpi-widget"}
-                isMinimized={chartStates["kpi-widget"].isMinimized}
-                isMaximized={chartStates["kpi-widget"].isMaximized}
-                isHidden={chartStates["kpi-widget"].isHidden}
-                onSelect={() => handleElementClick("kpi-widget")}
-                onMinimize={() => handleMinimize("kpi-widget")}
-                onMaximize={() => handleMaximize("kpi-widget")}
-                onHide={() => handleHide("kpi-widget")}
-                onRemove={() => handleRemove("kpi-widget")}
-                onDownload={() => handleDownload("kpi-widget")}
-                onDuplicate={() => handleDuplicate("kpi-widget")}
-                onEdit={() => handleEdit("kpi-widget")}
-              >
-                <KPIWidget />
-              </ChartWidget>
-            </div>
-          )}
-
-          {/* Revenue by Category */}
-          {chartStates["revenue-chart"] &&
-            !chartStates["revenue-chart"].isHidden && (
-              <div
-                className={`col-span-6 row-span-1 relative group ${chartStates["revenue-chart"].isMinimized ? "col-span-3" : ""}`}
-              >
-                <ChartWidget
-                  id="revenue-chart"
-                  title="Revenue by Category"
-                  className="h-48"
-                  isSelected={selectedElement === "revenue-chart"}
-                  isMinimized={chartStates["revenue-chart"].isMinimized}
-                  isMaximized={chartStates["revenue-chart"].isMaximized}
-                  isHidden={chartStates["revenue-chart"].isHidden}
-                  onSelect={() => handleElementClick("revenue-chart")}
-                  onMinimize={() => handleMinimize("revenue-chart")}
-                  onMaximize={() => handleMaximize("revenue-chart")}
-                  onHide={() => handleHide("revenue-chart")}
-                  onRemove={() => handleRemove("revenue-chart")}
-                  onDownload={() => handleDownload("revenue-chart")}
-                  onDuplicate={() => handleDuplicate("revenue-chart")}
-                  onEdit={() => handleEdit("revenue-chart")}
-                >
-                  <RevenueByCategoryChart />
-                </ChartWidget>
-              </div>
-            )}
-
-          {/* Sales Distribution */}
-          {chartStates["sales-dist"] && !chartStates["sales-dist"].isHidden && (
-            <div
-              className={`col-span-6 row-span-1 relative group ${chartStates["sales-dist"].isMinimized ? "col-span-3" : ""}`}
-            >
-              <ChartWidget
-                id="sales-dist"
-                title="Sales Distribution"
-                className="h-48"
-                isSelected={selectedElement === "sales-dist"}
-                isMinimized={chartStates["sales-dist"].isMinimized}
-                isMaximized={chartStates["sales-dist"].isMaximized}
-                isHidden={chartStates["sales-dist"].isHidden}
-                onSelect={() => handleElementClick("sales-dist")}
-                onMinimize={() => handleMinimize("sales-dist")}
-                onMaximize={() => handleMaximize("sales-dist")}
-                onHide={() => handleHide("sales-dist")}
-                onRemove={() => handleRemove("sales-dist")}
-                onDownload={() => handleDownload("sales-dist")}
-                onDuplicate={() => handleDuplicate("sales-dist")}
-                onEdit={() => handleEdit("sales-dist")}
-              >
-                <SalesDistributionChart />
-              </ChartWidget>
-            </div>
-          )}
-
-          {/* Additional KPI Cards */}
-          {chartStates["kpi-1"] && !chartStates["kpi-1"].isHidden && (
-            <div
-              className={`col-span-3 row-span-1 relative group ${chartStates["kpi-1"].isMinimized ? "col-span-2" : ""}`}
-            >
-              <ChartWidget
-                id="kpi-1"
-                title="Monthly Growth"
-                className="h-24"
-                isSelected={selectedElement === "kpi-1"}
-                isMinimized={chartStates["kpi-1"].isMinimized}
-                isMaximized={chartStates["kpi-1"].isMaximized}
-                isHidden={chartStates["kpi-1"].isHidden}
-                onSelect={() => handleElementClick("kpi-1")}
-                onMinimize={() => handleMinimize("kpi-1")}
-                onMaximize={() => handleMaximize("kpi-1")}
-                onHide={() => handleHide("kpi-1")}
-                onRemove={() => handleRemove("kpi-1")}
-                onDownload={() => handleDownload("kpi-1")}
-                onDuplicate={() => handleDuplicate("kpi-1")}
-                onEdit={() => handleEdit("kpi-1")}
-              >
+              {chart.id === "smart-chart" && (
+                <SmartChart properties={chartProperties[chart.id]} />
+              )}
+              {chart.id === "kpi-widget" && <KPIWidget />}
+              {chart.id === "revenue-chart" && (
+                <RevenueByCategoryChart
+                  properties={chartProperties[chart.id]}
+                />
+              )}
+              {chart.id === "sales-dist" && (
+                <SalesDistributionChart
+                  properties={chartProperties[chart.id]}
+                />
+              )}
+              {chart.id === "kpi-1" && (
                 <div className="flex flex-col justify-center items-center h-full">
                   <div className="text-lg font-bold text-green-400">+12.5%</div>
                   <div className="text-xs text-dashboard-text-muted">
                     vs last month
                   </div>
                 </div>
-              </ChartWidget>
-            </div>
-          )}
-
-          {chartStates["kpi-2"] && !chartStates["kpi-2"].isHidden && (
-            <div
-              className={`col-span-3 row-span-1 relative group ${chartStates["kpi-2"].isMinimized ? "col-span-2" : ""}`}
-            >
-              <ChartWidget
-                id="kpi-2"
-                title="Active Users"
-                className="h-24"
-                isSelected={selectedElement === "kpi-2"}
-                isMinimized={chartStates["kpi-2"].isMinimized}
-                isMaximized={chartStates["kpi-2"].isMaximized}
-                isHidden={chartStates["kpi-2"].isHidden}
-                onSelect={() => handleElementClick("kpi-2")}
-                onMinimize={() => handleMinimize("kpi-2")}
-                onMaximize={() => handleMaximize("kpi-2")}
-                onHide={() => handleHide("kpi-2")}
-                onRemove={() => handleRemove("kpi-2")}
-                onDownload={() => handleDownload("kpi-2")}
-                onDuplicate={() => handleDuplicate("kpi-2")}
-                onEdit={() => handleEdit("kpi-2")}
-              >
+              )}
+              {chart.id === "kpi-2" && (
                 <div className="flex flex-col justify-center items-center h-full">
                   <div className="text-lg font-bold text-dashboard-accent">
                     24.8k
@@ -567,62 +668,16 @@ export default function CanvasArea({
                     this week
                   </div>
                 </div>
-              </ChartWidget>
-            </div>
-          )}
-
-          {chartStates["kpi-3"] && !chartStates["kpi-3"].isHidden && (
-            <div
-              className={`col-span-3 row-span-1 relative group ${chartStates["kpi-3"].isMinimized ? "col-span-2" : ""}`}
-            >
-              <ChartWidget
-                id="kpi-3"
-                title="Conversion Rate"
-                className="h-24"
-                isSelected={selectedElement === "kpi-3"}
-                isMinimized={chartStates["kpi-3"].isMinimized}
-                isMaximized={chartStates["kpi-3"].isMaximized}
-                isHidden={chartStates["kpi-3"].isHidden}
-                onSelect={() => handleElementClick("kpi-3")}
-                onMinimize={() => handleMinimize("kpi-3")}
-                onMaximize={() => handleMaximize("kpi-3")}
-                onHide={() => handleHide("kpi-3")}
-                onRemove={() => handleRemove("kpi-3")}
-                onDownload={() => handleDownload("kpi-3")}
-                onDuplicate={() => handleDuplicate("kpi-3")}
-                onEdit={() => handleEdit("kpi-3")}
-              >
+              )}
+              {chart.id === "kpi-3" && (
                 <div className="flex flex-col justify-center items-center h-full">
                   <div className="text-lg font-bold text-yellow-400">3.2%</div>
                   <div className="text-xs text-dashboard-text-muted">
                     avg rate
                   </div>
                 </div>
-              </ChartWidget>
-            </div>
-          )}
-
-          {chartStates["kpi-4"] && !chartStates["kpi-4"].isHidden && (
-            <div
-              className={`col-span-3 row-span-1 relative group ${chartStates["kpi-4"].isMinimized ? "col-span-2" : ""}`}
-            >
-              <ChartWidget
-                id="kpi-4"
-                title="Customer LTV"
-                className="h-24"
-                isSelected={selectedElement === "kpi-4"}
-                isMinimized={chartStates["kpi-4"].isMinimized}
-                isMaximized={chartStates["kpi-4"].isMaximized}
-                isHidden={chartStates["kpi-4"].isHidden}
-                onSelect={() => handleElementClick("kpi-4")}
-                onMinimize={() => handleMinimize("kpi-4")}
-                onMaximize={() => handleMaximize("kpi-4")}
-                onHide={() => handleHide("kpi-4")}
-                onRemove={() => handleRemove("kpi-4")}
-                onDownload={() => handleDownload("kpi-4")}
-                onDuplicate={() => handleDuplicate("kpi-4")}
-                onEdit={() => handleEdit("kpi-4")}
-              >
+              )}
+              {chart.id === "kpi-4" && (
                 <div className="flex flex-col justify-center items-center h-full">
                   <div className="text-lg font-bold text-purple-400">
                     $1,247
@@ -631,20 +686,100 @@ export default function CanvasArea({
                     average
                   </div>
                 </div>
-              </ChartWidget>
-            </div>
-          )}
+              )}
+              {![
+                "smart-chart",
+                "kpi-widget",
+                "revenue-chart",
+                "sales-dist",
+                "kpi-1",
+                "kpi-2",
+                "kpi-3",
+                "kpi-4",
+              ].includes(chart.id) && (
+                <DynamicChart
+                  chartType={chart.chartType || "line"}
+                  properties={chartProperties[chart.id]}
+                />
+              )}
+            </ChartWidget>
+          ))}
+      </div>
+
+      {/* Canvas Controls - Positioned at bottom right */}
+      <div className="absolute bottom-4 right-4 bg-dashboard-surface border border-dashboard-border rounded-lg p-3 space-y-2 shadow-lg">
+        <div className="text-xs font-medium text-dashboard-text mb-2">
+          Canvas Controls
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-dashboard-text-muted">Size:</span>
+          <input
+            type="number"
+            value={canvasSize.width}
+            onChange={(e) =>
+              setCanvasSize((prev) => ({
+                ...prev,
+                width: parseInt(e.target.value) || 1920,
+              }))
+            }
+            className="w-16 px-1 py-0.5 text-xs bg-dashboard-muted border border-dashboard-border rounded"
+          />
+          <span className="text-xs text-dashboard-text-muted">×</span>
+          <input
+            type="number"
+            value={canvasSize.height}
+            onChange={(e) =>
+              setCanvasSize((prev) => ({
+                ...prev,
+                height: parseInt(e.target.value) || 1080,
+              }))
+            }
+            className="w-16 px-1 py-0.5 text-xs bg-dashboard-muted border border-dashboard-border rounded"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-dashboard-text-muted">Zoom:</span>
+          <input
+            type="range"
+            min="25"
+            max="200"
+            value={zoomLevel}
+            onChange={(e) => setZoomLevel(parseInt(e.target.value))}
+            className="w-20"
+          />
+          <span className="text-xs text-dashboard-text">{zoomLevel}%</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowGrid(!showGrid)}
+            className={`px-2 py-1 text-xs rounded border transition-colors ${showGrid ? "bg-dashboard-accent text-white border-dashboard-accent" : "bg-dashboard-muted text-dashboard-text border-dashboard-border hover:border-dashboard-accent"}`}
+          >
+            Grid
+          </button>
+          <input
+            type="range"
+            min="10"
+            max="50"
+            value={gridSize}
+            onChange={(e) => setGridSize(parseInt(e.target.value))}
+            className="w-16"
+          />
+          <span className="text-xs text-dashboard-text-muted">
+            {gridSize}px
+          </span>
         </div>
       </div>
 
       {/* Canvas Info */}
       <div className="absolute bottom-4 left-4 bg-dashboard-surface border border-dashboard-border rounded-lg p-2 text-xs text-dashboard-text-muted">
         <div className="flex items-center gap-4">
-          <span>Canvas: 1920x1080</span>
+          <span>
+            Canvas: {canvasSize.width}×{canvasSize.height}
+          </span>
           <span>•</span>
-          <span>Grid: 20px</span>
+          <span>Grid: {gridSize}px</span>
           <span>•</span>
-          <span>Zoom: 100%</span>
+          <span>Zoom: {zoomLevel}%</span>
           <span>•</span>
           <span>{visibleCharts.length} charts visible</span>
           {minimizedCharts.length > 0 && (
@@ -661,7 +796,7 @@ export default function CanvasArea({
           )}
           {selectedElement && (
             <>
-              <span>•</span>
+              <span>���</span>
               <span className="text-dashboard-accent">
                 Selected: {selectedElement}
               </span>

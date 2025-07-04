@@ -392,6 +392,15 @@ export default function ChartTemplatesPanel() {
                 <div
                   className="p-3 hover:border-dashboard-accent transition-colors cursor-pointer"
                   onClick={() => addChartType(chartType)}
+                  draggable={true}
+                  onDragStart={(e) => {
+                    e.dataTransfer.setData(
+                      "text/plain",
+                      `new-chart:${chartType.id}`,
+                    );
+                    e.dataTransfer.effectAllowed = "copy";
+                  }}
+                  title="Click to add or drag to canvas"
                 >
                   <div className="flex items-start gap-3">
                     <div className="p-2 bg-dashboard-muted rounded-lg group-hover:bg-dashboard-accent/20 transition-colors">
@@ -431,6 +440,16 @@ export default function ChartTemplatesPanel() {
                         size="sm"
                         onClick={() => addChartType(chartType, variant)}
                         className="h-6 px-2 text-xs text-dashboard-text-muted hover:text-dashboard-accent hover:bg-dashboard-accent/10 justify-start"
+                        draggable={true}
+                        onDragStart={(e) => {
+                          e.stopPropagation();
+                          e.dataTransfer.setData(
+                            "text/plain",
+                            `new-chart:${chartType.id}-${variant.toLowerCase().replace(/ /g, "-")}`,
+                          );
+                          e.dataTransfer.effectAllowed = "copy";
+                        }}
+                        title="Click to add or drag to canvas"
                       >
                         {variant}
                       </Button>

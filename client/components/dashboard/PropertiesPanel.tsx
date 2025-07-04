@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,13 +34,37 @@ interface PropertiesPanelProps {
   selectedElement: string | null;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
+  onPropertyChange?: (elementId: string, property: string, value: any) => void;
 }
 
 export default function PropertiesPanel({
   selectedElement,
   isCollapsed,
   onToggleCollapse,
+  onPropertyChange,
 }: PropertiesPanelProps) {
+  // Determine chart type based on selected element
+  const getChartTypeFromElement = (elementId: string | null): string => {
+    if (!elementId) return "line";
+
+    if (
+      elementId.includes("smart-chart") ||
+      elementId.includes("profit") ||
+      elementId.includes("sales-over")
+    ) {
+      return "line";
+    }
+    if (elementId.includes("revenue-chart")) {
+      return "bar";
+    }
+    if (elementId.includes("sales-dist")) {
+      return "pie";
+    }
+    if (elementId.includes("kpi")) {
+      return "kpi";
+    }
+    return "line";
+  };
   const [properties, setProperties] = useState({
     title: "Q4 Revenue Analysis",
     width: 400,
@@ -54,12 +78,34 @@ export default function PropertiesPanel({
     showGrid: true,
     opacity: 100,
     borderRadius: 8,
-    chartType: "line",
+    chartType: getChartTypeFromElement(selectedElement),
+    // X-Axis properties
+    xAxisLabel: "",
+    showXAxis: true,
+    rotateXLabels: false,
+    xLabelAngle: 0,
+    // Y-Axis properties
+    yAxisLabel: "",
+    showYAxis: true,
+    yMinValue: "",
+    yMaxValue: "",
+    startFromZero: true,
   });
 
   const updateProperty = (key: string, value: any) => {
     setProperties((prev) => ({ ...prev, [key]: value }));
+
+    // Notify parent component of property change
+    if (selectedElement && onPropertyChange) {
+      onPropertyChange(selectedElement, key, value);
+    }
   };
+
+  // Update chart type when selected element changes
+  React.useEffect(() => {
+    const detectedType = getChartTypeFromElement(selectedElement);
+    updateProperty("chartType", detectedType);
+  }, [selectedElement]);
 
   // Collapsed state
   if (isCollapsed) {
@@ -372,6 +418,161 @@ export default function PropertiesPanel({
             </div>
           </div>
         </div>
+
+        {/* X/Y Axis Properties - Show for line and bar charts */}
+        {(properties.chartType === "line" ||
+          properties.chartType === "bar") && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Layout className="w-4 h-4 text-dashboard-accent" />
+              <h4 className="font-medium text-dashboard-text">
+                Axis Configuration
+              </h4>
+            </div>
+
+            <div className="space-y-4">
+              {/* X-Axis Properties */}
+              <div className="space-y-3">
+                <Label className="text-sm font-medium text-dashboard-text">
+                  X-Axis
+                </Label>
+
+                <div className="space-y-2">
+                  <Label className="text-xs text-dashboard-text-muted">
+                    Label
+                  </Label>
+                  <Input
+                    placeholder="e.g., Months, Categories"
+                    value={properties.xAxisLabel}
+                    onChange={(e) =>
+                      updateProperty("xAxisLabel", e.target.value)
+                    }
+                    className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs text-dashboard-text-muted">
+                    Show X-Axis
+                  </Label>
+                  <Switch
+                    checked={properties.showXAxis}
+                    onCheckedChange={(checked) =>
+                      updateProperty("showXAxis", checked)
+                    }
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs text-dashboard-text-muted">
+                    Rotate Labels
+                  </Label>
+                  <Switch
+                    checked={properties.rotateXLabels}
+                    onCheckedChange={(checked) =>
+                      updateProperty("rotateXLabels", checked)
+                    }
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-xs text-dashboard-text-muted">
+                    Label Angle
+                  </Label>
+                  <Slider
+                    value={[properties.xLabelAngle]}
+                    onValueChange={(value) =>
+                      updateProperty("xLabelAngle", value[0])
+                    }
+                    max={90}
+                    min={-90}
+                    step={15}
+                    className="w-full"
+                  />
+                  <span className="text-xs text-dashboard-text-muted">
+                    {properties.xLabelAngle}°
+                  </span>
+                </div>
+              </div>
+
+              {/* Y-Axis Properties */}
+              <div className="space-y-3">
+                <Label className="text-sm font-medium text-dashboard-text">
+                  Y-Axis
+                </Label>
+
+                <div className="space-y-2">
+                  <Label className="text-xs text-dashboard-text-muted">
+                    Label
+                  </Label>
+                  <Input
+                    placeholder="e.g., Revenue ($), Count"
+                    value={properties.yAxisLabel}
+                    onChange={(e) =>
+                      updateProperty("yAxisLabel", e.target.value)
+                    }
+                    className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs text-dashboard-text-muted">
+                    Show Y-Axis
+                  </Label>
+                  <Switch
+                    checked={properties.showYAxis}
+                    onCheckedChange={(checked) =>
+                      updateProperty("showYAxis", checked)
+                    }
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label className="text-xs text-dashboard-text-muted">
+                      Min Value
+                    </Label>
+                    <Input
+                      type="number"
+                      placeholder="Auto"
+                      value={properties.yMinValue}
+                      onChange={(e) =>
+                        updateProperty("yMinValue", e.target.value)
+                      }
+                      className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs text-dashboard-text-muted">
+                      Max Value
+                    </Label>
+                    <Input
+                      type="number"
+                      placeholder="Auto"
+                      value={properties.yMaxValue}
+                      onChange={(e) =>
+                        updateProperty("yMaxValue", e.target.value)
+                      }
+                      className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs text-dashboard-text-muted">
+                    Start from Zero
+                  </Label>
+                  <Switch
+                    checked={properties.startFromZero}
+                    onCheckedChange={(checked) =>
+                      updateProperty("startFromZero", checked)
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* AI Suggestions */}
         <div className="p-3 bg-dashboard-surface border border-dashboard-accent/30 rounded-lg">

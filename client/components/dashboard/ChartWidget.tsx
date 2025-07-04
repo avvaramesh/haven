@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   MoreHorizontal,
@@ -12,6 +12,7 @@ import {
   Shrink,
   Eye,
   EyeOff,
+  GripVertical,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -20,6 +21,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
+interface ChartPosition {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
 
 interface ChartWidgetProps {
   id: string;
@@ -30,6 +38,7 @@ interface ChartWidgetProps {
   isMinimized?: boolean;
   isMaximized?: boolean;
   isHidden?: boolean;
+  position?: ChartPosition;
   onSelect?: () => void;
   onMinimize?: () => void;
   onMaximize?: () => void;
@@ -38,6 +47,8 @@ interface ChartWidgetProps {
   onDownload?: () => void;
   onDuplicate?: () => void;
   onEdit?: () => void;
+  onPositionChange?: (position: ChartPosition) => void;
+  onResize?: (size: { width: number; height: number }) => void;
 }
 
 export default function ChartWidget({
@@ -49,6 +60,7 @@ export default function ChartWidget({
   isMinimized = false,
   isMaximized = false,
   isHidden = false,
+  position,
   onSelect,
   onMinimize,
   onMaximize,
@@ -57,8 +69,14 @@ export default function ChartWidget({
   onDownload,
   onDuplicate,
   onEdit,
+  onPositionChange,
+  onResize,
 }: ChartWidgetProps) {
   const [showToolbar, setShowToolbar] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const widgetRef = React.useRef<HTMLDivElement>(null);
 
   if (isHidden) {
     return null;
@@ -77,11 +95,23 @@ export default function ChartWidget({
     ${isSelected ? "ring-2 ring-dashboard-accent ring-offset-2 ring-offset-dashboard-background" : ""}
     ${isMaximized ? "fixed inset-4 z-50 shadow-2xl" : ""}
     ${isMinimized ? "h-12 overflow-hidden" : ""}
+    ${isDragging ? "z-50 shadow-2xl" : ""}
     ${className}
   `;
 
+  const containerStyle =
+    position && !isMaximized
+      ? {
+          position: "absolute" as const,
+          left: position.x,
+          top: position.y,
+          width: position.width,
+          height: position.height,
+        }
+      : {};
+
   return (
-    <div className={containerClasses}>
+    <div ref={widgetRef} className={containerClasses} style={containerStyle}>
       {/* Toolbar - appears on hover or when selected */}
       <div
         className={`
@@ -188,12 +218,59 @@ export default function ChartWidget({
 
       {/* Chart Header */}
       <div
-        className={`flex items-center justify-between p-4 cursor-pointer ${isMinimized ? "pb-0" : "pb-2"}`}
+        className={`flex items-center justify-between p-4 ${isSelected ? "cursor-move" : "cursor-pointer"} ${isMinimized ? "pb-0" : "pb-2"}`}
         onClick={onSelect}
         onMouseEnter={() => setShowToolbar(true)}
         onMouseLeave={() => setShowToolbar(false)}
+        onMouseDown={(e) => {
+          if (!isSelected || !position) return;
+
+          setIsDragging(true);
+
+          // Get the canvas container for proper coordinate calculation
+          const canvasContainer = document.querySelector(
+            ".relative.p-6.min-h-full",
+          ) as HTMLElement;
+          if (!canvasContainer) return;
+
+          const canvasRect = canvasContainer.getBoundingClientRect();
+          const rect = widgetRef.current?.getBoundingClientRect();
+
+          if (!rect) return;
+
+          // Calculate offset from mouse position to element's current position
+          const offsetX = e.clientX - rect.left;
+          const offsetY = e.clientY - rect.top;
+
+          const handleMouseMove = (moveEvent: MouseEvent) => {
+            if (!onPositionChange) return;
+
+            // Calculate new position relative to canvas, accounting for padding
+            const newX = moveEvent.clientX - canvasRect.left - 24 - offsetX; // 24px is p-6 padding
+            const newY = moveEvent.clientY - canvasRect.top - 24 - offsetY;
+
+            onPositionChange({
+              ...position,
+              x: Math.max(0, newX),
+              y: Math.max(0, newY),
+            });
+          };
+
+          const handleMouseUp = () => {
+            setIsDragging(false);
+            document.removeEventListener("mousemove", handleMouseMove);
+            document.removeEventListener("mouseup", handleMouseUp);
+          };
+
+          document.addEventListener("mousemove", handleMouseMove);
+          document.addEventListener("mouseup", handleMouseUp);
+        }}
+        title={isSelected ? "Drag to move" : "Click to select"}
       >
-        <h3 className="text-dashboard-text font-medium truncate">{title}</h3>
+        <div className="flex items-center gap-2 flex-1">
+          <GripVertical className="w-4 h-4 text-dashboard-text-muted opacity-50 group-hover:opacity-100 transition-opacity" />
+          <h3 className="text-dashboard-text font-medium truncate">{title}</h3>
+        </div>
         {isMinimized && (
           <Button
             variant="ghost"
@@ -217,6 +294,126 @@ export default function ChartWidget({
         >
           <div className={isMaximized ? "h-full" : ""}>{children}</div>
         </div>
+      )}
+
+      {/* Resize Handles - Only show when selected and not maximized */}
+      {isSelected && !isMaximized && !isMinimized && position && (
+        <>
+          {/* Bottom-Right Corner */}
+          <div
+            className="absolute -bottom-1 -right-1 w-3 h-3 bg-dashboard-accent rounded-sm cursor-se-resize opacity-80 hover:opacity-100"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsResizing(true);
+
+              const startX = e.clientX;
+              const startY = e.clientY;
+              const startWidth = position.width;
+              const startHeight = position.height;
+
+              const handleMouseMove = (moveEvent: MouseEvent) => {
+                if (!onPositionChange) return;
+
+                const newWidth = Math.max(
+                  200,
+                  startWidth + (moveEvent.clientX - startX),
+                );
+                const newHeight = Math.max(
+                  150,
+                  startHeight + (moveEvent.clientY - startY),
+                );
+
+                onPositionChange({
+                  ...position,
+                  width: newWidth,
+                  height: newHeight,
+                });
+              };
+
+              const handleMouseUp = () => {
+                setIsResizing(false);
+                document.removeEventListener("mousemove", handleMouseMove);
+                document.removeEventListener("mouseup", handleMouseUp);
+              };
+
+              document.addEventListener("mousemove", handleMouseMove);
+              document.addEventListener("mouseup", handleMouseUp);
+            }}
+          />
+
+          {/* Right Edge */}
+          <div
+            className="absolute -right-1 top-1/2 transform -translate-y-1/2 w-2 h-6 bg-dashboard-accent rounded-sm cursor-e-resize opacity-80 hover:opacity-100"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsResizing(true);
+
+              const startX = e.clientX;
+              const startWidth = position.width;
+
+              const handleMouseMove = (moveEvent: MouseEvent) => {
+                if (!onPositionChange) return;
+
+                const newWidth = Math.max(
+                  200,
+                  startWidth + (moveEvent.clientX - startX),
+                );
+
+                onPositionChange({
+                  ...position,
+                  width: newWidth,
+                });
+              };
+
+              const handleMouseUp = () => {
+                setIsResizing(false);
+                document.removeEventListener("mousemove", handleMouseMove);
+                document.removeEventListener("mouseup", handleMouseUp);
+              };
+
+              document.addEventListener("mousemove", handleMouseMove);
+              document.addEventListener("mouseup", handleMouseUp);
+            }}
+          />
+
+          {/* Bottom Edge */}
+          <div
+            className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-6 h-2 bg-dashboard-accent rounded-sm cursor-s-resize opacity-80 hover:opacity-100"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsResizing(true);
+
+              const startY = e.clientY;
+              const startHeight = position.height;
+
+              const handleMouseMove = (moveEvent: MouseEvent) => {
+                if (!onPositionChange) return;
+
+                const newHeight = Math.max(
+                  150,
+                  startHeight + (moveEvent.clientY - startY),
+                );
+
+                onPositionChange({
+                  ...position,
+                  height: newHeight,
+                });
+              };
+
+              const handleMouseUp = () => {
+                setIsResizing(false);
+                document.removeEventListener("mousemove", handleMouseMove);
+                document.removeEventListener("mouseup", handleMouseUp);
+              };
+
+              document.addEventListener("mousemove", handleMouseMove);
+              document.addEventListener("mouseup", handleMouseUp);
+            }}
+          />
+        </>
       )}
 
       {/* Maximize Overlay Background */}

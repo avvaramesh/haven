@@ -18,7 +18,16 @@ import {
   Cloud,
   Server,
   Zap,
+  Users,
+  Target,
+  DollarSign,
+  TrendingUp,
 } from "lucide-react";
+import {
+  allDatasets,
+  getDatasetsByCategory,
+  Dataset,
+} from "../../data/sampleData";
 
 interface DataConnection {
   id: string;
@@ -231,6 +240,96 @@ export default function DataConnectionsPanel() {
                   <Filter className="w-3 h-3 mr-1" />
                   Query
                 </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Sample Data Section */}
+      <div className="p-4 border-t border-dashboard-border">
+        <div className="flex items-center gap-2 mb-3">
+          <FileSpreadsheet className="w-4 h-4 text-dashboard-accent" />
+          <h4 className="font-medium text-dashboard-text">Sample Datasets</h4>
+        </div>
+
+        <div className="space-y-2 mb-4">
+          <div className="grid grid-cols-2 gap-2">
+            {["hr", "marketing", "sales", "finance"].map((category) => (
+              <Button
+                key={category}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2 justify-start text-xs border-dashboard-border hover:bg-dashboard-muted"
+                onClick={() => {
+                  const datasets = getDatasetsByCategory(category);
+                  console.log(`${category} datasets:`, datasets);
+                }}
+              >
+                {category === "hr" && <Users className="w-3 h-3" />}
+                {category === "marketing" && <Target className="w-3 h-3" />}
+                {category === "sales" && <DollarSign className="w-3 h-3" />}
+                {category === "finance" && <TrendingUp className="w-3 h-3" />}
+                {category.toUpperCase()}
+                <Badge variant="secondary" className="text-xs">
+                  {getDatasetsByCategory(category).length}
+                </Badge>
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <div className="text-xs text-dashboard-text-muted mb-2">
+            Quick Load:
+          </div>
+          {allDatasets.slice(0, 3).map((dataset) => (
+            <div
+              key={dataset.id}
+              className="p-2 bg-dashboard-muted rounded border border-dashboard-border hover:bg-dashboard-accent/10 cursor-pointer transition-colors"
+              onClick={() => {
+                console.log("Loading dataset:", dataset);
+                // TODO: Implement chart creation with this dataset
+              }}
+            >
+              <div className="flex justify-between items-start">
+                <div className="flex-1">
+                  <div className="text-xs font-medium text-dashboard-text truncate">
+                    {dataset.name}
+                  </div>
+                  <div className="text-xs text-dashboard-text-muted truncate">
+                    {dataset.description}
+                  </div>
+                </div>
+                <Badge
+                  variant="outline"
+                  className={`text-xs ml-2 ${
+                    dataset.category === "hr"
+                      ? "border-blue-500 text-blue-600"
+                      : dataset.category === "marketing"
+                        ? "border-green-500 text-green-600"
+                        : dataset.category === "sales"
+                          ? "border-purple-500 text-purple-600"
+                          : "border-orange-500 text-orange-600"
+                  }`}
+                >
+                  {dataset.category}
+                </Badge>
+              </div>
+              <div className="flex justify-between items-center mt-1">
+                <span className="text-xs text-dashboard-text-muted">
+                  {dataset.data.length} records
+                </span>
+                <div className="flex gap-1">
+                  {dataset.chartTypes.slice(0, 3).map((type) => (
+                    <span
+                      key={type}
+                      className="text-xs px-1 py-0.5 bg-dashboard-accent/20 text-dashboard-accent rounded"
+                    >
+                      {type}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
           ))}
