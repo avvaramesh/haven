@@ -106,6 +106,18 @@ export default function SalesDistributionChart({
             ))}
           </Pie>
           <Tooltip content={<CustomTooltip />} />
+          {properties?.showLegend && (
+            <Legend
+              verticalAlign="bottom"
+              height={36}
+              iconType="circle"
+              wrapperStyle={{
+                paddingTop: "10px",
+                fontSize: "12px",
+                color: "hsl(215, 20.2%, 65.1%)",
+              }}
+            />
+          )}
         </PieChart>
       </ResponsiveContainer>
     </div>
