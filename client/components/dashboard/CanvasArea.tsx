@@ -708,6 +708,9 @@ export default function CanvasArea({
     // Expose grid and zoom controls to parent
     (window as any).setCanvasGrid = (show: boolean) => setShowGrid(show);
     (window as any).setCanvasZoom = (level: number) => setZoomLevel(level);
+    (window as any).setCanvasGridSize = (size: number) => setGridSize(size);
+    (window as any).setCanvasSize = (size: { width: number; height: number }) =>
+      setCanvasSize(size);
 
     // Expose property change handler for direct updates (avoid circular calls)
     (window as any).updateCanvasProperty = handlePropertyChange;
@@ -716,6 +719,8 @@ export default function CanvasArea({
     return () => {
       delete (window as any).setCanvasGrid;
       delete (window as any).setCanvasZoom;
+      delete (window as any).setCanvasGridSize;
+      delete (window as any).setCanvasSize;
       delete (window as any).updateCanvasProperty;
     };
   }, [handlePropertyChange]);
