@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Brain, Sparkles } from "lucide-react";
 import Sidebar from "./Sidebar";
