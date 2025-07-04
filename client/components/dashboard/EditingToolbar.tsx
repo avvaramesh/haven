@@ -33,6 +33,12 @@ interface EditingToolbarProps {
   canRedo?: boolean;
   onSave?: () => void;
   onExport?: () => void;
+  onZoomIn?: () => void;
+  onZoomOut?: () => void;
+  onFitToScreen?: () => void;
+  onPreview?: () => void;
+  onPublish?: () => void;
+  zoomLevel?: number;
 }
 
 export default function EditingToolbar({
@@ -42,6 +48,12 @@ export default function EditingToolbar({
   canRedo = false,
   onSave,
   onExport,
+  onZoomIn,
+  onZoomOut,
+  onFitToScreen,
+  onPreview,
+  onPublish,
+  zoomLevel = 100,
 }: EditingToolbarProps) {
   const [selectedTool, setSelectedTool] = useState("select");
   const [showGrid, setShowGrid] = useState(true);
@@ -142,22 +154,28 @@ export default function EditingToolbar({
           <Button
             variant="ghost"
             size="sm"
+            onClick={onZoomOut}
             className="text-dashboard-text hover:bg-dashboard-muted"
+            title="Zoom Out"
           >
             <ZoomOut className="w-4 h-4" />
           </Button>
-          <span className="text-sm text-dashboard-text px-2">100%</span>
+          <span className="text-sm text-dashboard-text px-2">{zoomLevel}%</span>
           <Button
             variant="ghost"
             size="sm"
+            onClick={onZoomIn}
             className="text-dashboard-text hover:bg-dashboard-muted"
+            title="Zoom In"
           >
             <ZoomIn className="w-4 h-4" />
           </Button>
           <Button
             variant="ghost"
             size="sm"
+            onClick={onFitToScreen}
             className="text-dashboard-text hover:bg-dashboard-muted"
+            title="Fit to Screen"
           >
             <Maximize className="w-4 h-4" />
           </Button>
@@ -165,7 +183,9 @@ export default function EditingToolbar({
           <Button
             variant="outline"
             size="sm"
+            onClick={onPreview}
             className="border-dashboard-border text-dashboard-text hover:bg-dashboard-muted"
+            title="Preview Dashboard"
           >
             <Eye className="w-4 h-4 mr-2" />
             Preview
@@ -173,6 +193,8 @@ export default function EditingToolbar({
           <Button
             className="bg-dashboard-accent hover:bg-dashboard-accent-light text-white"
             size="sm"
+            onClick={onPublish}
+            title="Publish Dashboard"
           >
             <Share2 className="w-4 h-4 mr-2" />
             Publish
