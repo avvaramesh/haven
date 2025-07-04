@@ -39,6 +39,8 @@ interface EditingToolbarProps {
   onPreview?: () => void;
   onPublish?: () => void;
   zoomLevel?: number;
+  showGrid?: boolean;
+  onToggleGrid?: () => void;
 }
 
 export default function EditingToolbar({
@@ -54,19 +56,16 @@ export default function EditingToolbar({
   onPreview,
   onPublish,
   zoomLevel = 100,
+  showGrid = true,
+  onToggleGrid,
 }: EditingToolbarProps) {
   const [selectedTool, setSelectedTool] = useState("select");
-  const [showGrid, setShowGrid] = useState(true);
 
   const tools = [
     { id: "select", icon: MousePointer2, label: "Select" },
-    { id: "pan", icon: Hand, label: "Pan" },
-    { id: "rectangle", icon: Square, label: "Rectangle" },
     { id: "bar-chart", icon: BarChart3, label: "Bar Chart" },
     { id: "line-chart", icon: LineChart, label: "Line Chart" },
     { id: "pie-chart", icon: PieChart, label: "Pie Chart" },
-    { id: "text", icon: Type, label: "Text" },
-    { id: "image", icon: Image, label: "Image" },
   ];
 
   return (
@@ -142,7 +141,7 @@ export default function EditingToolbar({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setShowGrid(!showGrid)}
+            onClick={onToggleGrid}
             className={`text-dashboard-text hover:bg-dashboard-muted ${
               showGrid ? "bg-dashboard-muted" : ""
             }`}
