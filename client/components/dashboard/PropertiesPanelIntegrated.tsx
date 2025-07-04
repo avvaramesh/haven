@@ -340,10 +340,11 @@ export default function PropertiesPanelIntegrated({
               <Label className="text-xs text-dashboard-text-muted">Width</Label>
               <Input
                 type="number"
-                value={properties.width}
-                onChange={(e) =>
-                  updateProperty("width", parseInt(e.target.value))
-                }
+                value={properties.width || ""}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value) || 0;
+                  updateProperty("width", value);
+                }}
                 className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
               />
             </div>
