@@ -75,26 +75,61 @@ export default function SmartChart({ properties }: SmartChartProps = {}) {
             data={data}
             margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(210, 11%, 20%)" />
-            <XAxis
-              dataKey="month"
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: "hsl(215, 20.2%, 65.1%)", fontSize: 12 }}
-            />
-            <YAxis
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: "hsl(215, 20.2%, 65.1%)", fontSize: 12 }}
-            />
+            {properties?.showGrid !== false && (
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="hsl(210, 11%, 20%)"
+              />
+            )}
+            {properties?.showXAxis !== false && (
+              <XAxis
+                dataKey="month"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "hsl(215, 20.2%, 65.1%)", fontSize: 12 }}
+                label={
+                  properties?.xAxisLabel
+                    ? {
+                        value: properties.xAxisLabel,
+                        position: "insideBottom",
+                        offset: -5,
+                      }
+                    : undefined
+                }
+              />
+            )}
+            {properties?.showYAxis !== false && (
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "hsl(215, 20.2%, 65.1%)", fontSize: 12 }}
+                label={
+                  properties?.yAxisLabel
+                    ? {
+                        value: properties.yAxisLabel,
+                        angle: -90,
+                        position: "insideLeft",
+                      }
+                    : undefined
+                }
+              />
+            )}
             <Tooltip content={<CustomTooltip />} />
             <Line
               type="monotone"
               dataKey="value"
-              stroke="hsl(199, 89%, 48%)"
+              stroke={properties?.color || "hsl(199, 89%, 48%)"}
               strokeWidth={2}
-              dot={{ fill: "hsl(199, 89%, 48%)", strokeWidth: 2, r: 4 }}
-              activeDot={{ r: 6, stroke: "hsl(199, 89%, 48%)", strokeWidth: 2 }}
+              dot={{
+                fill: properties?.color || "hsl(199, 89%, 48%)",
+                strokeWidth: 2,
+                r: 4,
+              }}
+              activeDot={{
+                r: 6,
+                stroke: properties?.color || "hsl(199, 89%, 48%)",
+                strokeWidth: 2,
+              }}
             />
             <ReferenceLine
               x="Oct"
