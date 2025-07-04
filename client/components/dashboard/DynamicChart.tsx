@@ -52,6 +52,14 @@ export default function DynamicChart({
     case "line-multi":
     case "line-stepped":
     case "line-smooth":
+    case "simple-line":
+    case "multi-line":
+    case "stepped-line":
+    case "smooth-line":
+    case "Simple Line":
+    case "Multi-line":
+    case "Stepped Line":
+    case "Smooth Line":
       return <SmartChart properties={{ ...properties, chartType }} />;
 
     case "bar-vertical":
@@ -72,18 +80,41 @@ export default function DynamicChart({
     case "pie-donut":
     case "pie-semi-circle":
     case "pie-nested":
+    case "donut":
+    case "semi-circle":
+    case "nested-donut":
+    case "Pie":
+    case "Donut":
+    case "Semi-circle":
+    case "Nested Donut":
       return <SalesDistributionChart properties={properties} />;
 
     case "area-filled":
     case "area-stacked":
     case "area-percentage":
     case "area-stream":
+    case "filled-area":
+    case "stacked-area":
+    case "percentage-area":
+    case "stream-graph":
+    case "Filled Area":
+    case "Stacked Area":
+    case "Percentage Area":
+    case "Stream Graph":
       return <SalesOverTimeChart properties={{ ...properties, chartType }} />;
 
     case "kpi-number":
     case "kpi-progress":
     case "kpi-trend":
     case "kpi-comparison":
+    case "number-card":
+    case "progress-card":
+    case "trend-card":
+    case "comparison-card":
+    case "Number Card":
+    case "Progress Card":
+    case "Trend Card":
+    case "Comparison Card":
       return <KPIWidget properties={properties} />;
 
     // Table chart
