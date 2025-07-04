@@ -30,10 +30,14 @@ import {
 
 interface PropertiesPanelProps {
   selectedElement: string | null;
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
 }
 
 export default function PropertiesPanel({
   selectedElement,
+  isCollapsed,
+  onToggleCollapse,
 }: PropertiesPanelProps) {
   const [properties, setProperties] = useState({
     title: "Q4 Revenue Analysis",
