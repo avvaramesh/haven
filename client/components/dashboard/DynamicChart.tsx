@@ -58,6 +58,14 @@ export default function DynamicChart({
     case "bar-horizontal":
     case "bar-stacked":
     case "bar-grouped":
+    case "vertical-bar":
+    case "horizontal-bar":
+    case "stacked-bar":
+    case "grouped-bar":
+    case "Vertical Bar":
+    case "Horizontal Bar":
+    case "Stacked Bar":
+    case "Grouped Bar":
       return <RevenueByCategoryChart properties={properties} />;
 
     case "pie-standard":
