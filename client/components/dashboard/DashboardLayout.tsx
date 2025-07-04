@@ -97,9 +97,22 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 <ChevronRight className="w-4 h-4" />
               </Button>
               <div className="flex flex-col gap-3">
-                <Database className="w-5 h-5 text-dashboard-text-muted" />
-                <BarChart3 className="w-5 h-5 text-dashboard-text-muted" />
-                <Bot className="w-5 h-5 text-dashboard-text-muted" />
+                <Database
+                  className="w-5 h-5 text-dashboard-text-muted"
+                  title="Data"
+                />
+                <BarChart3
+                  className="w-5 h-5 text-dashboard-text-muted"
+                  title="Charts"
+                />
+                <Settings
+                  className={`w-5 h-5 ${selectedElement ? "text-dashboard-accent" : "text-dashboard-text-muted"}`}
+                  title="Properties"
+                />
+                <Bot
+                  className="w-5 h-5 text-dashboard-text-muted"
+                  title="AI Copilot"
+                />
               </div>
             </div>
           ) : (
