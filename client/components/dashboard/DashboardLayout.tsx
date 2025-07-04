@@ -85,6 +85,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     setUndoStack((prev) => prev.slice(0, -1));
     setRedoStack((prev) => [lastAction, ...prev]);
 
+    // Call the CanvasArea undo handler
+    canvasUndoRef.current?.(lastAction);
+
     return lastAction;
   };
 
@@ -94,6 +97,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     const actionToRedo = redoStack[0];
     setRedoStack((prev) => prev.slice(1));
     setUndoStack((prev) => [...prev, actionToRedo]);
+
+    // Call the CanvasArea redo handler
+    canvasRedoRef.current?.(actionToRedo);
 
     return actionToRedo;
   };
@@ -354,6 +360,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           onAddToHistory={addToHistory}
           onUndo={handleGlobalUndo}
           onRedo={handleGlobalRedo}
+          undoRef={canvasUndoRef}
+          redoRef={canvasRedoRef}
         />
       </div>
 
