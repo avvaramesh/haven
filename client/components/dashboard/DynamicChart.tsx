@@ -99,7 +99,53 @@ export default function DynamicChart({
       return <TreemapChart properties={properties} />;
 
     case "scatter":
+    case "bubble-chart":
+    case "scatter-plot":
+    case "3d-scatter":
+    case "regression-line":
       return <ScatterChart properties={properties} />;
+
+    // Gauge variants
+    case "radial-gauge":
+    case "linear-gauge":
+    case "bullet-chart":
+    case "speedometer":
+      return <GaugeChart properties={properties} />;
+
+    // Funnel variants
+    case "sales-funnel":
+    case "conversion-funnel":
+    case "pyramid":
+    case "inverted-funnel":
+      return <FunnelChart properties={properties} />;
+
+    // Waterfall variants
+    case "financial-waterfall":
+    case "bridge-chart":
+    case "variance-analysis":
+    case "sequential":
+      return <WaterfallChart properties={properties} />;
+
+    // Heatmap variants
+    case "calendar-heatmap":
+    case "matrix-heatmap":
+    case "geographic-heatmap":
+    case "correlation-matrix":
+      return <HeatmapChart properties={properties} />;
+
+    // Treemap variants
+    case "simple-treemap":
+    case "nested-treemap":
+    case "sunburst":
+    case "icicle-chart":
+      return <TreemapChart properties={properties} />;
+
+    // Table variants
+    case "simple-table":
+    case "pivot-table":
+    case "matrix":
+    case "card-table":
+      return <TableChart properties={{ ...properties, chartType }} />;
 
     default:
       return (
