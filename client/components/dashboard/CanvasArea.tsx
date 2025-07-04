@@ -225,6 +225,34 @@ export default function CanvasArea({
           [action.chartId]: action.newState,
         }));
         break;
+      case "MODIFY_CHART":
+        if (action.newState?.property) {
+          setChartProperties((prev) => ({
+            ...prev,
+            [action.chartId]: {
+              ...prev[action.chartId],
+              [action.newState.property]: action.newState.value,
+            },
+          }));
+
+          // Handle chart type changes
+          if (action.newState.property === "chartType") {
+            setChartStates((prev) => ({
+              ...prev,
+              [action.chartId]: {
+                ...prev[action.chartId],
+                chartType: action.newState.value,
+              },
+            }));
+          }
+
+          toast({
+            title: "Property Restored",
+            description: `${action.newState.property} has been redone.`,
+            duration: 2000,
+          });
+        }
+        break;
     }
   };
 
