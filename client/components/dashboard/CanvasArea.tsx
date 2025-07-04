@@ -16,14 +16,28 @@ interface ChartState {
   isHidden: boolean;
 }
 
+interface HistoryAction {
+  type: "REMOVE_CHART" | "ADD_CHART" | "MODIFY_CHART";
+  chartId: string;
+  previousState?: any;
+  newState?: any;
+  timestamp: number;
+}
+
 interface CanvasAreaProps {
   selectedElement: string | null;
   onElementSelect: (elementId: string | null) => void;
+  onAddToHistory?: (action: Omit<HistoryAction, "timestamp">) => void;
+  onUndo?: () => HistoryAction | null;
+  onRedo?: () => HistoryAction | null;
 }
 
 export default function CanvasArea({
   selectedElement,
   onElementSelect,
+  onAddToHistory,
+  onUndo,
+  onRedo,
 }: CanvasAreaProps) {
   const [showGrid, setShowGrid] = useState(true);
   const [chartStates, setChartStates] = useState<Record<string, ChartState>>({
@@ -77,10 +91,6 @@ export default function CanvasArea({
     },
   });
 
-  // Store removed charts for undo functionality
-  const [removedCharts, setRemovedCharts] = useState<
-    Record<string, ChartState>
-  >({});
   const { toast } = useToast();
 
   const handleElementClick = (elementId: string) => {
@@ -116,11 +126,12 @@ export default function CanvasArea({
     const chartToRemove = chartStates[chartId];
     if (!chartToRemove) return;
 
-    // Store the removed chart for undo
-    setRemovedCharts((prev) => ({
-      ...prev,
-      [chartId]: chartToRemove,
-    }));
+    // Add to history before removing
+    onAddToHistory?.({
+      type: "REMOVE_CHART",
+      chartId,
+      previousState: chartToRemove,
+    });
 
     // Remove from active charts
     setChartStates((prev) => {
@@ -134,54 +145,87 @@ export default function CanvasArea({
       onElementSelect(null);
     }
 
-    // Show undo toast
+    // Show simple removal notification
     toast({
       title: "Chart Removed",
-      description: `${getChartTitle(chartId)} has been removed from the dashboard.`,
-      action: (
-        <ToastAction
-          altText="Undo remove"
-          onClick={() => handleUndo(chartId)}
-          className="bg-dashboard-accent hover:bg-dashboard-accent-light text-white"
-        >
-          Undo
-        </ToastAction>
-      ),
-      duration: 10000, // 10 seconds to undo
-    });
-
-    // Auto-cleanup after toast expires
-    setTimeout(() => {
-      setRemovedCharts((prev) => {
-        const newRemoved = { ...prev };
-        delete newRemoved[chartId];
-        return newRemoved;
-      });
-    }, 10000);
-  };
-
-  const handleUndo = (chartId: string) => {
-    const removedChart = removedCharts[chartId];
-    if (!removedChart) return;
-
-    // Restore the chart
-    setChartStates((prev) => ({
-      ...prev,
-      [chartId]: removedChart,
-    }));
-
-    // Remove from removed charts
-    setRemovedCharts((prev) => {
-      const newRemoved = { ...prev };
-      delete newRemoved[chartId];
-      return newRemoved;
-    });
-
-    toast({
-      title: "Chart Restored",
-      description: `${getChartTitle(chartId)} has been restored to the dashboard.`,
+      description: `${getChartTitle(chartId)} has been removed. Use Ctrl+Z to undo.`,
       duration: 3000,
     });
+  };
+
+  // Handle global undo/redo actions
+  React.useEffect(() => {
+    const handleKeyboard = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "z" && !e.shiftKey) {
+        e.preventDefault();
+        const action = onUndo?.();
+        if (action) {
+          handleUndoAction(action);
+        }
+      } else if (
+        (e.ctrlKey || e.metaKey) &&
+        (e.key === "y" || (e.key === "z" && e.shiftKey))
+      ) {
+        e.preventDefault();
+        const action = onRedo?.();
+        if (action) {
+          handleRedoAction(action);
+        }
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyboard);
+    return () => document.removeEventListener("keydown", handleKeyboard);
+  }, [onUndo, onRedo]);
+
+  const handleUndoAction = (action: any) => {
+    switch (action.type) {
+      case "REMOVE_CHART":
+        // Restore the removed chart
+        setChartStates((prev) => ({
+          ...prev,
+          [action.chartId]: action.previousState,
+        }));
+        toast({
+          title: "Chart Restored",
+          description: `${getChartTitle(action.chartId)} has been restored.`,
+          duration: 3000,
+        });
+        break;
+      case "ADD_CHART":
+        // Remove the added chart
+        setChartStates((prev) => {
+          const newStates = { ...prev };
+          delete newStates[action.chartId];
+          return newStates;
+        });
+        break;
+    }
+  };
+
+  const handleRedoAction = (action: any) => {
+    switch (action.type) {
+      case "REMOVE_CHART":
+        // Remove the chart again
+        setChartStates((prev) => {
+          const newStates = { ...prev };
+          delete newStates[action.chartId];
+          return newStates;
+        });
+        toast({
+          title: "Chart Removed",
+          description: `${getChartTitle(action.chartId)} has been removed again.`,
+          duration: 3000,
+        });
+        break;
+      case "ADD_CHART":
+        // Add the chart again
+        setChartStates((prev) => ({
+          ...prev,
+          [action.chartId]: action.newState,
+        }));
+        break;
+    }
   };
 
   const getChartTitle = (chartId: string): string => {
@@ -277,10 +321,25 @@ export default function CanvasArea({
     const newId = `${chartId}-copy-${Date.now()}`;
     const originalState = chartStates[chartId];
     if (originalState) {
+      const newChartState = { ...originalState, id: newId };
+
+      // Add to history
+      onAddToHistory?.({
+        type: "ADD_CHART",
+        chartId: newId,
+        newState: newChartState,
+      });
+
       setChartStates((prev) => ({
         ...prev,
-        [newId]: { ...originalState, id: newId },
+        [newId]: newChartState,
       }));
+
+      toast({
+        title: "Chart Duplicated",
+        description: `${getChartTitle(chartId)} has been duplicated.`,
+        duration: 3000,
+      });
     }
   };
 
