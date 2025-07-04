@@ -536,6 +536,10 @@ export default function CanvasArea({
                   onDownload={() => handleDownload("smart-chart")}
                   onDuplicate={() => handleDuplicate("smart-chart")}
                   onEdit={() => handleEdit("smart-chart")}
+                  onPositionChange={(position) =>
+                    handlePositionChange("smart-chart", position)
+                  }
+                  onResize={(size) => handleResize("smart-chart", size)}
                 >
                   <SmartChart />
                 </ChartWidget>
