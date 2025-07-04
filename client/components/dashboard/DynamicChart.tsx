@@ -6,6 +6,12 @@ import SalesOverTimeChart from "./SalesOverTimeChart";
 import ProfitMarginChart from "./ProfitMarginChart";
 import KPIWidget from "./KPIWidget";
 import TableChart from "./TableChart";
+import GaugeChart from "./GaugeChart";
+import FunnelChart from "./FunnelChart";
+import WaterfallChart from "./WaterfallChart";
+import HeatmapChart from "./HeatmapChart";
+import TreemapChart from "./TreemapChart";
+import ScatterChart from "./ScatterChart";
 
 interface DynamicChartProps {
   chartType: string;
@@ -76,30 +82,24 @@ export default function DynamicChart({
     case "table":
       return <TableChart properties={{ ...properties, chartType }} />;
 
-    // Simple placeholder charts for new chart types
+    // Advanced chart types with full implementations
     case "gauge":
+      return <GaugeChart properties={properties} />;
+
     case "funnel":
+      return <FunnelChart properties={properties} />;
+
     case "waterfall":
+      return <WaterfallChart properties={properties} />;
+
     case "heatmap":
+      return <HeatmapChart properties={properties} />;
+
     case "treemap":
+      return <TreemapChart properties={properties} />;
+
     case "scatter":
-      return (
-        <div className="flex items-center justify-center h-full p-4">
-          <div className="text-center">
-            <div className="text-lg font-medium text-dashboard-text mb-2">
-              {chartType.charAt(0).toUpperCase() + chartType.slice(1)} Chart
-            </div>
-            <div className="text-sm text-dashboard-text-muted mb-4">
-              Chart implementation coming soon
-            </div>
-            <div className="w-full h-32 bg-dashboard-muted rounded-lg border-2 border-dashed border-dashboard-border flex items-center justify-center">
-              <span className="text-dashboard-text-muted text-sm">
-                {chartType} visualization
-              </span>
-            </div>
-          </div>
-        </div>
-      );
+      return <ScatterChart properties={properties} />;
 
     default:
       return (
