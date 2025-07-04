@@ -60,6 +60,7 @@ export default function ChartWidget({
   isMinimized = false,
   isMaximized = false,
   isHidden = false,
+  position,
   onSelect,
   onMinimize,
   onMaximize,
@@ -68,6 +69,8 @@ export default function ChartWidget({
   onDownload,
   onDuplicate,
   onEdit,
+  onPositionChange,
+  onResize,
 }: ChartWidgetProps) {
   const [showToolbar, setShowToolbar] = useState(false);
 
