@@ -47,14 +47,14 @@ const exportOptions: ExportOption[] = [
     name: "Full Dashboard",
     description: "Export complete dashboard configuration and data",
     icon: <Package className="w-4 h-4" />,
-    formats: ["json", "zip"],
+    formats: ["json", "jpg", "png", "zip"],
   },
   {
     id: "charts",
     name: "All Charts",
     description: "Export all charts as images with associated data",
     icon: <Image className="w-4 h-4" />,
-    formats: ["png", "svg", "pdf"],
+    formats: ["png", "jpg", "svg", "pdf"],
   },
   {
     id: "data",
@@ -68,7 +68,7 @@ const exportOptions: ExportOption[] = [
     name: "Selected Element",
     description: "Export only the currently selected chart or table",
     icon: <FileText className="w-4 h-4" />,
-    formats: ["png", "csv", "json"],
+    formats: ["png", "jpg", "csv", "json"],
   },
 ];
 
@@ -112,30 +112,62 @@ export default function ExportDialog({
   };
 
   const exportDashboard = async () => {
-    const dashboardState = {
-      charts: (window as any).getCanvasState
-        ? (window as any).getCanvasState()
-        : {},
-      properties: (window as any).getCanvasProperties
-        ? (window as any).getCanvasProperties()
-        : {},
-      metadata: {
-        version: "1.0",
-        exportedBy: "Dashboard Designer",
-        exportDate: new Date().toISOString(),
-        selectedElement,
-      },
-    };
+    if (format === "jpg" || format === "png") {
+      // Export entire dashboard as image
+      const canvasElement = document.querySelector(".relative.p-6.min-h-full");
+      if (!canvasElement) return;
 
-    const dataStr = JSON.stringify(dashboardState, null, 2);
-    const blob = new Blob([dataStr], { type: "application/json" });
-    downloadFile(
-      blob,
-      `dashboard-${new Date().toISOString().split("T")[0]}.json`,
-    );
+      try {
+        const canvas = await html2canvas(canvasElement as HTMLElement, {
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: "#ffffff",
+        });
+
+        const mimeType = format === "jpg" ? "image/jpeg" : "image/png";
+        const extension = format === "jpg" ? "jpg" : "png";
+
+        canvas.toBlob((blob) => {
+          if (blob) {
+            downloadFile(
+              blob,
+              `dashboard-${new Date().toISOString().split("T")[0]}.${extension}`,
+            );
+          }
+        }, mimeType);
+      } catch (error) {
+        console.error("Failed to capture dashboard:", error);
+      }
+    } else {
+      // Export dashboard configuration as JSON
+      const dashboardState = {
+        charts: (window as any).getCanvasState
+          ? (window as any).getCanvasState()
+          : {},
+        properties: (window as any).getCanvasProperties
+          ? (window as any).getCanvasProperties()
+          : {},
+        metadata: {
+          version: "1.0",
+          exportedBy: "Dashboard Designer",
+          exportDate: new Date().toISOString(),
+          selectedElement,
+        },
+      };
+
+      const dataStr = JSON.stringify(dashboardState, null, 2);
+      const blob = new Blob([dataStr], { type: "application/json" });
+      downloadFile(
+        blob,
+        `dashboard-${new Date().toISOString().split("T")[0]}.json`,
+      );
+    }
   };
 
-  const exportChartAsImage = async (chartId: string) => {
+  const exportChartAsImage = async (
+    chartId: string,
+    format: string = "png",
+  ) => {
     const chartElement = document.getElementById(`chart-${chartId}`);
     if (!chartElement) return null;
 
@@ -145,10 +177,11 @@ export default function ExportDialog({
         allowTaint: true,
       });
 
+      const mimeType = format === "jpg" ? "image/jpeg" : "image/png";
       return new Promise<Blob>((resolve) => {
         canvas.toBlob((blob) => {
           if (blob) resolve(blob);
-        }, "image/png");
+        }, mimeType);
       });
     } catch (error) {
       console.error("Failed to capture chart:", error);
@@ -216,10 +249,13 @@ export default function ExportDialog({
             const chartIds = Object.keys(chartStates);
 
             for (const chartId of chartIds) {
-              if (format === "png") {
-                const imageBlob = await exportChartAsImage(chartId);
+              if (format === "png" || format === "jpg") {
+                const imageBlob = await exportChartAsImage(chartId, format);
                 if (imageBlob) {
-                  downloadFile(imageBlob, `chart-${chartId}-${timestamp}.png`);
+                  downloadFile(
+                    imageBlob,
+                    `chart-${chartId}-${timestamp}.${format}`,
+                  );
                 }
               }
 
@@ -274,12 +310,15 @@ export default function ExportDialog({
                 }
               } else {
                 // Export as chart image
-                if (format === "png") {
-                  const imageBlob = await exportChartAsImage(selectedElement);
+                if (format === "png" || format === "jpg") {
+                  const imageBlob = await exportChartAsImage(
+                    selectedElement,
+                    format,
+                  );
                   if (imageBlob) {
                     downloadFile(
                       imageBlob,
-                      `${selectedElement}-${timestamp}.png`,
+                      `${selectedElement}-${timestamp}.${format}`,
                     );
                   }
                 }
