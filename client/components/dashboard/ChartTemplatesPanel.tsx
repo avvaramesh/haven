@@ -440,6 +440,16 @@ export default function ChartTemplatesPanel() {
                         size="sm"
                         onClick={() => addChartType(chartType, variant)}
                         className="h-6 px-2 text-xs text-dashboard-text-muted hover:text-dashboard-accent hover:bg-dashboard-accent/10 justify-start"
+                        draggable={true}
+                        onDragStart={(e) => {
+                          e.stopPropagation();
+                          e.dataTransfer.setData(
+                            "text/plain",
+                            `new-chart:${chartType.id}-${variant.toLowerCase().replace(/ /g, "-")}`,
+                          );
+                          e.dataTransfer.effectAllowed = "copy";
+                        }}
+                        title="Click to add or drag to canvas"
                       >
                         {variant}
                       </Button>
