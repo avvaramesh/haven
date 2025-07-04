@@ -142,14 +142,20 @@ export default function ChartWidget({
               Download Chart
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={onDuplicate}
+              onClick={(e) => {
+                e.stopPropagation();
+                onDuplicate?.();
+              }}
               className="text-dashboard-text hover:bg-dashboard-muted"
             >
               <Copy className="w-4 h-4 mr-2" />
               Duplicate
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={onEdit}
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit?.();
+              }}
               className="text-dashboard-text hover:bg-dashboard-muted"
             >
               <Settings className="w-4 h-4 mr-2" />
@@ -157,14 +163,20 @@ export default function ChartWidget({
             </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-dashboard-border" />
             <DropdownMenuItem
-              onClick={onHide}
+              onClick={(e) => {
+                e.stopPropagation();
+                onHide?.();
+              }}
               className="text-dashboard-text hover:bg-dashboard-muted"
             >
               <EyeOff className="w-4 h-4 mr-2" />
               Hide Chart
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={onRemove}
+              onClick={(e) => {
+                e.stopPropagation();
+                onRemove?.();
+              }}
               className="text-red-500 hover:bg-red-500/10 hover:text-red-400"
             >
               <Trash2 className="w-4 h-4 mr-2" />
