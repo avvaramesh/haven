@@ -450,7 +450,7 @@ export default function PropertiesPanelIntegrated({
               <Label className="text-xs text-dashboard-text-muted">
                 Quick Colors
               </Label>
-              <div className="grid grid-cols-6 gap-2">
+              <div className="grid grid-cols-8 gap-1">
                 {[
                   "#3b82f6", // Blue
                   "#ef4444", // Red
@@ -464,6 +464,18 @@ export default function PropertiesPanelIntegrated({
                   "#6366f1", // Indigo
                   "#14b8a6", // Teal
                   "#a855f7", // Violet
+                  "#0ea5e9", // Sky
+                  "#22c55e", // Emerald
+                  "#eab308", // Amber
+                  "#dc2626", // Red-600
+                  "#7c3aed", // Violet-600
+                  "#0891b2", // Cyan-600
+                  "#65a30d", // Lime-600
+                  "#ea580c", // Orange-600
+                  "#db2777", // Pink-600
+                  "#4b5563", // Gray-600
+                  "#059669", // Emerald-600
+                  "#9333ea", // Purple-600
                 ].map((color) => (
                   <button
                     key={color}
