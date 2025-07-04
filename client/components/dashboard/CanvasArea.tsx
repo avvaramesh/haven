@@ -841,7 +841,12 @@ export default function CanvasArea({
             >
               {/* Use DynamicChart for all charts to enable type switching */}
               <DynamicChart
-                chartType={chart.chartType || "line"}
+                chartType={
+                  chartProperties[chart.id]?.chartType ||
+                  chartProperties[chart.id]?.type ||
+                  chart.chartType ||
+                  "line"
+                }
                 properties={chartProperties[chart.id]}
               />
             </ChartWidget>
