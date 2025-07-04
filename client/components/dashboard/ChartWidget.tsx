@@ -337,8 +337,15 @@ export default function ChartWidget({
           <div
             id={`chart-${id}`}
             className={`px-4 pb-4 ${isMaximized ? "h-full overflow-auto" : ""}`}
+            style={
+              !isMaximized && position
+                ? { height: `${position.height - 60}px` }
+                : undefined
+            }
           >
-            <div className={isMaximized ? "h-full w-full" : ""}>{children}</div>
+            <div className={isMaximized ? "h-full w-full" : "h-full w-full"}>
+              {children}
+            </div>
           </div>
         )}
 
