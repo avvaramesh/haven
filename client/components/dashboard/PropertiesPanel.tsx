@@ -34,7 +34,6 @@ interface PropertiesPanelProps {
 export default function PropertiesPanel({
   selectedElement,
 }: PropertiesPanelProps) {
-  const [selectedElement, setSelectedElement] = useState("Revenue Chart");
   const [properties, setProperties] = useState({
     title: "Q4 Revenue Analysis",
     width: 400,
