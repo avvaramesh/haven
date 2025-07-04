@@ -57,6 +57,11 @@ export default function PropertiesPanelIntegrated({
 
   const updateProperty = (key: string, value: any) => {
     setProperties((prev) => ({ ...prev, [key]: value }));
+
+    // Notify parent component of property change
+    if (selectedElement && onPropertyChange) {
+      onPropertyChange(selectedElement, key, value);
+    }
   };
 
   // Get element type and relevant properties
