@@ -101,6 +101,75 @@ export default function CanvasArea({
 
   const { toast } = useToast();
 
+  const handleUndoAction = (action: HistoryAction) => {
+    switch (action.type) {
+      case "REMOVE_CHART":
+        // Restore the removed chart
+        setChartStates((prev) => ({
+          ...prev,
+          [action.chartId]: action.previousState,
+        }));
+        toast({
+          title: "Chart Restored",
+          description: `${getChartTitle(action.chartId)} has been restored.`,
+          duration: 3000,
+        });
+        break;
+      case "ADD_CHART":
+        // Remove the added chart
+        setChartStates((prev) => {
+          const newStates = { ...prev };
+          delete newStates[action.chartId];
+          return newStates;
+        });
+        toast({
+          title: "Chart Removed",
+          description: `Duplicate chart has been removed.`,
+          duration: 3000,
+        });
+        break;
+    }
+  };
+
+  const handleRedoAction = (action: HistoryAction) => {
+    switch (action.type) {
+      case "REMOVE_CHART":
+        // Remove the chart again
+        setChartStates((prev) => {
+          const newStates = { ...prev };
+          delete newStates[action.chartId];
+          return newStates;
+        });
+        toast({
+          title: "Chart Removed",
+          description: `${getChartTitle(action.chartId)} has been removed again.`,
+          duration: 3000,
+        });
+        break;
+      case "ADD_CHART":
+        // Add the chart again
+        setChartStates((prev) => ({
+          ...prev,
+          [action.chartId]: action.newState,
+        }));
+        break;
+    }
+  };
+
+  const getChartTitle = (chartId: string): string => {
+    const titles: Record<string, string> = {
+      "smart-chart": "Smart Analytics Chart",
+      "kpi-widget": "Total Revenue",
+      "revenue-chart": "Revenue by Category",
+      "sales-dist": "Sales Distribution",
+      "kpi-1": "Monthly Growth",
+      "kpi-2": "Active Users",
+      "kpi-3": "Conversion Rate",
+      "kpi-4": "Customer LTV",
+    };
+    return titles[chartId] || chartId;
+  };
+
   // Set up refs for direct undo/redo communication
   React.useEffect(() => {
     if (undoRef) {
