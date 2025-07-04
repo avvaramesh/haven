@@ -699,7 +699,7 @@ export default function PropertiesPanelIntegrated({
                             className="w-full"
                           />
                           <span className="text-xs text-dashboard-text-muted">
-                            {properties.startAngle}°
+                            {properties.startAngle || 0}°
                           </span>
                         </div>
                       )}
