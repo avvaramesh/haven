@@ -431,6 +431,9 @@ export default function CanvasArea({
         [property]: value,
       },
     }));
+
+    // Notify parent component
+    parentOnPropertyChange?.(chartId, property, value);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
