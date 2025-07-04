@@ -106,6 +106,19 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   const canUndo = undoStack.length > 0;
   const canRedo = redoStack.length > 0;
+
+  const handlePropertyChange = (
+    elementId: string,
+    property: string,
+    value: any,
+  ) => {
+    // For now, just log the property change
+    // In a real implementation, this would update the chart's actual properties
+    console.log(`Property changed for ${elementId}: ${property} = ${value}`);
+
+    // You could store chart properties in state and pass them to charts
+    // or trigger a chart update mechanism here
+  };
   return (
     <div className="h-screen flex flex-col bg-dashboard-background">
       {/* Top Header */}
