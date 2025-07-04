@@ -26,18 +26,34 @@ export default function DynamicChart({
   switch (chartType) {
     case "line":
     case "smart-chart":
+    case "line-simple-line":
+    case "line-multi-line":
+    case "line-stepped-line":
+    case "line-smooth-line":
       return <SmartChart properties={{ ...properties, chartType }} />;
 
     case "bar":
     case "revenue-chart":
+    case "bar-vertical-bar":
+    case "bar-horizontal-bar":
+    case "bar-stacked-bar":
+    case "bar-grouped-bar":
       return <RevenueByCategoryChart properties={properties} />;
 
     case "pie":
     case "sales-dist":
+    case "pie-pie":
+    case "pie-donut":
+    case "pie-semi-circle":
+    case "pie-nested-donut":
       return <SalesDistributionChart properties={properties} />;
 
     case "area":
     case "sales-over-time":
+    case "area-filled-area":
+    case "area-stacked-area":
+    case "area-percentage-area":
+    case "area-stream-graph":
       return <SalesOverTimeChart properties={{ ...properties, chartType }} />;
 
     case "profit-margin":
@@ -45,6 +61,10 @@ export default function DynamicChart({
 
     case "kpi":
     case "kpi-widget":
+    case "kpi-number-card":
+    case "kpi-progress-card":
+    case "kpi-trend-card":
+    case "kpi-comparison-card":
       return <KPIWidget properties={properties} />;
 
     // New chart type variants - all pass properties for smooth updates
@@ -119,25 +139,53 @@ export default function DynamicChart({
 
     // Table chart
     case "table":
+    case "table-simple-table":
+    case "table-pivot-table":
+    case "table-matrix":
+    case "table-card-table":
       return <TableChart properties={{ ...properties, chartType }} />;
 
     // Advanced chart types with full implementations
     case "gauge":
+    case "gauge-radial-gauge":
+    case "gauge-linear-gauge":
+    case "gauge-bullet-chart":
+    case "gauge-speedometer":
       return <GaugeChart properties={properties} />;
 
     case "funnel":
+    case "funnel-sales-funnel":
+    case "funnel-conversion-funnel":
+    case "funnel-pyramid":
+    case "funnel-inverted-funnel":
       return <FunnelChart properties={properties} />;
 
     case "waterfall":
+    case "waterfall-financial-waterfall":
+    case "waterfall-bridge-chart":
+    case "waterfall-variance-analysis":
+    case "waterfall-sequential":
       return <WaterfallChart properties={properties} />;
 
     case "heatmap":
+    case "heatmap-calendar-heatmap":
+    case "heatmap-matrix-heatmap":
+    case "heatmap-geographic-heatmap":
+    case "heatmap-correlation-matrix":
       return <HeatmapChart properties={properties} />;
 
     case "treemap":
+    case "treemap-simple-treemap":
+    case "treemap-nested-treemap":
+    case "treemap-sunburst":
+    case "treemap-icicle-chart":
       return <TreemapChart properties={properties} />;
 
     case "scatter":
+    case "scatter-bubble-chart":
+    case "scatter-scatter-plot":
+    case "scatter-3d-scatter":
+    case "scatter-regression-line":
     case "bubble-chart":
     case "scatter-plot":
     case "3d-scatter":
