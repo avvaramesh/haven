@@ -16,6 +16,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [leftPanelTab, setLeftPanelTab] = useState<"data" | "templates">(
     "data",
   );
+  const [isRightPanelCollapsed, setIsRightPanelCollapsed] = useState(false);
   return (
     <div className="h-screen flex flex-col bg-dashboard-background">
       {/* Top Header */}
