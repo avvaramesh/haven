@@ -429,6 +429,17 @@ export default function CanvasArea({
   ) => {
     console.log("CanvasArea: Property change", { chartId, property, value }); // Debug log
 
+    // Handle chart type changes - update chartStates directly
+    if (property === "chartType") {
+      setChartStates((prev) => ({
+        ...prev,
+        [chartId]: {
+          ...prev[chartId],
+          chartType: value,
+        },
+      }));
+    }
+
     // Immediate state update for smooth real-time updates
     setChartProperties((prev) => {
       const newProps = {
@@ -637,71 +648,11 @@ export default function CanvasArea({
               }
               onResize={(size) => handleResize(chart.id, size)}
             >
-              {chart.id === "smart-chart" && (
-                <SmartChart properties={chartProperties[chart.id]} />
-              )}
-              {chart.id === "kpi-widget" && <KPIWidget />}
-              {chart.id === "revenue-chart" && (
-                <RevenueByCategoryChart
-                  properties={chartProperties[chart.id]}
-                />
-              )}
-              {chart.id === "sales-dist" && (
-                <SalesDistributionChart
-                  properties={chartProperties[chart.id]}
-                />
-              )}
-              {chart.id === "kpi-1" && (
-                <div className="flex flex-col justify-center items-center h-full">
-                  <div className="text-lg font-bold text-green-400">+12.5%</div>
-                  <div className="text-xs text-dashboard-text-muted">
-                    vs last month
-                  </div>
-                </div>
-              )}
-              {chart.id === "kpi-2" && (
-                <div className="flex flex-col justify-center items-center h-full">
-                  <div className="text-lg font-bold text-dashboard-accent">
-                    24.8k
-                  </div>
-                  <div className="text-xs text-dashboard-text-muted">
-                    this week
-                  </div>
-                </div>
-              )}
-              {chart.id === "kpi-3" && (
-                <div className="flex flex-col justify-center items-center h-full">
-                  <div className="text-lg font-bold text-yellow-400">3.2%</div>
-                  <div className="text-xs text-dashboard-text-muted">
-                    avg rate
-                  </div>
-                </div>
-              )}
-              {chart.id === "kpi-4" && (
-                <div className="flex flex-col justify-center items-center h-full">
-                  <div className="text-lg font-bold text-purple-400">
-                    $1,247
-                  </div>
-                  <div className="text-xs text-dashboard-text-muted">
-                    average
-                  </div>
-                </div>
-              )}
-              {![
-                "smart-chart",
-                "kpi-widget",
-                "revenue-chart",
-                "sales-dist",
-                "kpi-1",
-                "kpi-2",
-                "kpi-3",
-                "kpi-4",
-              ].includes(chart.id) && (
-                <DynamicChart
-                  chartType={chart.chartType || "line"}
-                  properties={chartProperties[chart.id]}
-                />
-              )}
+              {/* Use DynamicChart for all charts to enable type switching */}
+              <DynamicChart
+                chartType={chart.chartType || "line"}
+                properties={chartProperties[chart.id]}
+              />
             </ChartWidget>
           ))}
       </div>
