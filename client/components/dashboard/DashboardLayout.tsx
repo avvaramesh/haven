@@ -8,12 +8,13 @@ import {
   ChevronLeft,
   ChevronRight,
   Bot,
+  Settings,
 } from "lucide-react";
 import DataConnectionsPanel from "./DataConnectionsPanel";
 import ChartTemplatesPanel from "./ChartTemplatesPanel";
 import AICopilotIntegrated from "./AICopilotIntegrated";
-import EditingToolbar from "./EditingToolbar";
 import PropertiesPanel from "./PropertiesPanel";
+import EditingToolbar from "./EditingToolbar";
 import CanvasArea from "./CanvasArea";
 
 interface DashboardLayoutProps {
