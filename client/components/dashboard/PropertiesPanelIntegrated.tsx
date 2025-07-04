@@ -58,6 +58,151 @@ export default function PropertiesPanelIntegrated({
     setProperties((prev) => ({ ...prev, [key]: value }));
   };
 
+  // Get element type and relevant properties
+  const getElementInfo = (elementId: string | null) => {
+    if (!elementId) return { type: "none", title: "", properties: {} };
+
+    const elementConfigs = {
+      "smart-chart": {
+        type: "line-chart",
+        title: "Smart Analytics Chart",
+        properties: {
+          title: "Q4 Revenue Trends",
+          chartType: "line",
+          showLegend: true,
+          showGrid: true,
+          showDataPoints: true,
+          smoothCurves: true,
+          color: "#3b82f6",
+          background: "#1e293b",
+          width: 600,
+          height: 300,
+        },
+      },
+      "revenue-chart": {
+        type: "bar-chart",
+        title: "Revenue by Category Chart",
+        properties: {
+          title: "Revenue by Category",
+          chartType: "bar",
+          showLegend: true,
+          showGrid: true,
+          barSpacing: 0.3,
+          showValues: true,
+          color: "#10b981",
+          background: "#1e293b",
+          width: 400,
+          height: 280,
+        },
+      },
+      "sales-dist": {
+        type: "pie-chart",
+        title: "Sales Distribution Chart",
+        properties: {
+          title: "Sales Distribution",
+          chartType: "pie",
+          showLegend: true,
+          showPercentages: true,
+          donutMode: false,
+          startAngle: 0,
+          color: "#f59e0b",
+          background: "#1e293b",
+          width: 350,
+          height: 280,
+        },
+      },
+      "kpi-widget": {
+        type: "kpi-large",
+        title: "KPI Widget",
+        properties: {
+          title: "Total Revenue",
+          value: "$142,583",
+          trend: "+12.5%",
+          trendDirection: "up",
+          fontSize: 24,
+          color: "#3b82f6",
+          background: "#1e293b",
+          showTrend: true,
+          width: 300,
+          height: 150,
+        },
+      },
+      "kpi-1": {
+        type: "kpi-card",
+        title: "Growth KPI",
+        properties: {
+          title: "Monthly Growth",
+          value: "+12.5%",
+          subtitle: "vs last month",
+          color: "#10b981",
+          background: "#1e293b",
+          fontSize: 18,
+          width: 200,
+          height: 120,
+        },
+      },
+      "kpi-2": {
+        type: "kpi-card",
+        title: "Users KPI",
+        properties: {
+          title: "Active Users",
+          value: "24.8k",
+          subtitle: "this week",
+          color: "#3b82f6",
+          background: "#1e293b",
+          fontSize: 18,
+          width: 200,
+          height: 120,
+        },
+      },
+      "kpi-3": {
+        type: "kpi-card",
+        title: "Conversion KPI",
+        properties: {
+          title: "Conversion Rate",
+          value: "3.2%",
+          subtitle: "avg rate",
+          color: "#f59e0b",
+          background: "#1e293b",
+          fontSize: 18,
+          width: 200,
+          height: 120,
+        },
+      },
+      "kpi-4": {
+        type: "kpi-card",
+        title: "LTV KPI",
+        properties: {
+          title: "Customer LTV",
+          value: "$1,247",
+          subtitle: "average",
+          color: "#8b5cf6",
+          background: "#1e293b",
+          fontSize: 18,
+          width: 200,
+          height: 120,
+        },
+      },
+    };
+
+    return (
+      elementConfigs[elementId as keyof typeof elementConfigs] || {
+        type: "unknown",
+        title: elementId,
+        properties: {},
+      }
+    );
+  };
+
+  const elementInfo = getElementInfo(selectedElement);
+
+  // Update properties when element changes
+  React.useEffect(() => {
+    if (selectedElement && elementInfo.properties) {
+      setProperties((prev) => ({ ...prev, ...elementInfo.properties }));
+    }
+  }, [selectedElement]);
+
   if (!selectedElement) {
     return (
       <div className="bg-dashboard-background border-r border-dashboard-border h-full flex items-center justify-center">
@@ -106,9 +251,14 @@ export default function PropertiesPanelIntegrated({
             </Button>
           )}
         </div>
-        <Badge className="bg-dashboard-accent/20 text-dashboard-accent text-xs">
-          {selectedElement} Selected
-        </Badge>
+        <div className="flex flex-wrap gap-2">
+          <Badge className="bg-dashboard-accent/20 text-dashboard-accent text-xs">
+            {elementInfo.title}
+          </Badge>
+          <Badge variant="outline" className="text-xs border-dashboard-border">
+            {elementInfo.type}
+          </Badge>
+        </div>
       </div>
 
       <div className={`${isMobile ? "p-3 space-y-4" : "p-4 space-y-6"}`}>
@@ -274,59 +424,244 @@ export default function PropertiesPanelIntegrated({
           </div>
         </div>
 
-        {/* Chart Specific */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <BarChart3 className="w-4 h-4 text-dashboard-accent" />
-            <h4 className="font-medium text-dashboard-text">Chart Options</h4>
+        {/* Element-Specific Options */}
+        {(elementInfo.type.includes("chart") ||
+          elementInfo.type.includes("kpi")) && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              {elementInfo.type.includes("chart") ? (
+                <BarChart3 className="w-4 h-4 text-dashboard-accent" />
+              ) : (
+                <Settings className="w-4 h-4 text-dashboard-accent" />
+              )}
+              <h4 className="font-medium text-dashboard-text">
+                {elementInfo.type.includes("chart")
+                  ? "Chart Options"
+                  : "Display Options"}
+              </h4>
+            </div>
+
+            <div className="space-y-3">
+              {/* Chart Type - only for charts */}
+              {elementInfo.type.includes("chart") && (
+                <div className="space-y-2">
+                  <Label className="text-xs text-dashboard-text-muted">
+                    Chart Type
+                  </Label>
+                  <Select
+                    value={properties.chartType}
+                    onValueChange={(value) =>
+                      updateProperty("chartType", value)
+                    }
+                  >
+                    <SelectTrigger className="bg-dashboard-surface border-dashboard-border text-dashboard-text">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {elementInfo.type === "line-chart" && (
+                        <>
+                          <SelectItem value="line">Line Chart</SelectItem>
+                          <SelectItem value="area">Area Chart</SelectItem>
+                          <SelectItem value="spline">Smooth Line</SelectItem>
+                        </>
+                      )}
+                      {elementInfo.type === "bar-chart" && (
+                        <>
+                          <SelectItem value="bar">Bar Chart</SelectItem>
+                          <SelectItem value="column">Column Chart</SelectItem>
+                          <SelectItem value="stacked">Stacked Bar</SelectItem>
+                        </>
+                      )}
+                      {elementInfo.type === "pie-chart" && (
+                        <>
+                          <SelectItem value="pie">Pie Chart</SelectItem>
+                          <SelectItem value="donut">Donut Chart</SelectItem>
+                          <SelectItem value="semi-donut">
+                            Semi Circle
+                          </SelectItem>
+                        </>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {/* KPI Value - for KPI elements */}
+              {elementInfo.type.includes("kpi") && properties.value && (
+                <div className="space-y-2">
+                  <Label className="text-xs text-dashboard-text-muted">
+                    Value
+                  </Label>
+                  <Input
+                    value={properties.value}
+                    onChange={(e) => updateProperty("value", e.target.value)}
+                    className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
+                  />
+                </div>
+              )}
+
+              {/* Common Chart Options */}
+              {elementInfo.type.includes("chart") && (
+                <>
+                  {properties.showLegend !== undefined && (
+                    <div className="flex items-center justify-between">
+                      <Label className="text-xs text-dashboard-text-muted">
+                        Show Legend
+                      </Label>
+                      <Switch
+                        checked={properties.showLegend}
+                        onCheckedChange={(checked) =>
+                          updateProperty("showLegend", checked)
+                        }
+                      />
+                    </div>
+                  )}
+
+                  {properties.showGrid !== undefined && (
+                    <div className="flex items-center justify-between">
+                      <Label className="text-xs text-dashboard-text-muted">
+                        Show Grid
+                      </Label>
+                      <Switch
+                        checked={properties.showGrid}
+                        onCheckedChange={(checked) =>
+                          updateProperty("showGrid", checked)
+                        }
+                      />
+                    </div>
+                  )}
+
+                  {/* Line Chart Specific */}
+                  {elementInfo.type === "line-chart" && (
+                    <>
+                      {properties.showDataPoints !== undefined && (
+                        <div className="flex items-center justify-between">
+                          <Label className="text-xs text-dashboard-text-muted">
+                            Show Data Points
+                          </Label>
+                          <Switch
+                            checked={properties.showDataPoints}
+                            onCheckedChange={(checked) =>
+                              updateProperty("showDataPoints", checked)
+                            }
+                          />
+                        </div>
+                      )}
+                      {properties.smoothCurves !== undefined && (
+                        <div className="flex items-center justify-between">
+                          <Label className="text-xs text-dashboard-text-muted">
+                            Smooth Curves
+                          </Label>
+                          <Switch
+                            checked={properties.smoothCurves}
+                            onCheckedChange={(checked) =>
+                              updateProperty("smoothCurves", checked)
+                            }
+                          />
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  {/* Bar Chart Specific */}
+                  {elementInfo.type === "bar-chart" &&
+                    properties.barSpacing !== undefined && (
+                      <div className="space-y-2">
+                        <Label className="text-xs text-dashboard-text-muted">
+                          Bar Spacing
+                        </Label>
+                        <Slider
+                          value={[properties.barSpacing * 100]}
+                          onValueChange={(value) =>
+                            updateProperty("barSpacing", value[0] / 100)
+                          }
+                          min={0}
+                          max={100}
+                          step={5}
+                          className="w-full"
+                        />
+                        <span className="text-xs text-dashboard-text-muted">
+                          {Math.round(properties.barSpacing * 100)}%
+                        </span>
+                      </div>
+                    )}
+
+                  {/* Pie Chart Specific */}
+                  {elementInfo.type === "pie-chart" && (
+                    <>
+                      {properties.showPercentages !== undefined && (
+                        <div className="flex items-center justify-between">
+                          <Label className="text-xs text-dashboard-text-muted">
+                            Show Percentages
+                          </Label>
+                          <Switch
+                            checked={properties.showPercentages}
+                            onCheckedChange={(checked) =>
+                              updateProperty("showPercentages", checked)
+                            }
+                          />
+                        </div>
+                      )}
+                      {properties.startAngle !== undefined && (
+                        <div className="space-y-2">
+                          <Label className="text-xs text-dashboard-text-muted">
+                            Start Angle
+                          </Label>
+                          <Slider
+                            value={[properties.startAngle]}
+                            onValueChange={(value) =>
+                              updateProperty("startAngle", value[0])
+                            }
+                            min={0}
+                            max={360}
+                            step={15}
+                            className="w-full"
+                          />
+                          <span className="text-xs text-dashboard-text-muted">
+                            {properties.startAngle}°
+                          </span>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </>
+              )}
+
+              {/* KPI Specific Options */}
+              {elementInfo.type.includes("kpi") && (
+                <>
+                  {properties.showTrend !== undefined && (
+                    <div className="flex items-center justify-between">
+                      <Label className="text-xs text-dashboard-text-muted">
+                        Show Trend
+                      </Label>
+                      <Switch
+                        checked={properties.showTrend}
+                        onCheckedChange={(checked) =>
+                          updateProperty("showTrend", checked)
+                        }
+                      />
+                    </div>
+                  )}
+                  {properties.subtitle && (
+                    <div className="space-y-2">
+                      <Label className="text-xs text-dashboard-text-muted">
+                        Subtitle
+                      </Label>
+                      <Input
+                        value={properties.subtitle}
+                        onChange={(e) =>
+                          updateProperty("subtitle", e.target.value)
+                        }
+                        className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
+                      />
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
           </div>
-
-          <div className="space-y-3">
-            <div className="space-y-2">
-              <Label className="text-xs text-dashboard-text-muted">
-                Chart Type
-              </Label>
-              <Select
-                value={properties.chartType}
-                onValueChange={(value) => updateProperty("chartType", value)}
-              >
-                <SelectTrigger className="bg-dashboard-surface border-dashboard-border text-dashboard-text">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="line">Line Chart</SelectItem>
-                  <SelectItem value="bar">Bar Chart</SelectItem>
-                  <SelectItem value="area">Area Chart</SelectItem>
-                  <SelectItem value="pie">Pie Chart</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <Label className="text-xs text-dashboard-text-muted">
-                Show Legend
-              </Label>
-              <Switch
-                checked={properties.showLegend}
-                onCheckedChange={(checked) =>
-                  updateProperty("showLegend", checked)
-                }
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <Label className="text-xs text-dashboard-text-muted">
-                Show Grid
-              </Label>
-              <Switch
-                checked={properties.showGrid}
-                onCheckedChange={(checked) =>
-                  updateProperty("showGrid", checked)
-                }
-              />
-            </div>
-          </div>
-        </div>
+        )}
 
         {/* AI Suggestions */}
         <div className="p-3 bg-dashboard-surface border border-dashboard-accent/30 rounded-lg">
@@ -337,15 +672,30 @@ export default function PropertiesPanelIntegrated({
             </span>
           </div>
           <p className="text-xs text-dashboard-text-muted mb-2">
-            For this chart type, try using a gradient fill to enhance visual
-            appeal and improve data readability.
+            {elementInfo.type === "line-chart" &&
+              "Try adding smooth curves and data point markers to make trends more visible."}
+            {elementInfo.type === "bar-chart" &&
+              "Consider using gradient colors and adjusting bar spacing for better visual impact."}
+            {elementInfo.type === "pie-chart" &&
+              "Enable percentage labels and try a donut style for modern appearance."}
+            {elementInfo.type.includes("kpi") &&
+              "Add trend indicators and optimize the font size for better readability."}
+            {!elementInfo.type.includes("chart") &&
+              !elementInfo.type.includes("kpi") &&
+              "Select a chart or KPI element to get AI-powered suggestions."}
           </p>
           <Button
             size="sm"
             variant="ghost"
             className="h-6 px-2 text-xs text-dashboard-accent hover:bg-dashboard-accent/20 w-full"
           >
-            Apply Gradient
+            {elementInfo.type === "line-chart" && "Optimize Line Chart"}
+            {elementInfo.type === "bar-chart" && "Apply Gradient"}
+            {elementInfo.type === "pie-chart" && "Enable Donut Mode"}
+            {elementInfo.type.includes("kpi") && "Optimize KPI"}
+            {!elementInfo.type.includes("chart") &&
+              !elementInfo.type.includes("kpi") &&
+              "Get Suggestions"}
           </Button>
         </div>
       </div>
