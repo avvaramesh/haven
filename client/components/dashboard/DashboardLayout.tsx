@@ -76,43 +76,90 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
       {/* Main Editor Area */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Left Panel - Tabbed Interface */}
+        {/* Left Panel - Collapsible Tabbed Interface */}
         <div className="flex flex-col">
-          {/* Tab Header */}
-          <div className="flex bg-dashboard-surface border-r border-dashboard-border">
-            <Button
-              variant={leftPanelTab === "data" ? "default" : "ghost"}
-              size="sm"
-              onClick={() => setLeftPanelTab("data")}
-              className={`rounded-none border-b-2 ${
-                leftPanelTab === "data"
-                  ? "border-dashboard-accent bg-dashboard-accent text-white"
-                  : "border-transparent text-dashboard-text hover:bg-dashboard-muted"
-              }`}
-            >
-              <Database className="w-4 h-4 mr-2" />
-              Data
-            </Button>
-            <Button
-              variant={leftPanelTab === "templates" ? "default" : "ghost"}
-              size="sm"
-              onClick={() => setLeftPanelTab("templates")}
-              className={`rounded-none border-b-2 ${
-                leftPanelTab === "templates"
-                  ? "border-dashboard-accent bg-dashboard-accent text-white"
-                  : "border-transparent text-dashboard-text hover:bg-dashboard-muted"
-              }`}
-            >
-              <BarChart3 className="w-4 h-4 mr-2" />
-              Charts
-            </Button>
-          </div>
+          {/* Collapsed State */}
+          {isLeftPanelCollapsed ? (
+            <div className="w-12 bg-dashboard-background border-r border-dashboard-border h-full flex flex-col items-center py-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsLeftPanelCollapsed(false)}
+                className="text-dashboard-text hover:bg-dashboard-muted mb-4"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+              <div className="flex flex-col gap-3">
+                <Database className="w-5 h-5 text-dashboard-text-muted" />
+                <BarChart3 className="w-5 h-5 text-dashboard-text-muted" />
+                <Bot className="w-5 h-5 text-dashboard-text-muted" />
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Tab Header */}
+              <div className="flex bg-dashboard-surface border-r border-dashboard-border">
+                <Button
+                  variant={leftPanelTab === "data" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setLeftPanelTab("data")}
+                  className={`rounded-none border-b-2 ${
+                    leftPanelTab === "data"
+                      ? "border-dashboard-accent bg-dashboard-accent text-white"
+                      : "border-transparent text-dashboard-text hover:bg-dashboard-muted"
+                  }`}
+                >
+                  <Database className="w-4 h-4 mr-2" />
+                  Data
+                </Button>
+                <Button
+                  variant={leftPanelTab === "templates" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setLeftPanelTab("templates")}
+                  className={`rounded-none border-b-2 ${
+                    leftPanelTab === "templates"
+                      ? "border-dashboard-accent bg-dashboard-accent text-white"
+                      : "border-transparent text-dashboard-text hover:bg-dashboard-muted"
+                  }`}
+                >
+                  <BarChart3 className="w-4 h-4 mr-2" />
+                  Charts
+                </Button>
+                <Button
+                  variant={leftPanelTab === "copilot" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setLeftPanelTab("copilot")}
+                  className={`rounded-none border-b-2 ${
+                    leftPanelTab === "copilot"
+                      ? "border-dashboard-accent bg-dashboard-accent text-white"
+                      : "border-transparent text-dashboard-text hover:bg-dashboard-muted"
+                  }`}
+                >
+                  <Bot className="w-4 h-4 mr-2" />
+                  AI Copilot
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsLeftPanelCollapsed(true)}
+                  className="ml-auto text-dashboard-text hover:bg-dashboard-muted border-b-2 border-transparent rounded-none"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+              </div>
 
-          {/* Tab Content */}
-          <div className="flex-1">
-            {leftPanelTab === "data" && <DataConnectionsPanel />}
-            {leftPanelTab === "templates" && <ChartTemplatesPanel />}
-          </div>
+              {/* Tab Content */}
+              <div className="flex-1">
+                {leftPanelTab === "data" && <DataConnectionsPanel />}
+                {leftPanelTab === "templates" && <ChartTemplatesPanel />}
+                {leftPanelTab === "copilot" && (
+                  <div className="w-80 h-full">
+                    <AICopilotIntegrated />
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </div>
 
         {/* Center Canvas Area */}
