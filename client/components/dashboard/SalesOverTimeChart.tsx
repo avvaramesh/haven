@@ -58,8 +58,26 @@ interface SalesOverTimeChartProps {
 export default function SalesOverTimeChart({
   properties,
 }: SalesOverTimeChartProps = {}) {
-  const isAreaChart =
-    properties?.chartType?.includes("area") || properties?.chartType === "area";
+  const chartType = properties?.chartType || "area";
+  const isAreaChart = chartType.includes("area") || chartType === "area";
+  const isStacked =
+    chartType.includes("stacked") || chartType.includes("Stacked");
+  const isPercentage =
+    chartType.includes("percentage") || chartType.includes("Percentage");
+  const isStream = chartType.includes("stream") || chartType.includes("Stream");
+
+  // Multi-series data for stacked/percentage/stream charts
+  const stackedData = [
+    { period: "Week 1", mobile: 8, desktop: 12, tablet: 5 },
+    { period: "Week 2", mobile: 15, desktop: 20, tablet: 8 },
+    { period: "Week 3", mobile: 12, desktop: 15, tablet: 6 },
+    { period: "Week 4", mobile: 18, desktop: 22, tablet: 10 },
+    { period: "Week 5", mobile: 14, desktop: 16, tablet: 7 },
+    { period: "Week 6", mobile: 20, desktop: 25, tablet: 12 },
+  ];
+
+  // Ensure data is always available and properly formatted
+  const chartData = isStacked || isPercentage || isStream ? stackedData : data;
 
   return (
     <div className="h-40">
@@ -125,29 +143,82 @@ export default function SalesOverTimeChart({
                 }}
               />
             )}
-            <Area
-              type={properties?.smoothCurves ? "monotone" : "linear"}
-              dataKey="value"
-              name="Sales"
-              stroke={properties?.color || "hsl(199, 89%, 48%)"}
-              fill={properties?.color || "hsl(199, 89%, 48%)"}
-              fillOpacity={0.3}
-              strokeWidth={2}
-              dot={
-                properties?.showDataPoints !== false
-                  ? {
-                      fill: properties?.color || "hsl(199, 89%, 48%)",
-                      strokeWidth: 2,
-                      r: 3,
-                    }
-                  : false
-              }
-              activeDot={{
-                r: 5,
-                stroke: properties?.color || "hsl(199, 89%, 48%)",
-                strokeWidth: 2,
-              }}
-            />
+            {isStacked || isPercentage || isStream ? (
+              <>
+                <Area
+                  type={properties?.smoothCurves ? "monotone" : "linear"}
+                  dataKey="mobile"
+                  stackId={
+                    isPercentage
+                      ? "percent"
+                      : isStacked || isStream
+                        ? "1"
+                        : undefined
+                  }
+                  name="Mobile"
+                  stroke="hsl(199, 89%, 48%)"
+                  fill="hsl(199, 89%, 48%)"
+                  fillOpacity={0.8}
+                  strokeWidth={2}
+                />
+                <Area
+                  type={properties?.smoothCurves ? "monotone" : "linear"}
+                  dataKey="desktop"
+                  stackId={
+                    isPercentage
+                      ? "percent"
+                      : isStacked || isStream
+                        ? "1"
+                        : undefined
+                  }
+                  name="Desktop"
+                  stroke="hsl(142, 76%, 36%)"
+                  fill="hsl(142, 76%, 36%)"
+                  fillOpacity={0.8}
+                  strokeWidth={2}
+                />
+                <Area
+                  type={properties?.smoothCurves ? "monotone" : "linear"}
+                  dataKey="tablet"
+                  stackId={
+                    isPercentage
+                      ? "percent"
+                      : isStacked || isStream
+                        ? "1"
+                        : undefined
+                  }
+                  name="Tablet"
+                  stroke="hsl(271, 81%, 56%)"
+                  fill="hsl(271, 81%, 56%)"
+                  fillOpacity={0.8}
+                  strokeWidth={2}
+                />
+              </>
+            ) : (
+              <Area
+                type={properties?.smoothCurves ? "monotone" : "linear"}
+                dataKey="value"
+                name="Sales"
+                stroke={properties?.color || "hsl(199, 89%, 48%)"}
+                fill={properties?.color || "hsl(199, 89%, 48%)"}
+                fillOpacity={0.3}
+                strokeWidth={2}
+                dot={
+                  properties?.showDataPoints !== false
+                    ? {
+                        fill: properties?.color || "hsl(199, 89%, 48%)",
+                        strokeWidth: 2,
+                        r: 3,
+                      }
+                    : false
+                }
+                activeDot={{
+                  r: 5,
+                  stroke: properties?.color || "hsl(199, 89%, 48%)",
+                  strokeWidth: 2,
+                }}
+              />
+            )}
           </AreaChart>
         ) : (
           <LineChart
