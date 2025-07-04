@@ -329,12 +329,6 @@ export default function ChartWidget({
                   width: newWidth,
                   height: newHeight,
                 });
-
-                // Also notify resize callback for immediate chart updates
-                onResize?.({
-                  width: newWidth,
-                  height: newHeight,
-                });
               };
 
               const handleMouseUp = () => {
@@ -371,12 +365,6 @@ export default function ChartWidget({
                   ...position,
                   width: newWidth,
                 });
-
-                // Also notify resize callback for immediate chart updates
-                onResize?.({
-                  width: newWidth,
-                  height: position.height,
-                });
               };
 
               const handleMouseUp = () => {
@@ -411,12 +399,6 @@ export default function ChartWidget({
 
                 onPositionChange({
                   ...position,
-                  height: newHeight,
-                });
-
-                // Also notify resize callback for immediate chart updates
-                onResize?.({
-                  width: position.width,
                   height: newHeight,
                 });
               };
