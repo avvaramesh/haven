@@ -48,7 +48,9 @@ export default function DynamicChart({
     case "pie-donut":
     case "pie-semi-circle":
     case "pie-nested-donut":
-      return <SalesDistributionChart properties={properties} />;
+      return (
+        <SalesDistributionChart properties={{ ...properties, chartType }} />
+      );
 
     case "area":
     case "sales-over-time":
@@ -111,7 +113,9 @@ export default function DynamicChart({
     case "Donut":
     case "Semi-circle":
     case "Nested Donut":
-      return <SalesDistributionChart properties={properties} />;
+      return (
+        <SalesDistributionChart properties={{ ...properties, chartType }} />
+      );
 
     case "area-filled":
     case "area-stacked":

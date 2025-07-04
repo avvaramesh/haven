@@ -97,6 +97,7 @@ const renderCustomLabel = ({
 
 interface SalesDistributionChartProps {
   properties?: {
+    chartType?: string;
     color?: string;
     showLegend?: boolean;
   };
@@ -107,6 +108,27 @@ export default function SalesDistributionChart({
 }: SalesDistributionChartProps = {}) {
   const colors = getColors(properties?.color);
 
+  // Determine chart variant from chartType
+  const chartType = properties?.chartType || "pie";
+  const isDonut = chartType.includes("donut") || chartType.includes("Donut");
+  const isSemiCircle =
+    chartType.includes("semi-circle") || chartType.includes("Semi-circle");
+  const isNested = chartType.includes("nested") || chartType.includes("Nested");
+
+  // Calculate inner radius based on variant
+  let innerRadius = 0;
+  let startAngle = 0;
+  let endAngle = 360;
+
+  if (isDonut || isNested) {
+    innerRadius = 25;
+  }
+  if (isSemiCircle) {
+    startAngle = 180;
+    endAngle = 0;
+    innerRadius = isDonut ? 25 : 0;
+  }
+
   return (
     <div className="h-32 flex items-center justify-center">
       <ResponsiveContainer width="100%" height="100%">
@@ -116,9 +138,11 @@ export default function SalesDistributionChart({
             cx="50%"
             cy="50%"
             labelLine={false}
-            label={renderCustomLabel}
+            label={isSemiCircle ? undefined : renderCustomLabel}
             outerRadius={50}
-            innerRadius={0}
+            innerRadius={innerRadius}
+            startAngle={startAngle}
+            endAngle={endAngle}
             dataKey="value"
           >
             {data.map((entry, index) => (
