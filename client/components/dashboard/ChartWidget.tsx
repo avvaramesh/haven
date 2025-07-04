@@ -12,6 +12,7 @@ import {
   Shrink,
   Eye,
   EyeOff,
+  GripVertical,
 } from "lucide-react";
 import {
   DropdownMenu,
