@@ -59,15 +59,6 @@ export default function EditingToolbar({
   showGrid = true,
   onToggleGrid,
 }: EditingToolbarProps) {
-  const [selectedTool, setSelectedTool] = useState("select");
-
-  const tools = [
-    { id: "select", icon: MousePointer2, label: "Select" },
-    { id: "bar-chart", icon: BarChart3, label: "Bar Chart" },
-    { id: "line-chart", icon: LineChart, label: "Line Chart" },
-    { id: "pie-chart", icon: PieChart, label: "Pie Chart" },
-  ];
-
   return (
     <div className="bg-dashboard-background border-b border-dashboard-border px-4 py-2">
       <div className="flex items-center justify-between">
@@ -104,26 +95,6 @@ export default function EditingToolbar({
             <Save className="w-4 h-4 mr-2" />
             Save
           </Button>
-        </div>
-
-        {/* Center: Tools */}
-        <div className="flex items-center gap-1 bg-dashboard-surface border border-dashboard-border rounded-lg p-1">
-          {tools.map((tool) => (
-            <Button
-              key={tool.id}
-              variant={selectedTool === tool.id ? "default" : "ghost"}
-              size="sm"
-              onClick={() => setSelectedTool(tool.id)}
-              className={
-                selectedTool === tool.id
-                  ? "bg-dashboard-accent text-white"
-                  : "text-dashboard-text hover:bg-dashboard-muted"
-              }
-              title={tool.label}
-            >
-              <tool.icon className="w-4 h-4" />
-            </Button>
-          ))}
         </div>
 
         {/* Right: View Controls */}
