@@ -218,16 +218,29 @@ export default function ChartWidget({
 
       {/* Chart Header */}
       <div
-        className={`flex items-center justify-between p-4 cursor-move ${isMinimized ? "pb-0" : "pb-2"}`}
+        className={`flex items-center justify-between p-4 ${isSelected ? "cursor-move" : "cursor-pointer"} ${isMinimized ? "pb-0" : "pb-2"}`}
         onClick={onSelect}
         onMouseEnter={() => setShowToolbar(true)}
         onMouseLeave={() => setShowToolbar(false)}
-        draggable={true}
+        draggable={isSelected}
         onDragStart={(e) => {
+          if (!isSelected) {
+            e.preventDefault();
+            return;
+          }
+          setIsDragging(true);
+          const rect = widgetRef.current?.getBoundingClientRect();
+          if (rect) {
+            setDragStart({
+              x: e.clientX - rect.left,
+              y: e.clientY - rect.top,
+            });
+          }
           e.dataTransfer.setData("text/plain", id);
           e.dataTransfer.effectAllowed = "move";
         }}
-        title="Click to select • Drag to move"
+        onDragEnd={() => setIsDragging(false)}
+        title={isSelected ? "Drag to move" : "Click to select"}
       >
         <div className="flex items-center gap-2 flex-1">
           <GripVertical className="w-4 h-4 text-dashboard-text-muted opacity-50 group-hover:opacity-100 transition-opacity" />
