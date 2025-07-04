@@ -70,8 +70,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       ...action,
       timestamp: Date.now(),
     };
+    console.log("Adding to history:", historyAction);
 
-    setUndoStack((prev) => [...prev, historyAction]);
+    setUndoStack((prev) => {
+      const newStack = [...prev, historyAction];
+      console.log("New undo stack length:", newStack.length);
+      return newStack;
+    });
     setRedoStack([]); // Clear redo stack when new action is performed
   };
 
