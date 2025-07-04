@@ -1,8 +1,17 @@
 import React, { ReactNode, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Brain, Sparkles, Database, BarChart3 } from "lucide-react";
+import {
+  Brain,
+  Sparkles,
+  Database,
+  BarChart3,
+  ChevronLeft,
+  ChevronRight,
+  Bot,
+} from "lucide-react";
 import DataConnectionsPanel from "./DataConnectionsPanel";
 import ChartTemplatesPanel from "./ChartTemplatesPanel";
+import AICopilot from "./AICopilot";
 import EditingToolbar from "./EditingToolbar";
 import PropertiesPanel from "./PropertiesPanel";
 import CanvasArea from "./CanvasArea";
