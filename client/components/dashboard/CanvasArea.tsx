@@ -478,10 +478,31 @@ export default function CanvasArea({
       setTimeout(() => {
         const chartElement = document.getElementById(`chart-${chartId}`);
         if (chartElement) {
-          // Trigger a resize event to make ResponsiveContainer re-calculate
+          // Trigger multiple resize events to ensure ResponsiveContainer updates
           window.dispatchEvent(new Event("resize"));
+
+          // Force a re-render by temporarily hiding and showing the chart
+          const chartContent = chartElement.querySelector(
+            ".recharts-wrapper, .recharts-responsive-container",
+          );
+          if (chartContent) {
+            const originalDisplay = (chartContent as HTMLElement).style.display;
+            (chartContent as HTMLElement).style.display = "none";
+            requestAnimationFrame(() => {
+              (chartContent as HTMLElement).style.display = originalDisplay;
+              // Trigger another resize after the display change
+              setTimeout(() => {
+                window.dispatchEvent(new Event("resize"));
+              }, 10);
+            });
+          }
         }
       }, 50);
+
+      // Additional resize event after a longer delay to ensure proper recalculation
+      setTimeout(() => {
+        window.dispatchEvent(new Event("resize"));
+      }, 200);
     }
   };
 
