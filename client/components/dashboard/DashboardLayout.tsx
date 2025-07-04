@@ -189,6 +189,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               <div className="flex-1">
                 {leftPanelTab === "data" && <DataConnectionsPanel />}
                 {leftPanelTab === "templates" && <ChartTemplatesPanel />}
+                {leftPanelTab === "properties" && (
+                  <div className="w-80 h-full">
+                    <PropertiesPanel
+                      selectedElement={selectedElement}
+                      isCollapsed={false}
+                      onToggleCollapse={() => {}}
+                    />
+                  </div>
+                )}
                 {leftPanelTab === "copilot" && (
                   <div className="w-80 h-full">
                     <AICopilotIntegrated />
