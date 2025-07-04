@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, X, Edit, ChevronUp, ChevronDown } from "lucide-react";
+import { Plus, X, Edit, ChevronUp, ChevronDown, Download } from "lucide-react";
 
 interface TableColumn {
   id: string;
@@ -156,24 +156,66 @@ export default function TableChart({ properties }: TableChartProps = {}) {
     console.log("Sort by:", columnId, newDirection);
   };
 
+  const handleExportCSV = () => {
+    const csvContent = [
+      columns.map((col) => col.name).join(","),
+      ...sortedData.map((row) =>
+        columns
+          .map((col) => {
+            const value = row[col.id];
+            // Escape commas and quotes in CSV
+            if (
+              typeof value === "string" &&
+              (value.includes(",") || value.includes('"'))
+            ) {
+              return `"${value.replace(/"/g, '""')}"`;
+            }
+            return value;
+          })
+          .join(","),
+      ),
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `table-data-${new Date().toISOString().split("T")[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="p-4 space-y-4">
       {/* Table Controls */}
-      {properties?.editable && (
-        <div className="flex items-center gap-2 pb-2 border-b border-dashboard-border">
-          <Input
-            placeholder="Column name"
-            value={newColumnName}
-            onChange={(e) => setNewColumnName(e.target.value)}
-            className="w-32"
-            onKeyPress={(e) => e.key === "Enter" && handleAddColumn()}
-          />
-          <Button size="sm" onClick={handleAddColumn} className="text-xs">
-            <Plus className="w-3 h-3 mr-1" />
-            Add Column
-          </Button>
-        </div>
-      )}
+      <div className="flex items-center justify-between pb-2 border-b border-dashboard-border">
+        {properties?.editable && (
+          <div className="flex items-center gap-2">
+            <Input
+              placeholder="Column name"
+              value={newColumnName}
+              onChange={(e) => setNewColumnName(e.target.value)}
+              className="w-32"
+              onKeyPress={(e) => e.key === "Enter" && handleAddColumn()}
+            />
+            <Button size="sm" onClick={handleAddColumn} className="text-xs">
+              <Plus className="w-3 h-3 mr-1" />
+              Add Column
+            </Button>
+          </div>
+        )}
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={handleExportCSV}
+          className="text-xs"
+        >
+          <Download className="w-3 h-3 mr-1" />
+          Export CSV
+        </Button>
+      </div>
 
       {/* Table */}
       <div className="overflow-auto max-h-64">
