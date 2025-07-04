@@ -223,18 +223,31 @@ export default function ChartWidget({
         onMouseEnter={() => setShowToolbar(true)}
         onMouseLeave={() => setShowToolbar(false)}
         onMouseDown={(e) => {
-          if (!isSelected) return;
+          if (!isSelected || !position) return;
 
           setIsDragging(true);
+
+          // Get the canvas container for proper coordinate calculation
+          const canvasContainer = document.querySelector(
+            ".relative.p-6.min-h-full",
+          ) as HTMLElement;
+          if (!canvasContainer) return;
+
+          const canvasRect = canvasContainer.getBoundingClientRect();
           const rect = widgetRef.current?.getBoundingClientRect();
-          const startX = e.clientX - rect.left;
-          const startY = e.clientY - rect.top;
+
+          if (!rect) return;
+
+          // Calculate offset from mouse position to element's current position
+          const offsetX = e.clientX - rect.left;
+          const offsetY = e.clientY - rect.top;
 
           const handleMouseMove = (moveEvent: MouseEvent) => {
-            if (!position || !onPositionChange) return;
+            if (!onPositionChange) return;
 
-            const newX = moveEvent.clientX - startX;
-            const newY = moveEvent.clientY - startY;
+            // Calculate new position relative to canvas, accounting for padding
+            const newX = moveEvent.clientX - canvasRect.left - 24 - offsetX; // 24px is p-6 padding
+            const newY = moveEvent.clientY - canvasRect.top - 24 - offsetY;
 
             onPositionChange({
               ...position,
