@@ -63,6 +63,40 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     setLeftPanelTab(tab);
     setIsLeftPanelCollapsed(false);
   };
+
+  // Global undo/redo functions
+  const addToHistory = (action: Omit<HistoryAction, "timestamp">) => {
+    const historyAction: HistoryAction = {
+      ...action,
+      timestamp: Date.now(),
+    };
+
+    setUndoStack((prev) => [...prev, historyAction]);
+    setRedoStack([]); // Clear redo stack when new action is performed
+  };
+
+  const handleGlobalUndo = () => {
+    if (undoStack.length === 0) return null;
+
+    const lastAction = undoStack[undoStack.length - 1];
+    setUndoStack((prev) => prev.slice(0, -1));
+    setRedoStack((prev) => [lastAction, ...prev]);
+
+    return lastAction;
+  };
+
+  const handleGlobalRedo = () => {
+    if (redoStack.length === 0) return null;
+
+    const actionToRedo = redoStack[0];
+    setRedoStack((prev) => prev.slice(1));
+    setUndoStack((prev) => [...prev, actionToRedo]);
+
+    return actionToRedo;
+  };
+
+  const canUndo = undoStack.length > 0;
+  const canRedo = redoStack.length > 0;
   return (
     <div className="h-screen flex flex-col bg-dashboard-background">
       {/* Top Header */}
