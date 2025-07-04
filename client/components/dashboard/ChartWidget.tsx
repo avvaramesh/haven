@@ -73,6 +73,10 @@ export default function ChartWidget({
   onResize,
 }: ChartWidgetProps) {
   const [showToolbar, setShowToolbar] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const widgetRef = React.useRef<HTMLDivElement>(null);
 
   if (isHidden) {
     return null;
