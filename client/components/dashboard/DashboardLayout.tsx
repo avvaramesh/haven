@@ -343,7 +343,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   <div
                     className={`${isMobile ? "w-screen max-w-sm" : "w-80"} h-full`}
                   >
-                    <AICopilotIntegrated />
+                    <AIAssistantUnified />
                   </div>
                 )}
               </div>
