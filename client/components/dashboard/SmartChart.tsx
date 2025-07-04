@@ -39,7 +39,19 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-export default function SmartChart() {
+interface SmartChartProps {
+  properties?: {
+    color?: string;
+    showGrid?: boolean;
+    showLegend?: boolean;
+    xAxisLabel?: string;
+    yAxisLabel?: string;
+    showXAxis?: boolean;
+    showYAxis?: boolean;
+  };
+}
+
+export default function SmartChart({ properties }: SmartChartProps = {}) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
