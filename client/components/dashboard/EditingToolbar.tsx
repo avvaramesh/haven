@@ -26,7 +26,19 @@ import {
   Maximize,
 } from "lucide-react";
 
-export default function EditingToolbar() {
+interface EditingToolbarProps {
+  onUndo?: () => any;
+  onRedo?: () => any;
+  canUndo?: boolean;
+  canRedo?: boolean;
+}
+
+export default function EditingToolbar({
+  onUndo,
+  onRedo,
+  canUndo = false,
+  canRedo = false,
+}: EditingToolbarProps) {
   const [selectedTool, setSelectedTool] = useState("select");
   const [showGrid, setShowGrid] = useState(true);
 
@@ -49,14 +61,20 @@ export default function EditingToolbar() {
           <Button
             variant="ghost"
             size="sm"
-            className="text-dashboard-text hover:bg-dashboard-muted"
+            onClick={onUndo}
+            disabled={!canUndo}
+            className={`text-dashboard-text hover:bg-dashboard-muted ${!canUndo ? "opacity-50 cursor-not-allowed" : ""}`}
+            title="Undo (Ctrl+Z)"
           >
             <Undo className="w-4 h-4" />
           </Button>
           <Button
             variant="ghost"
             size="sm"
-            className="text-dashboard-text hover:bg-dashboard-muted"
+            onClick={onRedo}
+            disabled={!canRedo}
+            className={`text-dashboard-text hover:bg-dashboard-muted ${!canRedo ? "opacity-50 cursor-not-allowed" : ""}`}
+            title="Redo (Ctrl+Y)"
           >
             <Redo className="w-4 h-4" />
           </Button>
