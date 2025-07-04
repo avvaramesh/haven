@@ -534,36 +534,40 @@ export default function CanvasArea({
             )}
 
           {/* Additional KPI Cards */}
-          {chartStates["kpi-1"] && !chartStates["kpi-1"].isHidden && (
-            <div
-              className={`col-span-3 row-span-1 relative group ${chartStates["kpi-1"].isMinimized ? "col-span-2" : ""}`}
-            >
-              <ChartWidget
-                id="kpi-1"
-                title="Monthly Growth"
-                className="h-24"
-                isSelected={selectedElement === "kpi-1"}
-                isMinimized={chartStates["kpi-1"].isMinimized}
-                isMaximized={chartStates["kpi-1"].isMaximized}
-                isHidden={chartStates["kpi-1"].isHidden}
-                onSelect={() => handleElementClick("kpi-1")}
-                onMinimize={() => handleMinimize("kpi-1")}
-                onMaximize={() => handleMaximize("kpi-1")}
-                onHide={() => handleHide("kpi-1")}
-                onRemove={() => handleRemove("kpi-1")}
-                onDownload={() => handleDownload("kpi-1")}
-                onDuplicate={() => handleDuplicate("kpi-1")}
-                onEdit={() => handleEdit("kpi-1")}
+          {chartStates["kpi-1"] &&
+            !chartStates["kpi-1"].isHidden &&
+            !maximizedChart && (
+              <div
+                className={`col-span-6 md:col-span-3 relative group transition-all duration-300`}
               >
-                <div className="flex flex-col justify-center items-center h-full">
-                  <div className="text-lg font-bold text-green-400">+12.5%</div>
-                  <div className="text-xs text-dashboard-text-muted">
-                    vs last month
+                <ChartWidget
+                  id="kpi-1"
+                  title="Monthly Growth"
+                  className={chartStates["kpi-1"].isMinimized ? "h-20" : "h-28"}
+                  isSelected={selectedElement === "kpi-1"}
+                  isMinimized={chartStates["kpi-1"].isMinimized}
+                  isMaximized={chartStates["kpi-1"].isMaximized}
+                  isHidden={chartStates["kpi-1"].isHidden}
+                  onSelect={() => handleElementClick("kpi-1")}
+                  onMinimize={() => handleMinimize("kpi-1")}
+                  onMaximize={() => handleMaximize("kpi-1")}
+                  onHide={() => handleHide("kpi-1")}
+                  onRemove={() => handleRemove("kpi-1")}
+                  onDownload={() => handleDownload("kpi-1")}
+                  onDuplicate={() => handleDuplicate("kpi-1")}
+                  onEdit={() => handleEdit("kpi-1")}
+                >
+                  <div className="flex flex-col justify-center items-center h-full">
+                    <div className="text-lg font-bold text-green-400">
+                      +12.5%
+                    </div>
+                    <div className="text-xs text-dashboard-text-muted">
+                      vs last month
+                    </div>
                   </div>
-                </div>
-              </ChartWidget>
-            </div>
-          )}
+                </ChartWidget>
+              </div>
+            )}
 
           {chartStates["kpi-2"] && !chartStates["kpi-2"].isHidden && (
             <div
