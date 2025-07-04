@@ -81,6 +81,11 @@ export default function PropertiesPanelIntegrated({
         if (onPropertyChange && typeof onPropertyChange === "function") {
           onPropertyChange(selectedElement, key, value);
         }
+
+        // Also update canvas directly for immediate visual updates
+        if ((window as any).updateCanvasProperty) {
+          (window as any).updateCanvasProperty(selectedElement, key, value);
+        }
       }
     }
   };
