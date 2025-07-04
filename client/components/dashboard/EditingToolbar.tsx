@@ -104,16 +104,6 @@ export default function EditingToolbar({
             <Save className="w-4 h-4 mr-2" />
             Save
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onExport}
-            className="text-dashboard-text hover:bg-dashboard-muted"
-            title="Export Dashboard"
-          >
-            <Download className="w-4 h-4 mr-2" />
-            Export
-          </Button>
         </div>
 
         {/* Center: Tools */}
