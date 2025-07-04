@@ -46,6 +46,7 @@ interface CanvasAreaProps {
   redoRef?: React.MutableRefObject<
     ((action: HistoryAction) => void) | undefined
   >;
+  onPropertyChange?: (chartId: string, property: string, value: any) => void;
 }
 
 export default function CanvasArea({
