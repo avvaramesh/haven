@@ -32,7 +32,7 @@ const chartTypeIcons = {
   line: LineChart,
   bar: BarChart3,
   pie: PieChart,
-  scatter: Scatter,
+  scatter: Zap,
   metric: Target,
   table: Table,
 };
