@@ -957,7 +957,9 @@ export default function CanvasArea({
       {showCanvasInfo && (
         <div className="absolute bottom-4 left-4 bg-dashboard-surface border border-dashboard-border rounded-lg overflow-hidden">
           <div className="flex items-center justify-between px-2 py-1 border-b border-dashboard-border bg-dashboard-muted/30">
-            <span className="text-xs font-medium text-dashboard-text">Canvas Info</span>
+            <span className="text-xs font-medium text-dashboard-text">
+              Canvas Info
+            </span>
             <Button
               variant="ghost"
               size="sm"
@@ -969,36 +971,36 @@ export default function CanvasArea({
             </Button>
           </div>
           <div className="p-2 text-xs text-dashboard-text-muted">
-        <div className="flex items-center gap-4">
-          <span>
-            Canvas: {canvasSize.width}×{canvasSize.height}
-          </span>
-          <span>•</span>
-          <span>Grid: {gridSize}px</span>
-          <span>���</span>
-          <span>Zoom: {zoomLevel}%</span>
-          <span>•</span>
-          <span>{visibleCharts.length} charts visible</span>
-          {minimizedCharts.length > 0 && (
-            <>
-              <span>•</span>
-              <span>{minimizedCharts.length} minimized</span>
-            </>
-          )}
-          {maximizedChart && (
-            <>
-              <span>•</span>
-              <span className="text-dashboard-accent">1 maximized</span>
-            </>
-          )}
-          {selectedElement && (
-            <>
-              <span>���</span>
-              <span className="text-dashboard-accent">
-                Selected: {selectedElement}
+            <div className="flex items-center gap-4">
+              <span>
+                Canvas: {canvasSize.width}×{canvasSize.height}
               </span>
-            </>
-          )}
+              <span>•</span>
+              <span>Grid: {gridSize}px</span>
+              <span>���</span>
+              <span>Zoom: {zoomLevel}%</span>
+              <span>•</span>
+              <span>{visibleCharts.length} charts visible</span>
+              {minimizedCharts.length > 0 && (
+                <>
+                  <span>•</span>
+                  <span>{minimizedCharts.length} minimized</span>
+                </>
+              )}
+              {maximizedChart && (
+                <>
+                  <span>•</span>
+                  <span className="text-dashboard-accent">1 maximized</span>
+                </>
+              )}
+              {selectedElement && (
+                <>
+                  <span>���</span>
+                  <span className="text-dashboard-accent">
+                    Selected: {selectedElement}
+                  </span>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -1013,12 +1015,6 @@ export default function CanvasArea({
           className="absolute bottom-4 left-4 h-8 px-3 bg-dashboard-surface border border-dashboard-border text-xs text-dashboard-text-muted hover:text-dashboard-text"
           title="Show Canvas Info"
         >
-          Canvas Info
-        </Button>
-      )}
-    </div>
-  );
-}
           Canvas Info
         </Button>
       )}
