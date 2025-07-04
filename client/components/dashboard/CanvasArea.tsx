@@ -135,6 +135,66 @@ export default function CanvasArea({
 
   const { toast } = useToast();
 
+  // Helper function to get chart data
+  const getChartData = (chartId: string) => {
+    // This should be replaced with actual data retrieval from chart components
+    const sampleDataSets: Record<string, any[]> = {
+      "smart-chart": [
+        { month: "Jan", value: 20, sales: "$20k" },
+        { month: "Feb", value: 35, sales: "$35k" },
+        { month: "Mar", value: 25, sales: "$25k" },
+        { month: "Apr", value: 40, sales: "$40k" },
+        { month: "May", value: 30, sales: "$30k" },
+        { month: "Jun", value: 45, sales: "$45k" },
+      ],
+      "revenue-chart": [
+        { category: "Electronics", value: 30, revenue: "$30k" },
+        { category: "Clothing", value: 45, revenue: "$45k" },
+        { category: "Home", value: 55, revenue: "$55k" },
+        { category: "Sports", value: 60, revenue: "$60k" },
+        { category: "Books", value: 70, revenue: "$70k" },
+      ],
+      "sales-dist": [
+        { name: "Online", value: 40, percentage: "40%", sales: "$40k" },
+        { name: "In-Store", value: 30, percentage: "30%", sales: "$30k" },
+        { name: "Mobile", value: 20, percentage: "20%", sales: "$20k" },
+        { name: "Other", value: 10, percentage: "10%", sales: "$10k" },
+      ],
+      "kpi-widget": [
+        { metric: "Total Revenue", value: "$142,583", trend: "+12.5%" },
+      ],
+    };
+
+    return sampleDataSets[chartId] || [];
+  };
+
+  // Helper function to generate CSV
+  const generateCSV = (data: any[]) => {
+    if (!data || data.length === 0) return "";
+
+    const headers = Object.keys(data[0]);
+    const csvContent = [
+      headers.join(","),
+      ...data.map((row) =>
+        headers
+          .map((header) => {
+            const value = row[header];
+            // Escape commas and quotes in CSV
+            if (
+              typeof value === "string" &&
+              (value.includes(",") || value.includes('"'))
+            ) {
+              return `"${value.replace(/"/g, '""')}"`;
+            }
+            return value;
+          })
+          .join(","),
+      ),
+    ].join("\n");
+
+    return csvContent;
+  };
+
   const getChartTitle = (chartId: string): string => {
     const titles: Record<string, string> = {
       "smart-chart": "Smart Analytics Chart",
@@ -384,19 +444,37 @@ export default function CanvasArea({
             return;
           }
 
-          const url = URL.createObjectURL(blob);
-          const link = document.createElement("a");
-          link.href = url;
-          link.download = `${chartId}-${new Date().toISOString().split("T")[0]}.png`;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          URL.revokeObjectURL(url);
+          const timestamp = new Date().toISOString().split("T")[0];
+
+          // Download chart image
+          const imageUrl = URL.createObjectURL(blob);
+          const imageLink = document.createElement("a");
+          imageLink.href = imageUrl;
+          imageLink.download = `${chartId}-chart-${timestamp}.png`;
+          document.body.appendChild(imageLink);
+          imageLink.click();
+          document.body.removeChild(imageLink);
+          URL.revokeObjectURL(imageUrl);
+
+          // Also download chart data as CSV
+          const chartData = getChartData(chartId);
+          if (chartData && chartData.length > 0) {
+            const csvContent = generateCSV(chartData);
+            const csvBlob = new Blob([csvContent], { type: "text/csv" });
+            const csvUrl = URL.createObjectURL(csvBlob);
+            const csvLink = document.createElement("a");
+            csvLink.href = csvUrl;
+            csvLink.download = `${chartId}-data-${timestamp}.csv`;
+            document.body.appendChild(csvLink);
+            csvLink.click();
+            document.body.removeChild(csvLink);
+            URL.revokeObjectURL(csvUrl);
+          }
 
           loadingToast.dismiss();
           toast({
             title: "Download Complete",
-            description: `${getChartTitle(chartId)} has been downloaded as PNG.`,
+            description: `${getChartTitle(chartId)} image and data have been downloaded.`,
             duration: 5000,
           });
         },
