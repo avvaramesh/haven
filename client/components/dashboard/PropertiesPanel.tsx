@@ -103,12 +103,22 @@ export default function PropertiesPanel({
   return (
     <div className="w-80 bg-dashboard-background border-l border-dashboard-border h-full overflow-y-auto">
       <div className="p-4 border-b border-dashboard-border">
-        <div className="flex items-center gap-2">
-          <Settings className="w-5 h-5 text-dashboard-accent" />
-          <h3 className="font-semibold text-dashboard-text">Properties</h3>
-          <Badge className="bg-dashboard-accent/20 text-dashboard-accent text-xs">
-            {selectedElement}
-          </Badge>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Settings className="w-5 h-5 text-dashboard-accent" />
+            <h3 className="font-semibold text-dashboard-text">Properties</h3>
+            <Badge className="bg-dashboard-accent/20 text-dashboard-accent text-xs">
+              {selectedElement}
+            </Badge>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onToggleCollapse}
+            className="text-dashboard-text hover:bg-dashboard-muted"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </Button>
         </div>
       </div>
 
