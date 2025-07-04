@@ -38,6 +38,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   >("data");
   const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(100);
+  const [showGrid, setShowGrid] = useState(true);
   const isMobile = useIsMobile();
   const { toast } = useToast();
 
@@ -245,6 +246,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     }
   };
 
+  const handleToggleGrid = () => {
+    setShowGrid((prev) => !prev);
+    // Notify canvas area if available
+    if ((window as any).setCanvasGrid) {
+      (window as any).setCanvasGrid(!showGrid);
+    }
+  };
+
   const handlePropertyChange = (
     elementId: string,
     property: string,
@@ -322,6 +331,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         onPreview={handlePreview}
         onPublish={handlePublish}
         zoomLevel={zoomLevel}
+        showGrid={showGrid}
+        onToggleGrid={handleToggleGrid}
       />
 
       {/* Main Editor Area */}
