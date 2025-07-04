@@ -553,29 +553,13 @@ export default function PropertiesPanelIntegrated({
         {normalizedProperties && (
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              {[
-                "line",
-                "area",
-                "bar",
-                "column",
-                "pie",
-                "donut",
-                "scatter",
-              ].includes(normalizedProperties.type) ? (
+              {["line", "area", "bar", "column", "pie", "donut", "scatter"].includes(normalizedProperties.type) ? (
                 <BarChart3 className="w-4 h-4 text-dashboard-accent" />
               ) : (
                 <Settings className="w-4 h-4 text-dashboard-accent" />
               )}
               <h4 className="font-medium text-dashboard-text">
-                {[
-                  "line",
-                  "area",
-                  "bar",
-                  "column",
-                  "pie",
-                  "donut",
-                  "scatter",
-                ].includes(normalizedProperties.type)
+                {["line", "area", "bar", "column", "pie", "donut", "scatter"].includes(normalizedProperties.type)
                   ? "Chart Options"
                   : "Display Options"}
               </h4>
@@ -583,43 +567,34 @@ export default function PropertiesPanelIntegrated({
 
             <div className="space-y-3">
               {/* Chart Type - only for charts */}
-              {[
-                "line",
-                "area",
-                "bar",
-                "column",
-                "pie",
-                "donut",
-                "scatter",
-              ].includes(normalizedProperties.type) && (
+              {["line", "area", "bar", "column", "pie", "donut", "scatter"].includes(normalizedProperties.type) && (
                 <div className="space-y-2">
                   <Label className="text-xs text-dashboard-text-muted">
                     Chart Type
                   </Label>
                   <Select
                     value={normalizedProperties.type}
-                    onValueChange={(value) => updateProperty("type", value)}
+                    onValueChange={(value) =>
+                      updateProperty("type", value)
+                    }
                   >
                     <SelectTrigger className="bg-dashboard-surface border-dashboard-border text-dashboard-text">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {(normalizedProperties.type === "line" ||
-                        normalizedProperties.type === "area") && (
+                      {(normalizedProperties.type === "line" || normalizedProperties.type === "area") && (
                         <>
                           <SelectItem value="line">Line Chart</SelectItem>
                           <SelectItem value="area">Area Chart</SelectItem>
                         </>
                       )}
-                      {(normalizedProperties.type === "bar" ||
-                        normalizedProperties.type === "column") && (
+                      {(normalizedProperties.type === "bar" || normalizedProperties.type === "column") && (
                         <>
                           <SelectItem value="bar">Bar Chart</SelectItem>
                           <SelectItem value="column">Column Chart</SelectItem>
                         </>
                       )}
-                      {(normalizedProperties.type === "pie" ||
-                        normalizedProperties.type === "donut") && (
+                      {(normalizedProperties.type === "pie" || normalizedProperties.type === "donut") && (
                         <>
                           <SelectItem value="pie">Pie Chart</SelectItem>
                           <SelectItem value="donut">Donut Chart</SelectItem>
@@ -634,13 +609,13 @@ export default function PropertiesPanelIntegrated({
               )}
 
               {/* KPI Value - for KPI elements */}
-              {elementInfo.type.includes("kpi") && properties.value && (
+              {normalizedProperties.type === "metric" && (
                 <div className="space-y-2">
                   <Label className="text-xs text-dashboard-text-muted">
                     Value
                   </Label>
                   <Input
-                    value={properties.value}
+                    value={(normalizedProperties as any).value || ""}
                     onChange={(e) => updateProperty("value", e.target.value)}
                     className="bg-dashboard-surface border-dashboard-border text-dashboard-text"
                   />
@@ -648,90 +623,111 @@ export default function PropertiesPanelIntegrated({
               )}
 
               {/* Common Chart Options */}
-              {elementInfo.type.includes("chart") && (
+              {chartSupportsLegend(normalizedProperties.type) && (
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs text-dashboard-text-muted">
+                    Show Legend
+                  </Label>
+                  <Switch
+                    checked={(normalizedProperties as any).enabled !== false}
+                    onCheckedChange={(checked) =>
+                      updateProperty("enabled", checked)
+                    }
+                  />
+                </div>
+              )}
+
+              {chartSupportsAxes(normalizedProperties.type) && (
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs text-dashboard-text-muted">
+                    Show Grid
+                  </Label>
+                  <Switch
+                    checked={(normalizedProperties as any).xAxis?.showGridLines !== false}
+                    onCheckedChange={(checked) => {
+                      updateProperty("xAxis.showGridLines", checked);
+                      updateProperty("yAxis.showGridLines", checked);
+                    }}
+                  />
+                </div>
+              )}
+
+              {/* Line Chart Specific */}
+              {(normalizedProperties.type === "line" || normalizedProperties.type === "area") && (
                 <>
-                  {properties.showLegend !== undefined && (
-                    <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs text-dashboard-text-muted">
+                      Show Data Points
+                    </Label>
+                    <Switch
+                      checked={(normalizedProperties as any).showDataPoints !== false}
+                      onCheckedChange={(checked) =>
+                        updateProperty("showDataPoints", checked)
+                      }
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs text-dashboard-text-muted">
+                      Smooth Curves
+                    </Label>
+                    <Switch
+                      checked={(normalizedProperties as any).smoothCurve === true}
+                      onCheckedChange={(checked) =>
+                        updateProperty("smoothCurve", checked)
+                      }
+                    />
+                  </div>
+                  {normalizedProperties.type === "area" && (
+                    <div className="space-y-2">
                       <Label className="text-xs text-dashboard-text-muted">
-                        Show Legend
+                        Area Opacity: {Math.round(((normalizedProperties as any).areaOpacity || 0.3) * 100)}%
                       </Label>
-                      <Switch
-                        checked={properties.showLegend}
-                        onCheckedChange={(checked) =>
-                          updateProperty("showLegend", checked)
+                      <Slider
+                        value={[((normalizedProperties as any).areaOpacity || 0.3) * 100]}
+                        onValueChange={(value) =>
+                          updateProperty("areaOpacity", value[0] / 100)
                         }
+                        min={0}
+                        max={100}
+                        step={5}
+                        className="w-full"
                       />
                     </div>
                   )}
+                </>
+              )}
 
-                  {properties.showGrid !== undefined && (
-                    <div className="flex items-center justify-between">
-                      <Label className="text-xs text-dashboard-text-muted">
-                        Show Grid
-                      </Label>
-                      <Switch
-                        checked={properties.showGrid}
-                        onCheckedChange={(checked) =>
-                          updateProperty("showGrid", checked)
-                        }
-                      />
-                    </div>
-                  )}
-
-                  {/* Line Chart Specific */}
-                  {elementInfo.type === "line-chart" && (
-                    <>
-                      {properties.showDataPoints !== undefined && (
-                        <div className="flex items-center justify-between">
-                          <Label className="text-xs text-dashboard-text-muted">
-                            Show Data Points
-                          </Label>
-                          <Switch
-                            checked={properties.showDataPoints}
-                            onCheckedChange={(checked) =>
-                              updateProperty("showDataPoints", checked)
-                            }
-                          />
-                        </div>
-                      )}
-                      {properties.smoothCurves !== undefined && (
-                        <div className="flex items-center justify-between">
-                          <Label className="text-xs text-dashboard-text-muted">
-                            Smooth Curves
-                          </Label>
-                          <Switch
-                            checked={properties.smoothCurves}
-                            onCheckedChange={(checked) =>
-                              updateProperty("smoothCurves", checked)
-                            }
-                          />
-                        </div>
-                      )}
-                    </>
-                  )}
-
-                  {/* Bar Chart Specific */}
-                  {elementInfo.type === "bar-chart" &&
-                    properties.barSpacing !== undefined && (
-                      <div className="space-y-2">
-                        <Label className="text-xs text-dashboard-text-muted">
-                          Bar Spacing
-                        </Label>
-                        <Slider
-                          value={[(properties.barSpacing || 0.1) * 100]}
-                          onValueChange={(value) =>
-                            updateProperty("barSpacing", value[0] / 100)
-                          }
-                          min={0}
-                          max={100}
-                          step={5}
-                          className="w-full"
-                        />
-                        <span className="text-xs text-dashboard-text-muted">
-                          {Math.round((properties.barSpacing || 0.1) * 100)}%
-                        </span>
-                      </div>
-                    )}
+              {/* Bar Chart Specific */}
+              {(normalizedProperties.type === "bar" || normalizedProperties.type === "column") && (
+                <>
+                  <div className="space-y-2">
+                    <Label className="text-xs text-dashboard-text-muted">
+                      Bar Spacing: {Math.round(((normalizedProperties as any).barSpacing || 0.1) * 100)}%
+                    </Label>
+                    <Slider
+                      value={[((normalizedProperties as any).barSpacing || 0.1) * 100]}
+                      onValueChange={(value) =>
+                        updateProperty("barSpacing", value[0] / 100)
+                      }
+                      min={0}
+                      max={100}
+                      step={5}
+                      className="w-full"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs text-dashboard-text-muted">
+                      Show Data Labels
+                    </Label>
+                    <Switch
+                      checked={(normalizedProperties as any).showDataLabels === true}
+                      onCheckedChange={(checked) =>
+                        updateProperty("showDataLabels", checked)
+                      }
+                    />
+                  </div>
+                </>
+              )}
 
                   {/* Table Chart Specific */}
                   {elementInfo.type === "table" && (
