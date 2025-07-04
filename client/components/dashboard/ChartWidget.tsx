@@ -138,7 +138,13 @@ export default function ChartWidget({
         <Button
           variant="secondary"
           size="sm"
-          onClick={onMaximize}
+          onClick={(e) => {
+            e.stopPropagation();
+            console.log(
+              `Maximize button clicked for chart ${id}, currently maximized: ${isMaximized}`,
+            );
+            onMaximize?.();
+          }}
           className="h-6 w-6 p-0 bg-dashboard-surface border border-dashboard-border hover:bg-dashboard-muted"
           title={isMaximized ? "Restore" : "Maximize"}
         >
