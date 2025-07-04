@@ -1,62 +1,55 @@
-import { DemoResponse } from "@shared/api";
-import { useEffect, useState } from "react";
+import DashboardLayout from "@/components/dashboard/DashboardLayout";
+import ChartWidget from "@/components/dashboard/ChartWidget";
+import SalesOverTimeChart from "@/components/dashboard/SalesOverTimeChart";
+import RevenueByCategoryChart from "@/components/dashboard/RevenueByCategoryChart";
+import OrderDataTable from "@/components/dashboard/OrderDataTable";
+import KPIWidget from "@/components/dashboard/KPIWidget";
+import SalesDistributionChart from "@/components/dashboard/SalesDistributionChart";
+import ProfitMarginChart from "@/components/dashboard/ProfitMarginChart";
 
 export default function Index() {
-  const [exampleFromServer, setExampleFromServer] = useState("");
-  // Fetch users on component mount
-  useEffect(() => {
-    fetchDemo();
-  }, []);
-
-  // Example of how to fetch data from the server (if needed)
-  const fetchDemo = async () => {
-    try {
-      const response = await fetch("/api/demo");
-      const data = (await response.json()) as DemoResponse;
-      setExampleFromServer(data.message);
-    } catch (error) {
-      console.error("Error fetching hello:", error);
-    }
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
-      <div className="text-center">
-        {/* TODO: FUSION_GENERATION_APP_PLACEHOLDER replace everything here with the actual app! */}
-        <h1 className="text-2xl font-semibold text-slate-800 flex items-center justify-center gap-3">
-          <svg
-            className="animate-spin h-8 w-8 text-slate-400"
-            viewBox="0 0 50 50"
-          >
-            <circle
-              className="opacity-30"
-              cx="25"
-              cy="25"
-              r="20"
-              stroke="currentColor"
-              strokeWidth="5"
-              fill="none"
-            />
-            <circle
-              className="text-slate-600"
-              cx="25"
-              cy="25"
-              r="20"
-              stroke="currentColor"
-              strokeWidth="5"
-              fill="none"
-              strokeDasharray="100"
-              strokeDashoffset="75"
-            />
-          </svg>
-          Generating your app...
-        </h1>
-        <p className="mt-4 text-slate-600 max-w-md">
-          Watch the chat on the left for updates that might need your attention
-          to finish generating
-        </p>
-        <p className="mt-4 hidden max-w-md">{exampleFromServer}</p>
+    <DashboardLayout>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 h-full">
+        <ChartWidget
+          title="Sales Over Time"
+          className="md:col-span-1 lg:col-span-1"
+        >
+          <SalesOverTimeChart />
+        </ChartWidget>
+
+        <ChartWidget
+          title="Revenue by Category"
+          className="md:col-span-1 lg:col-span-1"
+        >
+          <RevenueByCategoryChart />
+        </ChartWidget>
+
+        <ChartWidget
+          title="KPI"
+          className="md:col-span-1 lg:col-span-1 row-span-2"
+        >
+          <KPIWidget />
+        </ChartWidget>
+
+        <ChartWidget title="Order Data" className="md:col-span-2 lg:col-span-1">
+          <OrderDataTable />
+        </ChartWidget>
+
+        <ChartWidget
+          title="Sales Distribution"
+          className="md:col-span-1 lg:col-span-1"
+        >
+          <SalesDistributionChart />
+        </ChartWidget>
+
+        <ChartWidget
+          title="Profit Margin"
+          className="md:col-span-2 lg:col-span-2"
+        >
+          <ProfitMarginChart />
+        </ChartWidget>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
