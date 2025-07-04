@@ -31,6 +31,8 @@ interface EditingToolbarProps {
   onRedo?: () => any;
   canUndo?: boolean;
   canRedo?: boolean;
+  onSave?: () => void;
+  onExport?: () => void;
 }
 
 export default function EditingToolbar({
@@ -38,6 +40,8 @@ export default function EditingToolbar({
   onRedo,
   canUndo = false,
   canRedo = false,
+  onSave,
+  onExport,
 }: EditingToolbarProps) {
   const [selectedTool, setSelectedTool] = useState("select");
   const [showGrid, setShowGrid] = useState(true);
@@ -82,7 +86,9 @@ export default function EditingToolbar({
           <Button
             variant="ghost"
             size="sm"
+            onClick={onSave}
             className="text-dashboard-text hover:bg-dashboard-muted"
+            title="Save Dashboard (Ctrl+S)"
           >
             <Save className="w-4 h-4 mr-2" />
             Save
@@ -90,7 +96,9 @@ export default function EditingToolbar({
           <Button
             variant="ghost"
             size="sm"
+            onClick={onExport}
             className="text-dashboard-text hover:bg-dashboard-muted"
+            title="Export Dashboard"
           >
             <Download className="w-4 h-4 mr-2" />
             Export
