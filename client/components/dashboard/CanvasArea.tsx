@@ -8,6 +8,7 @@ import SmartChart from "./SmartChart";
 import RevenueByCategoryChart from "./RevenueByCategoryChart";
 import KPIWidget from "./KPIWidget";
 import SalesDistributionChart from "./SalesDistributionChart";
+import DynamicChart from "./DynamicChart";
 
 interface ChartPosition {
   x: number;
