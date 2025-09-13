@@ -1,6 +1,6 @@
 # Project Overview
 
-**Haven** is a production-ready full-stack React application template featuring a modern SPA frontend with integrated Express API backend. It’s built with TypeScript, Vite, React Router 6, TailwindCSS 3, and a comprehensive UI component library.
+**Haven** is a dynamic chart-building platform inspired by leading Business Intelligence (BI) tools. It enables users to interactively create, customize, and visualize charts—such as line, bar, pie, KPI, and more—directly within the app. The system features a flexible property manager for each chart type, real-time editing, and intuitive dashboards, making it ideal for analytics, reporting, and data-driven decision making.
 
 ## Key Features
 
